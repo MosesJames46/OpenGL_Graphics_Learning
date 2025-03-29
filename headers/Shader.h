@@ -1,11 +1,8 @@
 #pragma once
-#include <glad/glad.h>
-#include <glm-master/glm/glm.hpp>
-#include <glm-master/glm/gtc/type_ptr.hpp>
+#include "libs.h"
 #include <sstream>
-#include <iostream>
 #include <fstream>
-#include <vector>
+#include <../glm/gtc/type_ptr.hpp>
 
 
 class Shader {
@@ -30,8 +27,4 @@ public:
 	void setVec3(const std::string& name, glm::vec3 vector);
 	void setVec4(const std::string& name, glm::vec4 vector);
 
-	void setPointLightStruct(
-		std::string& name, glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse,
-		glm::vec3 specular, float constant, float linear, float quadratic
-	);
 };
