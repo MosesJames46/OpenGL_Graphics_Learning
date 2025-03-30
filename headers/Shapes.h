@@ -1,5 +1,6 @@
 #pragma once
 #include "libs.h"
+#include "Shader.h"
 #include <iostream>
 #include <vector>
 
@@ -18,6 +19,9 @@ public:
 	void gen_bind_format(std::vector<float>& vertices, std::vector<unsigned int>& indices, unsigned int& VAO, unsigned int& VBO, unsigned int& EBO);
 	void gen_bind_format(std::vector<float>& vertices, unsigned int& VAO, unsigned int& VBO);
 	void unbind_buffers_and_attribute_pointer();
+
+	void attach_uniform(Shader& shader, const char* uniform_name, std::vector<float>& color);
+	void attach_uniform(Shader& shader, const char* uniform_name, std::vector<float>&& color);
 
 	template <typename T>
 	void print_data(T data) {

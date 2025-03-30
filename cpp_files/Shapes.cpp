@@ -52,3 +52,14 @@ void Shape::unbind_buffers_and_attribute_pointer() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glEnableVertexAttribArray(0);
 }
+
+void Shape::attach_uniform(Shader& shader, const char* uniform_name, std::vector<float>& color) {
+	int uniform_location = glGetUniformLocation(shader.programShaderID, uniform_name);
+	glUniform4f(uniform_location, color[0], color[1], color[2], 1.0f);
+}
+
+void Shape::attach_uniform(Shader& shader, const char* uniform_name, std::vector<float>&& color) {
+	int uniform_location = glGetUniformLocation(shader.programShaderID, uniform_name);
+	shader.useProgram();
+	glUniform4f(uniform_location, color[0], color[1], color[2], 1.0f);
+}

@@ -5,3 +5,4 @@ void Triangle::draw(Shader shader, int start, int vertex_count) {
 	glBindVertexArray(triangle_VAO);
 	glDrawArrays(GL_TRIANGLES, start, vertex_count);
 }
+
