@@ -1,6 +1,7 @@
 #include "headers/libs.h"
+#include "headers/Triangle.h"
+#include "headers/Square.h"
 #include "headers/Shader.h"
-#include <iostream>
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -26,17 +27,21 @@ int main() {
 	}
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
+	Shader s("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
+	Triangle t;
+	Square square;
 	
 
 	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
 
+		t.draw(s, 0, 3);
+		square.draw(s, 6);
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
-
+	s.delete_program_shader();
 	glfwTerminate();
 
 	return 0;

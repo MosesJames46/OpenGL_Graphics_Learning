@@ -25,19 +25,25 @@
     <ClInclude Include="headers\Shader.h" />
     <ClInclude Include="headers\Shapes.h" />
     <ClInclude Include="headers\Image.h" />
+    <ClInclude Include="headers\Square.h" />
+    <ClInclude Include="headers\Triangle.h" />
     <ClInclude Include="stb_imageloader_header\stb_image.h" />
     <ClInclude Include="headers\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cpp_files\Square.cpp" />
     <ClCompile Include="glad3.3\src\glad.c" />
-    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="cpp_files\Image.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="stb_image.cpp" />
-    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="cpp_files\Shader.cpp" />
+    <ClCompile Include="cpp_files\Shapes.cpp" />
+    <ClCompile Include="cpp_files\stb_image.cpp" />
+    <ClCompile Include="cpp_files\Texture.cpp" />
+    <ClCompile Include="cpp_files\Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="vertex_shader.glsl" />
+    <None Include="shaders\fragment_shader.glsl" />
+    <None Include="shaders\vertex_shader.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

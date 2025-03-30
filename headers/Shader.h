@@ -3,6 +3,8 @@
 #include <sstream>
 #include <fstream>
 #include <../glm/gtc/type_ptr.hpp>
+#include <iostream>
+#include <vector>
 
 
 class Shader {
@@ -15,11 +17,11 @@ public:
 	void transfer_from_file_to_stream(const char* vertex_file_path, const char* fragment_file_path, std::string& vertex_string,
 		std::string& fragment_string, std::ifstream& vertex_file, std::ifstream& fragment_file);
 	unsigned int compile_shader(GLenum shader_type, const char* source_file_path);
-	std::vector<unsigned int> get_compiled_vertex_and_fragment_shader(const char* vertex_file_path, const char* fragment_file_path);
-	std::vector<unsigned int> compile_and_check_frag_vertex_shader(const char* vertex_shader_file_path, const char* fragment_shader_file_path, int success_value);
+	std::vector<unsigned int> compile_and_check_frag_vertex_shader(const char* vertex_shader_glsl_code, const char* fragment_shader_glsl_code, int success_value);
 	void get_shader_iv(unsigned int shader, GLenum compilation_type, int success_value);
 	void link_program_shader(unsigned int vertex_shader, unsigned int fragment_shader);
 	void delete_shader(unsigned int shader);
+	void delete_program_shader();
 	void setBool(const std::string& name, bool value);
 	void setInt(const std::string& name, int value);
 	void setFloat(const std::string& name, float value);

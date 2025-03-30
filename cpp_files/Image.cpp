@@ -1,4 +1,4 @@
-#include "headers/Image.h"
+#include "../headers/Image.h"
 
 
 

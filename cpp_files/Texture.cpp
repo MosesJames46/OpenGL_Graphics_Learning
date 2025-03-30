@@ -1,4 +1,4 @@
-#include "headers/Texture.h"
+#include "../headers/Texture.h"
 
 void Texture::generate_and_bind_texture() {
 	glGenTextures(1, &texture);

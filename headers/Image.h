@@ -1,5 +1,6 @@
 #pragma once
-#include "headers/libs.h"
+#include "libs.h"
+#include "stb_image.h"
 
 class Image {
 public:

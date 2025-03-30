@@ -1,5 +1,5 @@
 #pragma once
-#include "headers/libs.h"
+#include "libs.h"
 
 class Texture {
 public:

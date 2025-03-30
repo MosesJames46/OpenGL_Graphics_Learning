@@ -1,6 +1,5 @@
-#include "Shader.h"
+#include "../headers/Shader.h"
 
-#include "Shader.h"
 Shader::Shader(const char* vertex_file_path, const char* fragment_file_path) {
 	//These will eventually hold the source code for the vert/frag shaders
 	std::string vertex_string;
@@ -12,13 +11,12 @@ Shader::Shader(const char* vertex_file_path, const char* fragment_file_path) {
 	vertex_file_stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	fragment_file_stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	transfer_from_file_to_stream(vertex_file_path, fragment_file_path, vertex_string, fragment_string, vertex_file_stream, fragment_file_stream);
-
-	const char* vertex_shader_file_path = vertex_string.c_str();
-	const char* fragment_shader_file_path = fragment_string.c_str();
+	const char* vertex_shader_glsl_code = vertex_string.c_str();
+	const char* fragment_shader_glsl_code = fragment_string.c_str();
 	int success = 0;
 	char infoLog[512];
 
-	std::vector<unsigned int> compiled_shaders = compile_and_check_frag_vertex_shader(vertex_file_path, fragment_file_path, success);
+	std::vector<unsigned int> compiled_shaders = compile_and_check_frag_vertex_shader(vertex_shader_glsl_code, fragment_shader_glsl_code, success);
 
 	link_program_shader(compiled_shaders[0], compiled_shaders[1]);
 
@@ -33,17 +31,15 @@ Shader::Shader(const char* vertex_file_path, const char* fragment_file_path) {
 	delete_shader(compiled_shaders[1]);
 }
 
-std::vector<unsigned int> Shader::get_compiled_vertex_and_fragment_shader(const char* vertex_file_path, const char* fragment_file_path) {
-	unsigned int vertex_shader = compile_shader(GL_VERTEX_SHADER, vertex_file_path);
-	unsigned int fragment_shader = compile_shader(GL_FRAGMENT_SHADER, fragment_file_path);
-	return { vertex_shader, fragment_shader };
-}
-
 void Shader::delete_shader(unsigned int shader) {
 	glDeleteShader(shader);
 }
 
-void Shader::get_shader_iv(unsigned int shader,GLenum compile_type, int success_value) {
+void Shader::delete_program_shader() {
+	glDeleteProgram(programShaderID);
+}
+
+void Shader::get_shader_iv(unsigned int shader, GLenum compile_type, int success_value) {
 	char info[512];
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success_value);
 	if (!success_value) {
@@ -126,15 +122,4 @@ void Shader::setVec4(const std::string& name, glm::vec4 vector) {
 	glUniform3fv(glGetUniformLocation(programShaderID, name.c_str()), 1, glm::value_ptr(vector));
 }
 
-void Shader::setPointLightStruct(
-	std::string& name, glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse,
-	glm::vec3 specular, float constant, float linear, float quadratic
-) {
-	setVec3(name + ".position", position);
-	setVec3(name + ".ambient", ambient);
-	setVec3(name + ".diffuse", diffuse);
-	setVec3(name + ".specular", specular);
-	setFloat(name + ".constant", constant);
-	setFloat(name + ".linear", linear);
-	setFloat(name + ".quadratic", quadratic);
-}
+

@@ -1,0 +1,54 @@
+#include "../headers/Shapes.h"
+
+void Shape::generate_and_bind_buffers(unsigned int& uninitialized_VAO, unsigned int& uninitialized_VBO, unsigned int& uninitialized_EBO) {
+	glGenVertexArrays(1, &uninitialized_VAO);
+	glGenBuffers(1, &uninitialized_VBO);
+	glGenBuffers(1, &uninitialized_EBO);
+
+	glBindVertexArray(uninitialized_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, uninitialized_VBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, uninitialized_EBO);
+}
+
+void Shape::generate_and_bind_buffers(unsigned int& uninitialized_VAO, unsigned int& uninitialized_VBO) {
+	glGenVertexArrays(1, &uninitialized_VAO);
+	glGenBuffers(1, &uninitialized_VBO);
+
+	glBindVertexArray(uninitialized_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, uninitialized_VBO);
+}
+
+
+void Shape::format_buffer(std::vector<float>& vertex_data, GLenum draw_type) {
+	glBufferData(GL_ARRAY_BUFFER, vertex_data.size() * sizeof(vertex_data[0]), vertex_data.data(), draw_type);
+}
+
+void Shape::format_buffer(std::vector<float>& vertex_data, std::vector<unsigned int>& index_data, GLenum draw_type) {
+	glBufferData(GL_ARRAY_BUFFER, vertex_data.size() * sizeof(vertex_data[0]), vertex_data.data(), draw_type);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_data.size() * sizeof(index_data[0]), index_data.data(), draw_type);
+
+}
+
+void Shape::set_attributes(int attribute_position, int attribute_size, GLenum numerical_type, GLboolean normalized, int stride_size, int offset) {
+	glVertexAttribPointer(attribute_position, attribute_size, numerical_type, normalized, stride_size * sizeof(float), reinterpret_cast<void*>(offset * sizeof(float)));
+	glEnableVertexAttribArray(attribute_position);
+}
+void Shape::set_attributes(int attribute_position, int attribute_size, int stride_size, int offset) {
+	glVertexAttribPointer(attribute_position, attribute_size, GL_FLOAT, GL_FALSE, stride_size * sizeof(float), reinterpret_cast<void*>(offset * sizeof(float)));
+	glEnableVertexAttribArray(attribute_position);
+}
+
+void Shape::gen_bind_format(std::vector<float>& vertices, unsigned int& VAO, unsigned int& VBO) {
+	generate_and_bind_buffers(VAO, VBO);
+	format_buffer(vertices, GL_STATIC_DRAW);
+}
+
+void Shape::gen_bind_format(std::vector<float>& vertices, std::vector<unsigned int>& indices, unsigned int& VAO, unsigned int& VBO, unsigned int& EBO) {
+	generate_and_bind_buffers(VAO, VBO, EBO);
+	format_buffer(vertices, indices, GL_STATIC_DRAW);
+}
+
+void Shape::unbind_buffers_and_attribute_pointer() {
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glEnableVertexAttribArray(0);
+}
