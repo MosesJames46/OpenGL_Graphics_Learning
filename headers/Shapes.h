@@ -2,6 +2,7 @@
 #include "libs.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "Texture.h"
 #include <iostream>
 #include <vector>
 
@@ -28,6 +29,10 @@ public:
 
 	void attach_uniform(Shader& shader, const char* uniform_name, std::vector<float>& color);
 	void attach_uniform(Shader& shader, const char* uniform_name, std::vector<float>&& color);
+
+	void bind_textures(Shader& shader, std::vector<const char*>&& uniform_names, std::vector<Texture>& texture_vector);
+	void bind_textures(Shader& shader, std::vector<const char*>& uniform_names, std::vector<Texture>& texture_vector);
+	void add_textures(std::vector<const char*> file_paths, std::vector<Texture>& texture_vector);
 
 	template <typename T>
 	void print_data(T data) {

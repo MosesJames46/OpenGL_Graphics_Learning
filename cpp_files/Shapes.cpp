@@ -83,3 +83,31 @@ void Shape::attach_uniform(Shader& shader, const char* uniform_name, std::vector
 	shader.useProgram();
 	glUniform4f(uniform_location, color[0], color[1], color[2], 1.0f);
 }
+
+void Shape::bind_textures(Shader& shader, std::vector<const char*>& uniform_names, std::vector<Texture>& texture_vector) {
+	if (!texture_vector.empty()) {
+		for (int i = 0; i < texture_vector.size(); i++) {
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texture_vector[i].texture);
+			shader.set_uniform_location(uniform_names[i], (int)i);
+		}
+	}
+}
+
+void Shape::bind_textures(Shader& shader, std::vector<const char*>&& uniform_names, std::vector<Texture>& texture_vector) {
+	if (!texture_vector.empty()) {
+		for (int i = 0; i < texture_vector.size(); i++) {
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texture_vector[i].texture);
+			shader.set_uniform_location(uniform_names[i], (int)i);
+		}
+	}
+}
+
+void Shape::add_textures(std::vector<const char*> file_paths, std::vector<Texture>& texture_vector) {
+	for (int i = 0; i < file_paths.size(); i++) {
+		Texture T;
+		texture_vector.push_back(T);
+		texture_vector[i].create_texture(file_paths[i]);
+	}
+}

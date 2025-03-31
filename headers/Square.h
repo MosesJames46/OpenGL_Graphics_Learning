@@ -18,15 +18,11 @@ public:
 
 	void initialize_mesh();
 	void ready_buffers();
-	void bind_textures(Shader& shader, std::vector<const char*>&& uniform_names);
-	void bind_textures(Shader& shader, std::vector<const char*>& uniform_names);
-	void add_textures(std::vector<const char*> file_paths);
 
 	void draw(Shader shader, int number_of_indices);
 	void draw(Shader& shader, int number_of_indices, std::vector<const char*>&& uniform_names);
 	void draw(Shader& shader, int number_of_indices, std::vector<const char*>& uniform_names);
 
-private:
 	Mesh mesh;
 
 	std::vector<unsigned int> square_indices{

@@ -30,9 +30,9 @@ int main() {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	Shader s("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
 	Triangle t("pictures/wall.jpg");
-	//t.add_textures({ "pictures/awesomeface.png", "pictures/wall.jpg" });
+	t.add_textures({ "pictures/awesomeface.png", "pictures/wall.jpg" }, t.triangle_textures);
 	Square square;
-	square.add_textures({ "pictures/awesomeface.png", "pictures/wall.jpg"});
+	square.add_textures({ "pictures/awesomeface.png", "pictures/wall.jpg"}, square.square_textures);
 
 	glm::mat4 transform = glm::mat4(1.0f);
 	transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -51,7 +51,7 @@ int main() {
 		s.set_uniform_location("projection", projection);
 		s.set_uniform_location("view", view);
 		s.set_uniform_location("model", model);
-		//t.draw(s, { "texture_one", "texture_two" });
+		t.draw(s, { "texture_one", "texture_two" });
 		square.draw(s, 6, {"texture_one", "texture_two"});
 		glfwPollEvents();
 		glfwSwapBuffers(window);

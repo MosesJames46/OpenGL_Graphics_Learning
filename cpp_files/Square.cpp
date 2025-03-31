@@ -8,14 +8,14 @@ void Square::draw(Shader shader, int number_of_indices) {
 
 void Square::draw(Shader& shader, int number_of_indices, std::vector<const char*>& uniform_names) {
 	shader.useProgram();
-	bind_textures(shader, uniform_names);
+	bind_textures(shader, uniform_names, square_textures);
 	glBindVertexArray(square_VAO);
 	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
 }
 
 void Square::draw(Shader& shader, int number_of_indices, std::vector<const char*>&& uniform_names) {
 	shader.useProgram();
-	bind_textures(shader, uniform_names);
+	bind_textures(shader, uniform_names, square_textures);
 	glBindVertexArray(square_VAO);
 	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
 }
@@ -37,32 +37,4 @@ void Square::ready_buffers() {
 	set_attributes(1, 3, 8, 3);
 	set_attributes(2, 2, 8, 6);
 	unbind_buffers_and_attribute_pointer();
-}
-
-void Square::bind_textures(Shader& shader, std::vector<const char*>& uniform_names) {
-	if (!square_textures.empty()) {
-		for (int i = 0; i < square_textures.size(); i++) {
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, square_textures[i].texture);
-			shader.set_uniform_location(uniform_names[i], (int)i);
-		}
-	}
-}
-
-void Square::bind_textures(Shader& shader, std::vector<const char*>&& uniform_names) {
-	if (!square_textures.empty()) {
-		for (int i = 0; i < square_textures.size(); i++) {
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, square_textures[i].texture);
-			shader.set_uniform_location(uniform_names[i], (int)i);
-		}
-	}
-}
-
-void Square::add_textures(std::vector<const char*> file_paths) {
-	for (int i = 0; i < file_paths.size(); i++) {
-		Texture T;
-		square_textures.push_back(T);
-		square_textures[i].create_texture(file_paths[i]);
-	}
 }

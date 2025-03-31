@@ -8,14 +8,14 @@ void Triangle::draw(Shader shader) {
 
 void Triangle::draw(Shader& shader, std::vector<const char*>& uniform_names) {
 	shader.useProgram();
-	bind_textures(shader, uniform_names);
+	bind_textures(shader, uniform_names, triangle_textures);
 	glBindVertexArray(triangle_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void Triangle::draw(Shader& shader, std::vector<const char*>&& uniform_names) {
 	shader.useProgram();
-	bind_textures(shader, uniform_names);
+	bind_textures(shader, uniform_names, triangle_textures);
 	glBindVertexArray(triangle_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
@@ -38,31 +38,3 @@ void Triangle::initialize_mesh() {
 	vertex_data.load_vertex(vertex_three);
 }
 
-
-void Triangle::bind_textures(Shader& shader, std::vector<const char*>& uniform_names) {
-	if (!triangle_textures.empty()) {
-		for (int i = 0; i < triangle_textures.size(); i++) {
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, triangle_textures[i].texture);
-			shader.set_uniform_location(uniform_names[i], (int)i);
-		}
-	}
-}
-
-void Triangle::bind_textures(Shader& shader, std::vector<const char*>&& uniform_names) {
-	if (!triangle_textures.empty()) {
-		for (int i = 0; i < triangle_textures.size(); i++) {
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, triangle_textures[i].texture);
-			shader.set_uniform_location(uniform_names[i], (int)i);
-		}
-	}
-}
-
-void Triangle::add_textures(std::vector<const char*> file_paths) {
-	for (int i = 0; i < file_paths.size(); i++) {
-		Texture T;
-		triangle_textures.push_back(T);
-		triangle_textures[i].create_texture(file_paths[i]);
-	}
-}

@@ -1,6 +1,6 @@
 #pragma once
-#include "Square.h"
+#include "Shapes.h"
 
-class Cube {
+class Cube : Shape{
 
 };
