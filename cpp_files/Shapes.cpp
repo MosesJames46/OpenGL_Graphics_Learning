@@ -34,9 +34,8 @@ void Shape::format_buffer(std::vector<float>& vertex_data, std::vector<unsigned 
 }
 
 void Shape::format_buffer(Mesh& vertex_data, std::vector<unsigned int>& index_data, GLenum draw_type) {
-	glBufferData(GL_ARRAY_BUFFER, vertex_data.mesh.size() * sizeof(Vertex), vertex_data.mesh.data(), draw_type);
+	glBufferData(GL_ARRAY_BUFFER, vertex_data.mesh.size() * sizeof(float), vertex_data.mesh.data(), draw_type);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_data.size() * sizeof(index_data[0]), index_data.data(), draw_type);
-
 }
 
 void Shape::set_attributes(int attribute_position, int attribute_size, GLenum numerical_type, GLboolean normalized, int stride_size, int offset) {
