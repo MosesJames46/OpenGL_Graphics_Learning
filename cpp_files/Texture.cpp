@@ -32,7 +32,7 @@ void Texture::apply_texture(const char* image_path) {
 
 void Texture::create_texture(const char* image_path) {
 	generate_and_bind_texture();
-	set_texture_2D_paramteri(GL_REPEAT, GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR);
+	set_texture_2D_paramteri(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 	apply_texture(image_path);
 }
 

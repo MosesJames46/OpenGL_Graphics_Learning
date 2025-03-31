@@ -18,10 +18,6 @@ public:
 		ready_buffers();
 	}
 
-	void draw(Shader shader);
-	void draw(Shader& shader, std::vector<const char*>&& uniform_names);
-	void draw(Shader& shader, std::vector<const char*>& uniform_names);
-
 	void ready_buffers();
 	void initialize_mesh();
 	

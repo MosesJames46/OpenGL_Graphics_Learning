@@ -1,6 +1,7 @@
 #include "headers/libs.h"
 #include "headers/Triangle.h"
 #include "headers/Square.h"
+#include "headers/Cube.h"
 #include "headers/Shader.h"
 #include "headers/Texture.h"
 
@@ -29,30 +30,29 @@ int main() {
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	Shader s("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
-	Triangle t("pictures/wall.jpg");
-	t.add_textures({ "pictures/awesomeface.png", "pictures/wall.jpg" }, t.triangle_textures);
-	Square square;
-	square.add_textures({ "pictures/awesomeface.png", "pictures/wall.jpg"}, square.square_textures);
 
-	glm::mat4 transform = glm::mat4(1.0f);
-	transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	transform = glm::scale(transform, glm::vec3(0.5f, 0.5f, 0.5f));
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1980.0f / 1080.0f, 0.1f, 100.0f);
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 view = glm::mat4(1.0f);
+
 	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	Cube cube;
+	cube.add_textures({ "pictures/awesomeface.png", "pictures/wall.jpg" }, cube.cube_textures);
 
 	while (!glfwWindowShouldClose(window)) {
 
 		glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		s.set_uniform_location("projection", projection);
 		s.set_uniform_location("view", view);
 		s.set_uniform_location("model", model);
-		t.draw(s, { "texture_one", "texture_two" });
-		square.draw(s, 6, {"texture_one", "texture_two"});
+		cube.draw(s, cube.cube_VAO, cube.cube_indices.size(), {"texture_one", "texture_two"}, cube.cube_textures);
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}

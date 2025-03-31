@@ -111,3 +111,43 @@ void Shape::add_textures(std::vector<const char*> file_paths, std::vector<Textur
 		texture_vector[i].create_texture(file_paths[i]);
 	}
 }
+
+void Shape::draw(Shader shader,unsigned int VAO, int number_of_indices) {
+	shader.useProgram();
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
+}
+
+void Shape::draw(Shader& shader,unsigned int VAO, int number_of_indices, std::vector<const char*>& uniform_names, std::vector<Texture>& texture) {
+	shader.useProgram();
+	bind_textures(shader, uniform_names, texture);
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
+}
+
+void Shape::draw(Shader& shader,unsigned int VAO, int number_of_indices, std::vector<const char*>&& uniform_names, std::vector<Texture>& texture) {
+	shader.useProgram();
+	bind_textures(shader, uniform_names, texture);
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
+}
+
+void Shape::draw(Shader shader, unsigned int VAO) {
+	shader.useProgram();
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+void Shape::draw(Shader& shader,unsigned int VAO, std::vector<const char*>& uniform_names, std::vector<Texture>& texture) {
+	shader.useProgram();
+	bind_textures(shader, uniform_names, texture);
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+void Shape::draw(Shader& shader,unsigned int VAO, std::vector<const char*>&& uniform_names, std::vector<Texture>& texture) {
+	shader.useProgram();
+	bind_textures(shader, uniform_names, texture);
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+}

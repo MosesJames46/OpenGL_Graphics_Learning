@@ -1,24 +1,5 @@
 #include "../headers/Square.h"
 
-void Square::draw(Shader shader, int number_of_indices) {
-	shader.useProgram();
-	glBindVertexArray(square_VAO);
-	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
-}
-
-void Square::draw(Shader& shader, int number_of_indices, std::vector<const char*>& uniform_names) {
-	shader.useProgram();
-	bind_textures(shader, uniform_names, square_textures);
-	glBindVertexArray(square_VAO);
-	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
-}
-
-void Square::draw(Shader& shader, int number_of_indices, std::vector<const char*>&& uniform_names) {
-	shader.useProgram();
-	bind_textures(shader, uniform_names, square_textures);
-	glBindVertexArray(square_VAO);
-	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
-}
 
 void Square::initialize_mesh() {
 	Vertex vertex_one(glm::vec3{ -0.5f, -0.5f, 0.0f }, glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec2{ 0.0f, 0.0f });

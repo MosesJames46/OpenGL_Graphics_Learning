@@ -1,26 +1,4 @@
 #include "../headers/Triangle.h"
-
-void Triangle::draw(Shader shader) {
-	shader.useProgram();
-	glBindVertexArray(triangle_VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-}
-
-void Triangle::draw(Shader& shader, std::vector<const char*>& uniform_names) {
-	shader.useProgram();
-	bind_textures(shader, uniform_names, triangle_textures);
-	glBindVertexArray(triangle_VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-}
-
-void Triangle::draw(Shader& shader, std::vector<const char*>&& uniform_names) {
-	shader.useProgram();
-	bind_textures(shader, uniform_names, triangle_textures);
-	glBindVertexArray(triangle_VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-}
-
-
 void Triangle::ready_buffers() {
 	gen_bind_format(vertex_data, triangle_VAO, triangle_VBO);
 	set_attributes(0, 3, 8, 0);

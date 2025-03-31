@@ -34,6 +34,8 @@
     <ClInclude Include="headers\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cpp_files\Cube.cpp" />
+    <ClCompile Include="cpp_files\Mesh.cpp" />
     <ClCompile Include="cpp_files\Square.cpp" />
     <ClCompile Include="glad3.3\src\glad.c" />
     <ClCompile Include="cpp_files\Image.cpp" />

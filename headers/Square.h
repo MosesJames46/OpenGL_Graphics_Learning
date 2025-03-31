@@ -19,9 +19,6 @@ public:
 	void initialize_mesh();
 	void ready_buffers();
 
-	void draw(Shader shader, int number_of_indices);
-	void draw(Shader& shader, int number_of_indices, std::vector<const char*>&& uniform_names);
-	void draw(Shader& shader, int number_of_indices, std::vector<const char*>& uniform_names);
 
 	Mesh mesh;
 

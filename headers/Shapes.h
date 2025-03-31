@@ -34,6 +34,13 @@ public:
 	void bind_textures(Shader& shader, std::vector<const char*>& uniform_names, std::vector<Texture>& texture_vector);
 	void add_textures(std::vector<const char*> file_paths, std::vector<Texture>& texture_vector);
 
+	void draw(Shader shader, unsigned int VAO, int number_of_indices);
+	void draw(Shader& shader, unsigned int VAO, int number_of_indices, std::vector<const char*>&& uniform_names, std::vector<Texture>& texture);
+	void draw(Shader& shader, unsigned int VAO, int number_of_indices, std::vector<const char*>& uniform_names, std::vector<Texture>& texture);
+	void draw(Shader shader, unsigned int VAO);
+	void draw(Shader& shader, unsigned int VAO, std::vector<const char*>&& uniform_names, std::vector<Texture>& texture);
+	void draw(Shader& shader, unsigned int VAO, std::vector<const char*>& uniform_names, std::vector<Texture>& texture);
+
 	template <typename T>
 	void print_data(T data) {
 		std::cout << data << "\n";
