@@ -22,9 +22,11 @@ public:
 	void link_program_shader(unsigned int vertex_shader, unsigned int fragment_shader);
 	void delete_shader(unsigned int shader);
 	void delete_program_shader();
-	void setBool(const std::string& name, bool value);
-	void setInt(const std::string& name, int value);
-	void setFloat(const std::string& name, float value);
+
+	void set_uniform_location(const char* uniform_name, int value);
+	void set_uniform_location(const char* uniform_name, float value);
+	void set_uniform_location(const char* uniform_name, bool value);
+	void set_uniform_location(const char* uniform_name, glm::mat4 matrix);
 	void setMat4(const std::string& name, glm::mat4 matrix);
 	void setVec3(const std::string& name, glm::vec3 vector);
 	void setVec4(const std::string& name, glm::vec4 vector);

@@ -1,24 +1,33 @@
 #pragma once
 #include "Shapes.h"
 #include "Shader.h"
+#include "Mesh.h"
+#include "Texture.h"
 
 class Square : public Shape {
 public:
 	Square() {
-		gen_bind_format(square_vertices, square_indices, square_VAO, square_VBO, square_EBO);
-		set_attributes(0, 3, 3, 0);
-		unbind_buffers_and_attribute_pointer();
+		initialize_mesh();
+		ready_buffers();
 	}
 
+	Square(const char* image_path) {
+		initialize_mesh();
+		ready_buffers();
+	}
+
+	void initialize_mesh();
+	void ready_buffers();
+	void bind_textures(Shader& shader, std::vector<const char*>&& uniform_names);
+	void bind_textures(Shader& shader, std::vector<const char*>& uniform_names);
+	void add_textures(std::vector<const char*> file_paths);
+
 	void draw(Shader shader, int number_of_indices);
+	void draw(Shader& shader, int number_of_indices, std::vector<const char*>&& uniform_names);
+	void draw(Shader& shader, int number_of_indices, std::vector<const char*>& uniform_names);
 
 private:
-	std::vector<float> square_vertices{
-		-0.5f, -0.5f, 0.0f,
-		-0.5f, 0.5f, 0.0f,
-		0.5f, 0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f
-	};
+	Mesh mesh;
 
 	std::vector<unsigned int> square_indices{
 		0, 1, 2,
@@ -26,4 +35,5 @@ private:
 	};
 
 	unsigned int square_VAO, square_VBO, square_EBO;
+	std::vector<Texture> square_textures;
 };

@@ -23,8 +23,18 @@ void Shape::format_buffer(std::vector<float>& vertex_data, GLenum draw_type) {
 	glBufferData(GL_ARRAY_BUFFER, vertex_data.size() * sizeof(vertex_data[0]), vertex_data.data(), draw_type);
 }
 
+void Shape::format_buffer(Mesh& vertex_data, GLenum draw_type) {
+	glBufferData(GL_ARRAY_BUFFER,  vertex_data.mesh.size() * sizeof(Vertex), vertex_data.mesh.data(), draw_type);
+}
+
 void Shape::format_buffer(std::vector<float>& vertex_data, std::vector<unsigned int>& index_data, GLenum draw_type) {
 	glBufferData(GL_ARRAY_BUFFER, vertex_data.size() * sizeof(vertex_data[0]), vertex_data.data(), draw_type);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_data.size() * sizeof(index_data[0]), index_data.data(), draw_type);
+
+}
+
+void Shape::format_buffer(Mesh& vertex_data, std::vector<unsigned int>& index_data, GLenum draw_type) {
+	glBufferData(GL_ARRAY_BUFFER, vertex_data.mesh.size() * sizeof(Vertex), vertex_data.mesh.data(), draw_type);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_data.size() * sizeof(index_data[0]), index_data.data(), draw_type);
 
 }
@@ -43,7 +53,17 @@ void Shape::gen_bind_format(std::vector<float>& vertices, unsigned int& VAO, uns
 	format_buffer(vertices, GL_STATIC_DRAW);
 }
 
+void Shape::gen_bind_format(Mesh& vertices, unsigned int& VAO, unsigned int& VBO) {
+	generate_and_bind_buffers(VAO, VBO);
+	format_buffer(vertices, GL_STATIC_DRAW);
+}
+
 void Shape::gen_bind_format(std::vector<float>& vertices, std::vector<unsigned int>& indices, unsigned int& VAO, unsigned int& VBO, unsigned int& EBO) {
+	generate_and_bind_buffers(VAO, VBO, EBO);
+	format_buffer(vertices, indices, GL_STATIC_DRAW);
+}
+
+void Shape::gen_bind_format(Mesh& vertices, std::vector<unsigned int>& indices, unsigned int& VAO, unsigned int& VBO, unsigned int& EBO) {
 	generate_and_bind_buffers(VAO, VBO, EBO);
 	format_buffer(vertices, indices, GL_STATIC_DRAW);
 }

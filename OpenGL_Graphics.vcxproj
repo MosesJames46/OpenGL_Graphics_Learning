@@ -21,12 +21,15 @@
   <ItemGroup>
     <ClInclude Include="glad3.3\include\glad\glad.h" />
     <ClInclude Include="glad3.3\include\KHR\khrplatform.h" />
+    <ClInclude Include="headers\Cube.h" />
     <ClInclude Include="headers\libs.h" />
+    <ClInclude Include="headers\Mesh.h" />
     <ClInclude Include="headers\Shader.h" />
     <ClInclude Include="headers\Shapes.h" />
     <ClInclude Include="headers\Image.h" />
     <ClInclude Include="headers\Square.h" />
     <ClInclude Include="headers\Triangle.h" />
+    <ClInclude Include="headers\Vertex.h" />
     <ClInclude Include="stb_imageloader_header\stb_image.h" />
     <ClInclude Include="headers\Texture.h" />
   </ItemGroup>
@@ -44,6 +47,10 @@
   <ItemGroup>
     <None Include="shaders\fragment_shader.glsl" />
     <None Include="shaders\vertex_shader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="pictures\awesomeface.png" />
+    <Image Include="pictures\wall.jpg" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

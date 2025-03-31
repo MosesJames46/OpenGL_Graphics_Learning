@@ -54,6 +54,15 @@
     <ClInclude Include="headers\Square.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\Vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad3.3\src\glad.c">
@@ -91,5 +100,13 @@
     <None Include="shaders\fragment_shader.glsl">
       <Filter>shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="pictures\wall.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="pictures\awesomeface.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
