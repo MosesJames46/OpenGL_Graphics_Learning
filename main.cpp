@@ -4,6 +4,8 @@
 #include "headers/Cube.h"
 #include "headers/Shader.h"
 #include "headers/Texture.h"
+#include "headers/Sphere.h"
+#include "headers/Camera.h"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -35,24 +37,32 @@ int main() {
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 view = glm::mat4(1.0f);
 
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	Cube cube;
 	cube.add_textures({ "pictures/awesomeface.png", "pictures/wall.jpg" }, cube.cube_textures);
 
+	Sphere sphere(72, 36);
+	sphere.set_radius(1.0f);
+	Camera camera;
 	while (!glfwWindowShouldClose(window)) {
 
 		glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
+		camera.get_camera_input(window);
+		view = glm::lookAt(camera.camera_origin, camera.camera_forward + camera.camera_origin, camera.camera_up);
 		s.set_uniform_location("projection", projection);
 		s.set_uniform_location("view", view);
+		
+		//cube.draw(s, cube.cube_VAO, cube.cube_indices.size(), {"texture_one", "texture_two"}, cube.cube_textures);
+		
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3{ 0, 0, 0.0f });
 		s.set_uniform_location("model", model);
-		cube.draw(s, cube.cube_VAO, cube.cube_indices.size(), {"texture_one", "texture_two"}, cube.cube_textures);
+		sphere.draw(s, sphere.sphere_VAO, sphere.sphere_indices.size());
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
@@ -65,3 +75,4 @@ int main() {
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
+
