@@ -2,16 +2,17 @@
 #include "libs.h"
 #include "Shapes.h"
 #include "Mesh.h"
+#include "Shader.h"
 
 class Sphere : public Shape {
 public:
-	Sphere() {
+	Sphere(Shader& shader) : shader(shader){
 		initialize_mesh(36, 18);
 		ready_buffers();
 		unbind_buffers_and_attribute_pointer();
 	}
 
-	Sphere(float sectors, float stacks) : sectors(sectors), stacks(stacks){
+	Sphere(Shader& shader, float sectors, float stacks) : sectors(sectors), stacks(stacks), shader(shader) {
 		initialize_mesh(sectors, stacks);
 		ready_buffers();
 		unbind_buffers_and_attribute_pointer();
@@ -29,4 +30,5 @@ public:
 	unsigned int sphere_VAO, sphere_VBO, sphere_EBO;
 	float radius = 1;
 	float sectors, stacks;
+	Shader shader;
 };

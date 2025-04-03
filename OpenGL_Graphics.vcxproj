@@ -19,10 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="extern\imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="extern\imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="extern\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="extern\imgui\imconfig.h" />
+    <ClInclude Include="extern\imgui\imgui.h" />
+    <ClInclude Include="extern\imgui\imgui_internal.h" />
+    <ClInclude Include="extern\imgui\imstb_rectpack.h" />
+    <ClInclude Include="extern\imgui\imstb_textedit.h" />
+    <ClInclude Include="extern\imgui\imstb_truetype.h" />
     <ClInclude Include="glad3.3\include\glad\glad.h" />
     <ClInclude Include="glad3.3\include\KHR\khrplatform.h" />
     <ClInclude Include="headers\Camera.h" />
     <ClInclude Include="headers\Cube.h" />
+    <ClInclude Include="headers\Gui_Settings.h" />
     <ClInclude Include="headers\libs.h" />
     <ClInclude Include="headers\Mesh.h" />
     <ClInclude Include="headers\Shader.h" />
@@ -36,10 +46,20 @@
     <ClInclude Include="headers\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cpp_files\Camera.cpp" />
     <ClCompile Include="cpp_files\Cube.cpp" />
+    <ClCompile Include="cpp_files\Gui_Settings.cpp" />
     <ClCompile Include="cpp_files\Mesh.cpp" />
     <ClCompile Include="cpp_files\Sphere.cpp" />
     <ClCompile Include="cpp_files\Square.cpp" />
+    <ClCompile Include="extern\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="extern\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="extern\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="extern\imgui\imgui.cpp" />
+    <ClCompile Include="extern\imgui\imgui_demo.cpp" />
+    <ClCompile Include="extern\imgui\imgui_draw.cpp" />
+    <ClCompile Include="extern\imgui\imgui_tables.cpp" />
+    <ClCompile Include="extern\imgui\imgui_widgets.cpp" />
     <ClCompile Include="glad3.3\src\glad.c" />
     <ClCompile Include="cpp_files\Image.cpp" />
     <ClCompile Include="main.cpp" />
@@ -50,12 +70,16 @@
     <ClCompile Include="cpp_files\Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="extern\imgui\misc\debuggers\imgui.natstepfilter" />
     <None Include="shaders\fragment_shader.glsl" />
     <None Include="shaders\vertex_shader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="pictures\awesomeface.png" />
     <Image Include="pictures\wall.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="extern\imgui\misc\debuggers\imgui.natvis" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -110,22 +134,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;C:\Users\Moses James\source\repos\OpenGL_Graphics\glad3.3\include;C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Moses James\source\repos\OpenGL_Graphics\extern\imgui\backends;C:\Users\Moses James\source\repos\OpenGL_Graphics\extern\imgui;C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;C:\Users\Moses James\source\repos\OpenGL_Graphics\glad3.3\include;C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW;$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW\lib;C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;C:\Users\Moses James\source\repos\OpenGL_Graphics\glad3.3\include;C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Moses James\source\repos\OpenGL_Graphics\extern\imgui\backends;C:\Users\Moses James\source\repos\OpenGL_Graphics\extern\imgui;C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;C:\Users\Moses James\source\repos\OpenGL_Graphics\glad3.3\include;C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW;$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW\lib;C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;C:\Users\Moses James\source\repos\OpenGL_Graphics\glad3.3\include;C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Moses James\source\repos\OpenGL_Graphics\extern\imgui\backends;C:\Users\Moses James\source\repos\OpenGL_Graphics\extern\imgui;C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;C:\Users\Moses James\source\repos\OpenGL_Graphics\glad3.3\include;C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW;$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW\lib;C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;C:\Users\Moses James\source\repos\OpenGL_Graphics\glad3.3\include;C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Moses James\source\repos\OpenGL_Graphics\extern\imgui\backends;C:\Users\Moses James\source\repos\OpenGL_Graphics\extern\imgui;C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;C:\Users\Moses James\source\repos\OpenGL_Graphics\glad3.3\include;C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW;$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\Users\Moses James\source\repos\OpenGL_Graphics\GLFW\lib;C:\Users\Moses James\source\repos\OpenGL_Graphics\glm;$(LibraryPath)</LibraryPath>
   </PropertyGroup>

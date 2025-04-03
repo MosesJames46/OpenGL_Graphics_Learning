@@ -11,7 +11,6 @@ void Sphere::initialize_mesh(float sectors, float stacks) {
 	vertices.clear();
 	texture_coordinates.clear();
 	sphere_indices.clear();
-	
 
 	for (int i = 0; i <= stack_count; i++) {
 		float current_stack_angle = (pi / 2) - i * stack_step;
@@ -69,9 +68,13 @@ void Sphere::initialize_mesh(float sectors, float stacks) {
 }
 
 void Sphere::set_radius(float radius_input) {
+	for (int i = 0; i < sphere_mesh.mesh.size(); i+= 8) {
+		sphere_mesh.mesh[i] = (sphere_mesh.mesh[i] / radius) * radius_input;
+		sphere_mesh.mesh[i + 1] = (sphere_mesh.mesh[i + 1] / radius) * radius_input;
+		sphere_mesh.mesh[i + 2] = (sphere_mesh.mesh[i + 2] / radius) * radius_input;
+	}
 	radius = radius_input;
-	initialize_mesh(sectors, stacks);
-	ready_buffers();
+	redraw(shader, sphere_VBO, sphere_mesh);
 	unbind_buffers_and_attribute_pointer();
 }
 

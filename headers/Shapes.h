@@ -41,6 +41,8 @@ public:
 	void draw(Shader& shader, unsigned int VAO, std::vector<const char*>&& uniform_names, std::vector<Texture>& texture);
 	void draw(Shader& shader, unsigned int VAO, std::vector<const char*>& uniform_names, std::vector<Texture>& texture);
 
+	void redraw(Shader& shader, unsigned int& VBO, Mesh& new_vertices);
+
 	template <typename T>
 	void print_data(T data) {
 		std::cout << data << "\n";

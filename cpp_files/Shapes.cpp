@@ -150,3 +150,9 @@ void Shape::draw(Shader& shader,unsigned int VAO, std::vector<const char*>&& uni
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
+
+void Shape::redraw(Shader& shader, unsigned int& VBO, Mesh& new_verices) {
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, new_verices.mesh.size() * sizeof(float), new_verices.mesh.data());
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
