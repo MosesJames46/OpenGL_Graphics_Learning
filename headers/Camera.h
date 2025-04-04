@@ -41,6 +41,8 @@ public:
 	GLenum is_edit_mode = GLFW_CURSOR_DISABLED;
 	GLenum last_edit_mode = is_edit_mode;
 
+	bool does_ImGui_have_control = true;
+
 	void get_camera_input(GLFWwindow* window);
 	void mouse_callback(GLFWwindow* window, double x_position, double y_position);
 	void view_through_camera(Shader& shader);

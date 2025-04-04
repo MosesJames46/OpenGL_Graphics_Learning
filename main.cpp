@@ -54,29 +54,28 @@ int main() {
 		return -1;
 	}
 
+	Camera camera(window);
+	//Apparently, any callback I initialize after ImGui will be overwritten. Wished I knew this.
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetWindowUserPointer(window, &camera);
+
+	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
+		if (ImGui::GetIO().WantCaptureMouse) return;
+		Camera* camera = static_cast<Camera*>(glfwGetWindowUserPointer(window));
+		camera->mouse_callback(window, (float)xpos, (float)ypos);
+		});
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 
 	ImGui::StyleColorsDark();
 
-	Camera camera(window);
-
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetWindowUserPointer(window, &camera);
-
-	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
-		Camera* camera = static_cast<Camera*>(glfwGetWindowUserPointer(window));
-		camera->mouse_callback(window, (float)xpos, (float)ypos);
-		});
-
-	
 	Shader s("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
 	Sphere sphere(s, 36, 18);
 	sphere.add_textures({ "pictures/awesomeface.png", "pictures/wall.jpg" }, sphere.sphere_textures);
@@ -86,7 +85,6 @@ int main() {
 
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
-		
 		glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

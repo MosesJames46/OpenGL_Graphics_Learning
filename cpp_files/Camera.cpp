@@ -12,8 +12,14 @@ void Camera::get_camera_input(GLFWwindow* window) {
 		is_edit_mode = cursor[selector];
 		last_toggle = current_time;
 	}
+
+	if (is_edit_mode != last_edit_mode) {
+		glfwSetInputMode(window, GLFW_CURSOR, is_edit_mode);
+		last_edit_mode = is_edit_mode;
+	}
 	
 	if (is_edit_mode == GLFW_CURSOR_NORMAL) {
+		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		ImGui::GetIO().WantCaptureKeyboard = true;
 		ImGui::GetIO().WantCaptureMouse = true;
 		return;
@@ -21,8 +27,6 @@ void Camera::get_camera_input(GLFWwindow* window) {
 
 	if (is_edit_mode == GLFW_CURSOR_DISABLED) {
 		glfwSetCursorPos(window, last_x_position, last_y_position);
-		ImGui::GetIO().WantCaptureKeyboard = false;
-		ImGui::GetIO().WantCaptureMouse = false;
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 			camera_origin += cameraSpeed * camera_forward;
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -31,11 +35,6 @@ void Camera::get_camera_input(GLFWwindow* window) {
 			camera_origin -= glm::normalize(glm::cross(camera_forward, camera_up)) * cameraSpeed;
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 			camera_origin += glm::normalize(glm::cross(camera_forward, camera_up)) * cameraSpeed;
-	}
-	
-	if (is_edit_mode != last_edit_mode) {
-		glfwSetInputMode(window, GLFW_CURSOR, is_edit_mode);
-		last_edit_mode = is_edit_mode;
 	}
 }
 
@@ -52,8 +51,7 @@ glm::vec3 Camera::get_camera_direction(float yaw, float pitch) {
 
 void Camera::mouse_callback(GLFWwindow* window, double x_position, double y_position) {
 	Camera* camera = static_cast<Camera*>(glfwGetWindowUserPointer(window));
-	
-	if (camera->is_edit_mode == GLFW_CURSOR_NORMAL) return;
+
 	if (camera->first_mouse) {
 		camera->last_x_position = x_position;
 		camera->last_y_position = y_position;
