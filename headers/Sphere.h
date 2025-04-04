@@ -3,6 +3,7 @@
 #include "Shapes.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "Texture.h"
 
 class Sphere : public Shape {
 public:
@@ -27,6 +28,7 @@ public:
 	std::vector<unsigned int> top_sphere_indices;
 	std::vector<float> vertices;
 	std::vector<float> texture_coordinates;
+	std::vector<Texture> sphere_textures;
 	unsigned int sphere_VAO, sphere_VBO, sphere_EBO;
 	float radius = 1;
 	float sectors, stacks;

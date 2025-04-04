@@ -1,23 +1,28 @@
 #include "../headers/Camera.h"
 
-void Camera::get_camera_input(GLFWwindow* window, void (*mouse_callback)(GLFWwindow*, double, double)) {
-	const float cameraSpeed = 0.05f; // adjust accordingly
-	float last_toggle = 0.0f;
+void Camera::get_camera_input(GLFWwindow* window) {
 	float current_time = glfwGetTime();
-	//debug_camera(window);
+	float delta_time = current_time - last_frame;
+	last_frame = current_time;
+	float cameraSpeed = delta_time * 2;
 	
 	if (glfwGetKey(window, GLFW_KEY_CAPS_LOCK) == GLFW_PRESS && current_time - last_toggle > 1.0f) {
 		selector = (selector + 1) % 2;
-		glfwSetInputMode(window, GLFW_CURSOR, cursor[selector]);
+		last_edit_mode = is_edit_mode;
+		is_edit_mode = cursor[selector];
+		last_toggle = current_time;
 	}
 	
-	if (cursor[selector] == GLFW_CURSOR_NORMAL) {
-		ImGui::GetIO().WantCaptureMouse = true; 
+	if (is_edit_mode == GLFW_CURSOR_NORMAL) {
 		ImGui::GetIO().WantCaptureKeyboard = true;
+		ImGui::GetIO().WantCaptureMouse = true;
+		return;
 	}
-	else {
-		ImGui::GetIO().WantCaptureMouse = false;
+
+	if (is_edit_mode == GLFW_CURSOR_DISABLED) {
+		glfwSetCursorPos(window, last_x_position, last_y_position);
 		ImGui::GetIO().WantCaptureKeyboard = false;
+		ImGui::GetIO().WantCaptureMouse = false;
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 			camera_origin += cameraSpeed * camera_forward;
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -27,21 +32,28 @@ void Camera::get_camera_input(GLFWwindow* window, void (*mouse_callback)(GLFWwin
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 			camera_origin += glm::normalize(glm::cross(camera_forward, camera_up)) * cameraSpeed;
 	}
-
-	//glfwSetWindowUserPointer(window, this);
-	//glfwSetCursorPosCallback(window, mouse_callback);
+	
+	if (is_edit_mode != last_edit_mode) {
+		glfwSetInputMode(window, GLFW_CURSOR, is_edit_mode);
+		last_edit_mode = is_edit_mode;
+	}
 }
 
-glm::vec3 Camera::get_camera_direction(float yaw, float pitch) {
-	camera_direction.x = cosf(glm::radians(yaw)) * cosf(glm::radians(pitch));
-	camera_direction.y = sinf(glm::radians(pitch));
-	camera_direction.z = sinf(glm::radians(yaw)) * cosf(glm::radians(pitch));
-	return camera_direction;
+glm::vec3 Camera::get_camera_direction(float yaw, float pitch) { 
+	glm::vec3 forward = glm::vec3(
+		cosf(glm::radians(yaw)) * cosf(glm::radians(pitch)),
+		sinf(glm::radians(pitch)),
+		sinf(glm::radians(yaw)) * cosf(glm::radians(pitch))
+	);
+	camera_up = glm::normalize(glm::cross(camera_right, camera_forward));
+	camera_right = glm::normalize(glm::cross(camera_forward, {0.0f, 1.0f, 0.0f}));
+	return forward;
 }
 
 void Camera::mouse_callback(GLFWwindow* window, double x_position, double y_position) {
-	if (ImGui::GetIO().WantCaptureMouse) return;
 	Camera* camera = static_cast<Camera*>(glfwGetWindowUserPointer(window));
+	
+	if (camera->is_edit_mode == GLFW_CURSOR_NORMAL) return;
 	if (camera->first_mouse) {
 		camera->last_x_position = x_position;
 		camera->last_y_position = y_position;
@@ -58,31 +70,18 @@ void Camera::mouse_callback(GLFWwindow* window, double x_position, double y_posi
 	camera->yaw += x_offset * sensitivity;
 	camera->pitch += y_offset * sensitivity;
 
-	if (camera->pitch > 90.0f)
-		camera->pitch = 89.0f;
-	if (camera->pitch < -90.0f)
-		camera->pitch = -89.0f;
+	camera->pitch = glm::clamp(camera->pitch, -89.0f, 89.0f);
 
-	glm::vec3 direction = camera->get_camera_direction(camera->yaw, camera->pitch);
-	camera->camera_forward = glm::normalize(direction);
+	camera->camera_forward = glm::normalize(get_camera_direction(camera->yaw, camera->pitch));
 }
 
-void Camera::debug_camera(GLFWwindow* window) {
-	ImGuiIO& io = ImGui::GetIO();
+void Camera::view_through_camera(Shader& shader) {
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, camera_origin);
+	view = glm::lookAt(camera_origin, camera_origin + camera_forward, camera_up);
+	projection = glm::perspective(glm::radians(45.0f), 1980.0f / 1080.0f, 0.1f, 100.0f);
 
-	std::cout << "\033[H";
-	std::cout << "\033[J"; 
-	
-	if (first_debug) {
-		std::cout << "Mouse Pos: " << std::setw(5) << io.MousePos.x << ", " << std::setw(5) << io.MousePos.y << std::endl;
-		std::cout << "Selector Value: " << selector << std::endl;
-		first_debug = false;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS || x_val != io.MousePos.x && y_val != io.MousePos.y) {
-		std::cout << "Mouse Pos: " << std::setw(5) << io.MousePos.x << ", " << std::setw(5) << io.MousePos.y << std::endl
-		 << "Selector Value: " << selector << std::endl;
-		x_val = io.MousePos.x;
-		y_val = io.MousePos.y;
-	}
+	shader.set_uniform_location("model", model);
+	shader.set_uniform_location("view", view);
+	shader.set_uniform_location("projection", projection);
 }
