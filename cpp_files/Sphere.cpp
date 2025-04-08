@@ -8,13 +8,14 @@ void Sphere::initialize_mesh(float sectors, float stacks) {
 	generate_indices(stacks, sectors);
 }
 
-void Sphere::set_radius(float radius_input) {
+void Sphere::set_radius() {
+	if (prev_radius == radius) return;
 	for (int i = 0; i < sphere_mesh.mesh.size(); i+= 6) {
-		sphere_mesh.mesh[i] = (sphere_mesh.mesh[i] / radius) * radius_input;
-		sphere_mesh.mesh[i + 1] = (sphere_mesh.mesh[i + 1] / radius) * radius_input;
-		sphere_mesh.mesh[i + 2] = (sphere_mesh.mesh[i + 2] / radius) * radius_input;
+		sphere_mesh.mesh[i] = (sphere_mesh.mesh[i] / prev_radius) * radius;
+		sphere_mesh.mesh[i + 1] = (sphere_mesh.mesh[i + 1] / prev_radius) * radius;
+		sphere_mesh.mesh[i + 2] = (sphere_mesh.mesh[i + 2] / prev_radius) * radius;
 	}
-	radius = radius_input;
+	prev_radius = radius;
 	redraw(shader, sphere_VBO, sphere_mesh);
 	unbind_buffers_and_attribute_pointer();
 }
@@ -97,7 +98,7 @@ void Sphere::generate_indices(int stack, int sector) {
 }
 void Sphere::set_color() {
 	//static float color = 0;
-	ImGui::Begin("Testing Window");
+	ImGui::Begin("Color");
 	float speed = 0.001f; // base drag speed
 
 	// Optional: modify speed based on key modifiers
@@ -123,9 +124,14 @@ void Sphere::set_color() {
 }
 void Sphere::set_object_size() {
 	ImGui::Begin("Sphere");
-	ImGui::SliderFloat("float", &radius, 0.1f, 10.0f);
-	set_radius(radius);
+	ImGui::Text("Radius: ");
+	ImGui::PushItemWidth(60);
+	ImGui::SameLine();
+	ImGui::DragFloat("##float", &radius, 0.1f, 0.1f, 10.0f);
+	ImGui::PopItemWidth();
 	ImGui::End();
+
+	set_radius();
 }
 
 void Sphere::set_position(glm::vec3 position) {

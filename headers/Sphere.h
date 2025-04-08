@@ -25,19 +25,26 @@ public:
 	void generate_sphere(int stacks, int sectors);
 	void generate_indices(int stacks, int sectors);
 	void ready_buffers();
-	void set_radius(float radius);
+	void set_radius();
 	void set_color();
 	void set_object_size();
 	void set_position(glm::vec3 position);
 
 	Mesh sphere_mesh;
+
 	std::vector<unsigned int> sphere_indices;
 	std::vector<unsigned int> top_sphere_indices;
 	std::vector<float> vertices;
 	std::vector<float> texture_coordinates;
 	std::vector<Texture> sphere_textures;
+	
 	unsigned int sphere_VAO, sphere_VBO, sphere_EBO;
-	float radius = 1;
+	
 	Shader shader;
+
 	glm::vec3 color{1.0f, 1.0f, 1.0f};
+
+	float radius = 1;
+	float prev_radius = radius;
+	float slider_speed = 0.01f;
 };
