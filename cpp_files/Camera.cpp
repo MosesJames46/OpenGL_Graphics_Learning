@@ -78,8 +78,14 @@ void Camera::view_through_camera(Shader& shader) {
 	model = glm::translate(model, camera_origin);
 	view = glm::lookAt(camera_origin, camera_origin + camera_forward, camera_up);
 	projection = glm::perspective(glm::radians(45.0f), 1980.0f / 1080.0f, 0.1f, 100.0f);
-
-	shader.set_uniform_location("model", model);
-	shader.set_uniform_location("view", view);
+	
 	shader.set_uniform_location("projection", projection);
+	shader.set_uniform_location("view", view);
+	shader.set_uniform_location("model", model);
+	reset_camera(shader);
+}
+
+void Camera::reset_camera(Shader& shader) {
+	model = glm::mat4(1.0f);
+	shader.set_uniform_location("model", model);
 }

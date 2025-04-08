@@ -33,6 +33,7 @@
     <ClInclude Include="headers\Camera.h" />
     <ClInclude Include="headers\Cube.h" />
     <ClInclude Include="headers\Gui_Settings.h" />
+    <ClInclude Include="headers\Icosphere.h" />
     <ClInclude Include="headers\libs.h" />
     <ClInclude Include="headers\Mesh.h" />
     <ClInclude Include="headers\Shader.h" />

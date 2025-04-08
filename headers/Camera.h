@@ -46,6 +46,7 @@ public:
 	void get_camera_input(GLFWwindow* window);
 	void mouse_callback(GLFWwindow* window, double x_position, double y_position);
 	void view_through_camera(Shader& shader);
+	void reset_camera(Shader& shader);
 
 	glm::vec3 get_camera_direction(float yaw, float pitch);
 };

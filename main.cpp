@@ -13,6 +13,7 @@
 #include "extern/imgui/backends/imgui_impl_win32.h"
 #include <windows.h>
 #include "../headers/Gui_Settings.h"
+#include "../headers/Icosphere.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -48,7 +49,6 @@ int main() {
 
 	glfwMakeContextCurrent(window);
 	
-
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD.\n";
 		return -1;
@@ -76,12 +76,9 @@ int main() {
 
 	ImGui::StyleColorsDark();
 
-	Shader s("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
-	Sphere sphere(s, 36, 18);
-	sphere.add_textures({ "pictures/awesomeface.png", "pictures/wall.jpg" }, sphere.sphere_textures);
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-	float sphere_radius = 1;
+	Shader standard_shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
+	Sphere sphere(standard_shader, 36, 18);
+
 
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -90,19 +87,22 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		camera.get_camera_input(window);
-		camera.view_through_camera(s);
-		s.set_uniform_location("model", model);
-		sphere.draw(sphere.shader, sphere.sphere_VAO, sphere.sphere_indices.size());
+		camera.view_through_camera(standard_shader);
 
+		sphere.draw(sphere.shader, sphere.sphere_VAO, sphere.sphere_indices.size());
+		sphere.set_position(glm::vec3{ 10.0f, 0.0f, 0.0f });
 		glfwPollEvents();
 		
 		Gui_Settings::call_new_frame();
-		Gui_Settings::edit_object_size(sphere, sphere_radius);
+		//Gui_Settings::gui_test();
+		//Gui_Settings::apply_colors(sphere, s);
+		sphere.set_object_size();
+		sphere.set_color();
 		Gui_Settings::render_frame();
 		
 		glfwSwapBuffers(window);
 	}
-	s.delete_program_shader();
+	standard_shader.delete_program_shader();
 	glfwTerminate();
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplWin32_Shutdown();

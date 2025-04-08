@@ -134,7 +134,7 @@ void Shape::draw(Shader& shader,unsigned int VAO, int number_of_indices, std::ve
 void Shape::draw(Shader shader, unsigned int VAO) {
 	shader.useProgram();
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void Shape::draw(Shader& shader,unsigned int VAO, std::vector<const char*>& uniform_names, std::vector<Texture>& texture) {

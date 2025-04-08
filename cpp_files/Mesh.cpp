@@ -32,3 +32,16 @@ void Mesh::load_textures(std::vector<float>& textures) {
 		texture_index += 2;
 	}
 }
+
+void Mesh::load_vertices_and_colors(std::vector<float>& vertices) {
+	mesh.resize((vertices.size() / 3) * 6);
+	int size = mesh.size();
+	int vertices_index = 0;
+	for (int i = 0; i < size; i += 6) {
+		mesh[i] = vertices[vertices_index];
+		mesh[i + 1] = vertices[vertices_index + 1];
+		mesh[i + 2] = vertices[vertices_index + 2];
+		vertices_index += 3;
+		
+	}
+}

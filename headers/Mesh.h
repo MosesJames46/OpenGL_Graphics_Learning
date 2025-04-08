@@ -10,5 +10,6 @@ public:
 	//void load_vertices(std::vector<Vertex>& vertices);
 	//void load_vertices(float vertices[]);
 	void load_vertices(std::vector<float>& vertices);
+	void load_vertices_and_colors(std::vector<float>& vertices);
 	void load_textures(std::vector<float>& textures);
 };

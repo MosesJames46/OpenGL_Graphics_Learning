@@ -4,6 +4,8 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Gui_Settings.h"
+#include <cmath>
 
 class Sphere : public Shape {
 public:
@@ -13,15 +15,20 @@ public:
 		unbind_buffers_and_attribute_pointer();
 	}
 
-	Sphere(Shader& shader, float sectors, float stacks) : sectors(sectors), stacks(stacks), shader(shader) {
+	Sphere(Shader& shader, float sectors, float stacks) : shader(shader) {
 		initialize_mesh(sectors, stacks);
 		ready_buffers();
 		unbind_buffers_and_attribute_pointer();
 	}
 
-	void initialize_mesh(float sectors, float stacks);
+	void initialize_mesh(float stacks, float sectors);
+	void generate_sphere(int stacks, int sectors);
+	void generate_indices(int stacks, int sectors);
 	void ready_buffers();
 	void set_radius(float radius);
+	void set_color();
+	void set_object_size();
+	void set_position(glm::vec3 position);
 
 	Mesh sphere_mesh;
 	std::vector<unsigned int> sphere_indices;
@@ -31,6 +38,6 @@ public:
 	std::vector<Texture> sphere_textures;
 	unsigned int sphere_VAO, sphere_VBO, sphere_EBO;
 	float radius = 1;
-	float sectors, stacks;
 	Shader shader;
+	glm::vec3 color{1.0f, 1.0f, 1.0f};
 };
