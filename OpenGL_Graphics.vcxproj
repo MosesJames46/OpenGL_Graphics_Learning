@@ -73,6 +73,8 @@
   <ItemGroup>
     <None Include="extern\imgui\misc\debuggers\imgui.natstepfilter" />
     <None Include="shaders\fragment_shader.glsl" />
+    <None Include="shaders\light_fragment_shader.glsl" />
+    <None Include="shaders\light_vertex_shader.glsl" />
     <None Include="shaders\vertex_shader.glsl" />
   </ItemGroup>
   <ItemGroup>

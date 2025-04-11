@@ -111,8 +111,46 @@ void Shape::add_textures(std::vector<const char*> file_paths, std::vector<Textur
 	}
 }
 
-void Shape::draw(Shader shader,unsigned int VAO, int number_of_indices) {
+void Shape::set_MVP(Shader& shader, Camera& camera) {
+	shader.set_uniform_location("model", camera.model);
+	shader.set_uniform_location("view", camera.view);
+	shader.set_uniform_location("projection", camera.projection);
+}
+
+void Shape::draw(Shader& shader,unsigned int VAO, int number_of_indices) {
 	shader.useProgram();
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
+}
+
+
+void Shape::set_color(Shader& shader, const char* uniform_name, float* color) {
+
+	ImGui::Text("Color:");
+	ImGui::SameLine();
+	ImGui::PushItemWidth(100);
+	//Use the starting position of the float pointer.
+	ImGui::ColorEdit3("Color Wheel", &color[0]);
+	ImGui::PopItemWidth();
+
+	//We access the float values and cast them to a vec 3.
+	shader.set_uniform_location(uniform_name, glm::vec3{color[0], color[1], color[2]});
+}
+
+void Shape::set_position(Shader& shader, const char* uniform_name, float* position) {
+	float speed = 0.001f;
+	if (ImGui::GetKeyName(ImGuiKey_LeftShift)) {
+		speed = 0.1f;
+	}
+
+	ImGui::DragFloat3("Sphere Position", &position[0], speed, std::numeric_limits<float>::lowest(), (std::numeric_limits<float>::max)());
+	shader.set_uniform_location(uniform_name, glm::vec3{position[0], position[1] , position[2] });
+}
+
+void Shape::draw(Shader& shader, unsigned int VAO, int number_of_indices, const char* uniform_color, float* color, const char* uniform_position, float* position) {
+	shader.useProgram();
+	set_color(shader, uniform_color, color);
+	set_position(shader, uniform_position, position);
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
 }
@@ -131,7 +169,7 @@ void Shape::draw(Shader& shader,unsigned int VAO, int number_of_indices, std::ve
 	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
 }
 
-void Shape::draw(Shader shader, unsigned int VAO) {
+void Shape::draw(Shader& shader, unsigned int VAO) {
 	shader.useProgram();
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -155,4 +193,19 @@ void Shape::redraw(Shader& shader, unsigned int& VBO, Mesh& new_verices) {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, new_verices.mesh.size() * sizeof(float), new_verices.mesh.data());
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+const char* Shape::get_shader_type(fragment_shader_type shader_type) {
+	switch (shader_type) {
+	case 0:
+		return "fragment_shader.glsl";
+	case 1:
+		return "light_fragment_shader.glsl";
+	}
+}
+
+glm::vec3 Shape::calculate_normals(glm::vec3& a, glm::vec3& b, glm::vec3& c) {
+	glm::vec3 v = b - a;
+	glm::vec3 u = c - a;
+	return glm::cross(v, u);
 }

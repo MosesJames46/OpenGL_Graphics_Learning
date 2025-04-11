@@ -12,10 +12,10 @@ void Mesh::load_vertex(Vertex vertex) {
 }
 
 void Mesh::load_vertices(std::vector<float>& vertices) {
-	mesh.resize((vertices.size() / 3) * 8);
+	mesh.resize((vertices.size() / 3) * 9);
 	int size = mesh.size();
 	int vertices_index = 0;
-	for (int i = 0; i < size; i+= 8) {
+	for (int i = 0; i < size; i+= 9) {
 		mesh[i] = vertices[vertices_index];
 		mesh[i + 1] = vertices[vertices_index + 1];
 		mesh[i + 2] = vertices[vertices_index + 2];
@@ -33,15 +33,34 @@ void Mesh::load_textures(std::vector<float>& textures) {
 	}
 }
 
-void Mesh::load_vertices_and_colors(std::vector<float>& vertices) {
-	mesh.resize((vertices.size() / 3) * 6);
+void Mesh::load_vertices_and_colors(std::vector<float>& vertices, std::vector<float>& normals) {
+	mesh.resize(vertices.size() * 3);
 	int size = mesh.size();
-	int vertices_index = 0;
-	for (int i = 0; i < size; i += 6) {
-		mesh[i] = vertices[vertices_index];
-		mesh[i + 1] = vertices[vertices_index + 1];
-		mesh[i + 2] = vertices[vertices_index + 2];
-		vertices_index += 3;
+	for (int i = 0; i < size; i += 9) {
+		mesh[i] = vertices[i];
+		mesh[i + 1] = vertices[i + 1];
+		mesh[i + 2] = vertices[i + 2];
 		
+		mesh[i + 6] = vertices[i + 6];
+		mesh[i + 7] = vertices[i + 7];
+		mesh[i + 8] = vertices[i + 8];
+		//std::cout << mesh[i + 6] << " " << mesh[i + 7] << " " << mesh[i + 8];
 	}
+}
+
+void Mesh::load_normals(std::vector<float>& normals) {
+	int size = mesh.size();
+	int normals_index = 0;
+	for (int i = 6; i < size; i += 9) {
+		mesh[i] = normals[normals_index];
+		mesh[i + 1] = normals[normals_index + 1];
+		mesh[i + 2] = normals[normals_index + 2];
+
+		normals_index += 3;
+	}
+}
+
+void Mesh::load_vertices_and_normals(std::vector<float>& vertices, std::vector<float>& normals) {
+	load_vertices(vertices);
+	load_normals(normals);
 }

@@ -13,7 +13,7 @@
 
 class Camera {
 public: 
-	Camera(GLFWwindow* window) {
+	Camera(GLFWwindow* window, Shader& shader) : camera_shader(shader) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
@@ -45,8 +45,9 @@ public:
 
 	void get_camera_input(GLFWwindow* window);
 	void mouse_callback(GLFWwindow* window, double x_position, double y_position);
-	void view_through_camera(Shader& shader);
-	void reset_camera(Shader& shader);
+	void view_through_camera();
+	void reset_camera();
 
+	Shader camera_shader;
 	glm::vec3 get_camera_direction(float yaw, float pitch);
 };

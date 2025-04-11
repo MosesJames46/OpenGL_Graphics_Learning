@@ -2,10 +2,14 @@
 #include "libs.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "Camera.h"
 #include "Texture.h"
 #include <iostream>
 #include <vector>
 
+static enum fragment_shader_type {
+	STANDARD_SHADER, LIGHT_SHADER
+};
 
 class Shape {
 public:
@@ -32,16 +36,27 @@ public:
 
 	void bind_textures(Shader& shader, std::vector<const char*>&& uniform_names, std::vector<Texture>& texture_vector);
 	void bind_textures(Shader& shader, std::vector<const char*>& uniform_names, std::vector<Texture>& texture_vector);
+
 	void add_textures(std::vector<const char*> file_paths, std::vector<Texture>& texture_vector);
 
-	void draw(Shader shader, unsigned int VAO, int number_of_indices);
+	void set_MVP(Shader& shader, Camera& camera);
+
+	void set_color(Shader& shader, const char* uniform_name, float* color);
+	void set_position(Shader& shader, const char* uniform_name, float* position);
+
+	void draw(Shader& shader, unsigned int VAO, int number_of_indices, const char* uniform_color, float* color, const char* uniform_position, float* position);
+	void draw(Shader& shader, unsigned int VAO, int number_of_indices);
 	void draw(Shader& shader, unsigned int VAO, int number_of_indices, std::vector<const char*>&& uniform_names, std::vector<Texture>& texture);
 	void draw(Shader& shader, unsigned int VAO, int number_of_indices, std::vector<const char*>& uniform_names, std::vector<Texture>& texture);
-	void draw(Shader shader, unsigned int VAO);
+	void draw(Shader& shader, unsigned int VAO);
 	void draw(Shader& shader, unsigned int VAO, std::vector<const char*>&& uniform_names, std::vector<Texture>& texture);
 	void draw(Shader& shader, unsigned int VAO, std::vector<const char*>& uniform_names, std::vector<Texture>& texture);
 
 	void redraw(Shader& shader, unsigned int& VBO, Mesh& new_vertices);
+
+	const char* get_shader_type(fragment_shader_type);
+
+	static glm::vec3 calculate_normals(glm::vec3& a, glm::vec3& b, glm::vec3& c);
 
 	template <typename T>
 	void print_data(T data) {

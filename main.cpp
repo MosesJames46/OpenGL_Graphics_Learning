@@ -54,7 +54,9 @@ int main() {
 		return -1;
 	}
 
-	Camera camera(window);
+	Shader standard_shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
+	Camera camera(window, standard_shader);
+
 	//Apparently, any callback I initialize after ImGui will be overwritten. Wished I knew this.
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetWindowUserPointer(window, &camera);
@@ -66,6 +68,7 @@ int main() {
 		});
 
 	IMGUI_CHECKVERSION();
+
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -76,28 +79,43 @@ int main() {
 
 	ImGui::StyleColorsDark();
 
-	Shader standard_shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
-	Sphere sphere(standard_shader, 36, 18);
-
+	Shader light_shader("shaders/light_vertex_shader.glsl", "shaders/light_fragment_shader.glsl");
+	Sphere sphere(light_shader, camera);
+	Sphere light_sphere(standard_shader, camera);
+	light_sphere.position = glm::vec3(5, 0.0f, -2);
 
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
+
 		glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		camera.get_camera_input(window);
-		camera.view_through_camera(standard_shader);
+		camera.get_camera_input(window);	
+		camera.view_through_camera();
 
-		sphere.draw(sphere.shader, sphere.sphere_VAO, sphere.sphere_indices.size());
-		sphere.set_position(glm::vec3{ 10.0f, 0.0f, 0.0f });
 		glfwPollEvents();
 		
 		Gui_Settings::call_new_frame();
 		//Gui_Settings::gui_test();
 		//Gui_Settings::apply_colors(sphere, s);
-		sphere.set_object_size();
-		sphere.set_color();
+		//sphere.draw();
+		//sphere.shader.set_uniform_location("object_position", sphere.position);
+		//sphere.sphere_options("object_color", "object_position");
+		
+		light_sphere.draw("fragment_color", "object_position");
+		//light_sphere.sphere_options("fragment_color", "object_position");
+		//
+		//ImGui::Begin("Testing");
+		//ImGui::ColorEdit3("color", &light_sphere.color[0]);
+		//ImGui::DragFloat3("position", &light_sphere.position[0]);
+		//
+		//
+		//light_sphere.move_to();
+		//ImGui::End();
+		//sphere.shader.set_uniform_location("light_color", light_sphere.color);
+		//sphere.shader.set_uniform_location("light_position", light_sphere.position);
+		//light_sphere.sphere_options("object_color", "light_positions");
 		Gui_Settings::render_frame();
 		
 		glfwSwapBuffers(window);
