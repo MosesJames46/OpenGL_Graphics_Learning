@@ -80,7 +80,7 @@ int main() {
 	ImGui::StyleColorsDark();
 
 	Shader light_shader("shaders/light_vertex_shader.glsl", "shaders/light_fragment_shader.glsl");
-	Sphere sphere(light_shader, camera);
+	Sphere sphere(standard_shader, camera);
 	Sphere light_sphere(standard_shader, camera);
 	light_sphere.position = glm::vec3(5, 0.0f, -2);
 
@@ -104,6 +104,7 @@ int main() {
 		//sphere.sphere_options("object_color", "object_position");
 		
 		light_sphere.draw("fragment_color", "object_position");
+		sphere.draw("fragment_color", "object_position");
 		//light_sphere.sphere_options("fragment_color", "object_position");
 		//
 		//ImGui::Begin("Testing");

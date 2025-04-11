@@ -8,6 +8,7 @@
 #include "Gui_Settings.h"
 #include <sstream>
 #include <cmath>
+#include <functional>
 
 
 
@@ -67,4 +68,8 @@ public:
 	float radius = 1;
 	float prev_radius = radius;
 	float slider_speed = 0.01f;
+
+	std::function<void()> func = [this]() {
+		set_object_size();
+		};
 };

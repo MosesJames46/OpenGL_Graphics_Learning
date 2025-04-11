@@ -174,7 +174,7 @@ void Sphere::sphere_options(const char* uniform_color_name, const char* uniform_
 }
 
 void Sphere::draw(const char* uniform_color_name, const char* uniform_position_name) {
-	Shape::draw(shader, sphere_VAO, sphere_indices.size(), uniform_color_name, &color[0], uniform_position_name, &position[0]);
-	set_object_size();
+	Shape::draw(shader, sphere_VAO, sphere_indices.size(), uniform_color_name, &color[0], 
+		uniform_position_name, &position[0], sphere_name.c_str(), func);
 }
 

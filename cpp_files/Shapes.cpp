@@ -147,10 +147,14 @@ void Shape::set_position(Shader& shader, const char* uniform_name, float* positi
 	shader.set_uniform_location(uniform_name, glm::vec3{position[0], position[1] , position[2] });
 }
 
-void Shape::draw(Shader& shader, unsigned int VAO, int number_of_indices, const char* uniform_color, float* color, const char* uniform_position, float* position) {
+void Shape::draw(Shader& shader, unsigned int VAO, int number_of_indices, const char* uniform_color, 
+	float* color, const char* uniform_position, float* position, const char* ImGui_object_name, std::function<void()> func) {
 	shader.useProgram();
+	ImGui::Begin(ImGui_object_name);
 	set_color(shader, uniform_color, color);
 	set_position(shader, uniform_position, position);
+	func();
+	ImGui::End();
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
 }
