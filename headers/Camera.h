@@ -8,12 +8,11 @@
 #include <thread>
 #include "Windows.h"
 #include <iomanip>
-#include "Shader.h"
 
 
 class Camera {
 public: 
-	Camera(GLFWwindow* window, Shader& shader) : camera_shader(shader) {
+	Camera(GLFWwindow* window) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
@@ -48,6 +47,5 @@ public:
 	void view_through_camera();
 	void reset_camera();
 
-	Shader camera_shader;
 	glm::vec3 get_camera_direction(float yaw, float pitch);
 };

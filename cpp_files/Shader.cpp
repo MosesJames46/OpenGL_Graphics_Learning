@@ -110,11 +110,11 @@ void Shader::set_uniform_location(const char* uniform_location_name, bool value)
 	glUniform1i(glGetUniformLocation(programShaderID, uniform_location_name), (int)value);
 }
 
-void Shader::set_uniform_location(const char* uniform_location_name, glm::mat4 matrix) {
+void Shader::set_uniform_location(const char* uniform_location_name, glm::mat4& matrix) {
 	glUniformMatrix4fv(glGetUniformLocation(programShaderID, uniform_location_name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Shader::set_uniform_location(const char* uniform_location_name, glm::vec3 vector) {
+void Shader::set_uniform_location(const char* uniform_location_name, glm::vec3& vector) {
 	glUniform3fv(glGetUniformLocation(programShaderID, uniform_location_name), 1, glm::value_ptr(vector));
 }
 

@@ -1,6 +1,7 @@
 #version 330 core
 
 out vec4 fragment_colors;
+
 in vec3 normal_outputs;
 in vec3 fragment_positions;
 
@@ -16,5 +17,5 @@ void main(){
 	float diffuse = max(dot(norm, light_direction), 0.0f);
 	vec3 diff = diffuse * light_color;
 	vec3 result = (ambient + diff) * object_color;
-	fragment_colors = vec4(object_color, 1.0f);
+	fragment_colors = vec4(result, 1.0f);
 }

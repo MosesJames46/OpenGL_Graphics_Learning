@@ -7,7 +7,6 @@ void Sphere::initialize_mesh(float sectors, float stacks) {
 	generate_indices(stacks, sectors);
 	generate_basic_normals();
 	sphere_mesh.load_vertices_and_normals(vertices, normals);
-	generate_indices(stacks, sectors);
 }
 
 void Sphere::set_radius() {
@@ -166,15 +165,16 @@ void Sphere::set_object_size() {
 	set_radius();
 }
 
-void Sphere::sphere_options(const char* uniform_color_name, const char* uniform_position_name) {
-	ImGui::Begin(sphere_name.c_str());
-	set_color(shader, uniform_color_name, &color[0]);
-	set_object_size();
-	ImGui::End();
+void Sphere::draw(const char* uniform_color_name, const char* uniform_position_name) {
+	
+	Shape::draw(shader, camera, sphere_VAO, sphere_indices.size(), uniform_color_name, &color[0], 
+		uniform_position_name, &position[0], sphere_name.c_str(), func);
 }
 
-void Sphere::draw(const char* uniform_color_name, const char* uniform_position_name) {
-	Shape::draw(shader, sphere_VAO, sphere_indices.size(), uniform_color_name, &color[0], 
-		uniform_position_name, &position[0], sphere_name.c_str(), func);
+void Sphere::draw(const char* uniform_color_name, const char* uniform_position_name, 
+	const char* uniform_color_name_other, const char* uniform_position_name_other, Sphere& sphere) {
+
+	Shape::draw(shader, camera, sphere_VAO, sphere_indices.size(), uniform_color_name, &color[0],
+		uniform_position_name, &position[0], uniform_color_name_other, &sphere.color[0], uniform_position_name_other, &sphere.position[0], sphere_name.c_str(), func);
 }
 

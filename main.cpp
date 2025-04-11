@@ -54,8 +54,8 @@ int main() {
 		return -1;
 	}
 
-	Shader standard_shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
-	Camera camera(window, standard_shader);
+	
+	Camera camera(window);
 
 	//Apparently, any callback I initialize after ImGui will be overwritten. Wished I knew this.
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -79,9 +79,11 @@ int main() {
 
 	ImGui::StyleColorsDark();
 
+	Shader standard_shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
 	Shader light_shader("shaders/light_vertex_shader.glsl", "shaders/light_fragment_shader.glsl");
-	Sphere sphere(standard_shader, camera);
-	Sphere light_sphere(standard_shader, camera);
+
+	Sphere sphere(standard_shader, camera, "Regular Sphere");
+	Sphere light_sphere(light_shader, camera, "Light Sphere");
 	light_sphere.position = glm::vec3(5, 0.0f, -2);
 
 	while (!glfwWindowShouldClose(window)) {
@@ -99,24 +101,19 @@ int main() {
 		Gui_Settings::call_new_frame();
 		//Gui_Settings::gui_test();
 		//Gui_Settings::apply_colors(sphere, s);
-		//sphere.draw();
-		//sphere.shader.set_uniform_location("object_position", sphere.position);
-		//sphere.sphere_options("object_color", "object_position");
 		
-		light_sphere.draw("fragment_color", "object_position");
+		//light_sphere.shader.set_uniform_location("light_position", sphere.position);
+		//light_sphere.shader.set_uniform_location("light_color", sphere.color);
+		light_sphere.draw("object_color", "object_position", "light_color", "light_position", sphere);
 		sphere.draw("fragment_color", "object_position");
-		//light_sphere.sphere_options("fragment_color", "object_position");
-		//
+		
+		
 		//ImGui::Begin("Testing");
 		//ImGui::ColorEdit3("color", &light_sphere.color[0]);
 		//ImGui::DragFloat3("position", &light_sphere.position[0]);
-		//
-		//
-		//light_sphere.move_to();
+
 		//ImGui::End();
-		//sphere.shader.set_uniform_location("light_color", light_sphere.color);
-		//sphere.shader.set_uniform_location("light_position", light_sphere.position);
-		//light_sphere.sphere_options("object_color", "light_positions");
+
 		Gui_Settings::render_frame();
 		
 		glfwSwapBuffers(window);

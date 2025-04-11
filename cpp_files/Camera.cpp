@@ -74,18 +74,13 @@ void Camera::mouse_callback(GLFWwindow* window, double x_position, double y_posi
 }
 
 void Camera::view_through_camera() {
+	projection = glm::perspective(glm::radians(45.0f), 1980.0f / 1080.0f, 0.1f, 100.0f);
+	view = glm::lookAt(camera_origin, camera_origin + camera_forward, camera_up);
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, camera_origin);
-	view = glm::lookAt(camera_origin, camera_origin + camera_forward, camera_up);
-	projection = glm::perspective(glm::radians(45.0f), 1980.0f / 1080.0f, 0.1f, 100.0f);
 	
-	camera_shader.set_uniform_location("projection", projection);
-	camera_shader.set_uniform_location("view", view);
-	camera_shader.set_uniform_location("model", model);
-	reset_camera();
 }
 
 void Camera::reset_camera() {
 	model = glm::mat4(1.0f);
-	camera_shader.set_uniform_location("model", model);
 }

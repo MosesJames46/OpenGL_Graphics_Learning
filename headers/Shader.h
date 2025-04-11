@@ -26,8 +26,8 @@ public:
 	void set_uniform_location(const char* uniform_name, int value);
 	void set_uniform_location(const char* uniform_name, float value);
 	void set_uniform_location(const char* uniform_name, bool value);
-	void set_uniform_location(const char* uniform_name, glm::mat4 matrix);
-	void set_uniform_location(const char* uniform_name, glm::vec3 vector);
+	void set_uniform_location(const char* uniform_name, glm::mat4& matrix);
+	void set_uniform_location(const char* uniform_name, glm::vec3& vector);
 	//void setMat4(const std::string& name, glm::mat4 matrix);
 	//void setVec3(const std::string& name, glm::vec3 vector);
 	//void setVec4(const std::string& name, glm::vec4 vector);

@@ -123,7 +123,6 @@ void Shape::draw(Shader& shader,unsigned int VAO, int number_of_indices) {
 	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
 }
 
-
 void Shape::set_color(Shader& shader, const char* uniform_name, float* color) {
 
 	ImGui::Text("Color:");
@@ -132,27 +131,47 @@ void Shape::set_color(Shader& shader, const char* uniform_name, float* color) {
 	//Use the starting position of the float pointer.
 	ImGui::ColorEdit3("Color Wheel", &color[0]);
 	ImGui::PopItemWidth();
-
+	glm::vec3 c = glm::vec3{ color[0], color[1], color[2] };
 	//We access the float values and cast them to a vec 3.
-	shader.set_uniform_location(uniform_name, glm::vec3{color[0], color[1], color[2]});
+	shader.set_uniform_location(uniform_name, c);
 }
 
-void Shape::set_position(Shader& shader, const char* uniform_name, float* position) {
+void Shape::set_position(Shader& shader, Camera& camera, const char* uniform_name, float* position) {
 	float speed = 0.001f;
 	if (ImGui::GetKeyName(ImGuiKey_LeftShift)) {
 		speed = 0.1f;
 	}
 
 	ImGui::DragFloat3("Sphere Position", &position[0], speed, std::numeric_limits<float>::lowest(), (std::numeric_limits<float>::max)());
-	shader.set_uniform_location(uniform_name, glm::vec3{position[0], position[1] , position[2] });
+	glm::vec3 p = glm::vec3{ position[0], position[1] , position[2] };
+	shader.set_uniform_location(uniform_name, p);
+	camera.reset_camera();
+	set_MVP(shader, camera);
 }
 
-void Shape::draw(Shader& shader, unsigned int VAO, int number_of_indices, const char* uniform_color, 
+void Shape::draw(Shader& shader, Camera& camera, unsigned int VAO, int number_of_indices, const char* uniform_color, 
 	float* color, const char* uniform_position, float* position, const char* ImGui_object_name, std::function<void()> func) {
 	shader.useProgram();
 	ImGui::Begin(ImGui_object_name);
 	set_color(shader, uniform_color, color);
-	set_position(shader, uniform_position, position);
+	set_position(shader, camera, uniform_position, position);
+	func();
+	ImGui::End();
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
+}
+
+void Shape::draw(Shader& shader, Camera& camera, unsigned int VAO, int number_of_indices, const char* uniform_color,
+	float* color, const char* uniform_position, float* position, const char* uniform_color_other, float* color_other,
+	const char* uniform_position_other, float* position_other, const char* ImGui_object_name, std::function<void()> func) {
+	shader.useProgram();
+	ImGui::Begin(ImGui_object_name);
+	set_color(shader, uniform_color, color);
+	set_position(shader, camera, uniform_position, position);
+	glm::vec3 c = glm::vec3{ color_other[0],color_other[1], color_other[2] };
+	glm::vec3 p = glm::vec3{ position_other[0], position_other[1] , position_other[2] };
+	shader.set_uniform_location(uniform_color_other, c);
+	shader.set_uniform_location(uniform_position_other, p);
 	func();
 	ImGui::End();
 	glBindVertexArray(VAO);
