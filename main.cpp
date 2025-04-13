@@ -84,7 +84,7 @@ int main() {
 
 	Sphere sphere(standard_shader, camera, "Regular Sphere");
 	Sphere light_sphere(light_shader, camera, "Light Sphere");
-	light_sphere.position = glm::vec3(5, 0.0f, -2);
+	light_sphere.sphere_mesh.position = glm::vec3(5, 0.0f, -2);
 
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -92,6 +92,7 @@ int main() {
 		glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		camera.get_camera_input(window);	
 		camera.view_through_camera();
@@ -99,20 +100,9 @@ int main() {
 		glfwPollEvents();
 		
 		Gui_Settings::call_new_frame();
-		//Gui_Settings::gui_test();
-		//Gui_Settings::apply_colors(sphere, s);
 		
-		//light_sphere.shader.set_uniform_location("light_position", sphere.position);
-		//light_sphere.shader.set_uniform_location("light_color", sphere.color);
-		light_sphere.draw("object_color", "object_position", "light_color", "light_position", sphere);
-		sphere.draw("fragment_color", "object_position");
-		
-		
-		//ImGui::Begin("Testing");
-		//ImGui::ColorEdit3("color", &light_sphere.color[0]);
-		//ImGui::DragFloat3("position", &light_sphere.position[0]);
-
-		//ImGui::End();
+		light_sphere.draw(sphere);
+		sphere.draw();
 
 		Gui_Settings::render_frame();
 		

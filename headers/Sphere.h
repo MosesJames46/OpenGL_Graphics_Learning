@@ -28,43 +28,26 @@ public:
 
 	void initialize_mesh(float stacks, float sectors);
 
-	void generate_sphere(int stacks, int sectors);
-	void generate_indices(int stacks, int sectors);
-	void generate_normals();
-	void generate_basic_normals();
-
 	void ready_buffers();
 
 	void set_radius();
-	void set_object_size();
+	void set_scale();
 
-	void draw(const char* uniform_color_name, const char* uniform_position_name);
-	void draw(const char* uniform_color_name, const char* uniform_position_name,
-		const char* uniform_color_name_other, const char* uniform_position_name_other, Sphere& sphere);
+	void set_object_size();
+	void set_object_scale();
+
+	void draw(Sphere& sphere);
+	void draw();
 
 	Mesh sphere_mesh;
 	std::string sphere_name;
-	std::vector<unsigned int> sphere_indices;
-	std::vector<float> vertices;
-	std::vector<float> normals;
-	std::vector<Texture> sphere_textures;
 	
 	unsigned int sphere_VAO, sphere_VBO, sphere_EBO;
 	
 	Shader shader;
 
-	glm::vec3 color{1.0f, 1.0f, 1.0f};
-	glm::vec3 position{ 0.0f, 0.0f, 0.0f };
-
 	Camera& camera;
-
-	float radius = 1;
-	float prev_radius = radius;
-	float slider_speed = 0.01f;
 
 	//std::function is a way to store memeber variable functions. This allows us to set a callback to a instantiated type and calls its function.
 	//We capture the this pointer in the capture clause and call the set_object_size() of the this pointer.
-	std::function<void()> func = [this]() {
-		set_object_size();
-		};
 };

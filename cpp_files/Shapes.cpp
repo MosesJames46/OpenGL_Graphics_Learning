@@ -1,4 +1,5 @@
 #include "../headers/Shapes.h"
+#include "../headers/Sphere.h"
 
 void Shape::generate_and_bind_buffers(unsigned int& uninitialized_VAO, unsigned int& uninitialized_VBO, unsigned int& uninitialized_EBO) {
 	glGenVertexArrays(1, &uninitialized_VAO);
@@ -149,33 +150,30 @@ void Shape::set_position(Shader& shader, Camera& camera, const char* uniform_nam
 	set_MVP(shader, camera);
 }
 
-void Shape::draw(Shader& shader, Camera& camera, unsigned int VAO, int number_of_indices, const char* uniform_color, 
-	float* color, const char* uniform_position, float* position, const char* ImGui_object_name, std::function<void()> func) {
-	shader.useProgram();
+void Shape::draw(Sphere& sphere, Sphere& other_sphere, const char* ImGui_object_name) {
+	sphere.shader.useProgram();
 	ImGui::Begin(ImGui_object_name);
-	set_color(shader, uniform_color, color);
-	set_position(shader, camera, uniform_position, position);
-	func();
+	set_color(sphere.shader, "object_color", &sphere.sphere_mesh.color[0]);
+	set_position(sphere.shader, sphere.camera, "object_position", &sphere.sphere_mesh.position[0]);
+	sphere.shader.set_uniform_location("light_color", other_sphere.sphere_mesh.color);
+	sphere.shader.set_uniform_location("light_position", other_sphere.sphere_mesh.position);
+	sphere.set_object_size();
+	sphere.set_object_scale();
 	ImGui::End();
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(sphere.sphere_VAO);
+	glDrawElements(GL_TRIANGLES, sphere.sphere_mesh.indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-void Shape::draw(Shader& shader, Camera& camera, unsigned int VAO, int number_of_indices, const char* uniform_color,
-	float* color, const char* uniform_position, float* position, const char* uniform_color_other, float* color_other,
-	const char* uniform_position_other, float* position_other, const char* ImGui_object_name, std::function<void()> func) {
-	shader.useProgram();
+void Shape::draw(Sphere& sphere, const char* ImGui_object_name) {
+	sphere.shader.useProgram();
 	ImGui::Begin(ImGui_object_name);
-	set_color(shader, uniform_color, color);
-	set_position(shader, camera, uniform_position, position);
-	glm::vec3 c = glm::vec3{ color_other[0],color_other[1], color_other[2] };
-	glm::vec3 p = glm::vec3{ position_other[0], position_other[1] , position_other[2] };
-	shader.set_uniform_location(uniform_color_other, c);
-	shader.set_uniform_location(uniform_position_other, p);
-	func();
+	set_color(sphere.shader, "object_color", &sphere.sphere_mesh.color[0]);
+	set_position(sphere.shader, sphere.camera, "object_position", &sphere.sphere_mesh.position[0]);
+	sphere.set_object_size();
+	sphere.set_object_scale();
 	ImGui::End();
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(sphere.sphere_VAO);
+	glDrawElements(GL_TRIANGLES, sphere.sphere_mesh.indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 void Shape::draw(Shader& shader,unsigned int VAO, int number_of_indices, std::vector<const char*>& uniform_names, std::vector<Texture>& texture) {

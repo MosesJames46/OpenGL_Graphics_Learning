@@ -12,7 +12,7 @@ uniform vec3 object_color;
 
 void main(){
 	vec3 norm = normalize(normal_outputs);
-	vec3 ambient = 0.4f * light_color;
+	vec3 ambient = 0.1f * light_color;
 	vec3 light_direction = normalize(light_position - fragment_positions);
 	float diffuse = max(dot(norm, light_direction), 0.0f);
 	vec3 diff = diffuse * light_color;
