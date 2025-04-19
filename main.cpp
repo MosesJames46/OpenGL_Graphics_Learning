@@ -17,22 +17,6 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
-void disableCursor() {
-	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_CURSOR_INFO cursorInfo;
-	GetConsoleCursorInfo(consoleHandle, &cursorInfo);
-	cursorInfo.bVisible = false; // Set cursor visibility to false
-	SetConsoleCursorInfo(consoleHandle, &cursorInfo);
-}
-
-void enableCursor() {
-	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_CURSOR_INFO cursorInfo;
-	GetConsoleCursorInfo(consoleHandle, &cursorInfo);
-	cursorInfo.bVisible = true; // Set cursor visibility to false
-	SetConsoleCursorInfo(consoleHandle, &cursorInfo);
-}
-
 int main() {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -84,6 +68,8 @@ int main() {
 
 	Sphere sphere(standard_shader, camera, "Regular Sphere");
 	Sphere light_sphere(light_shader, camera, "Light Sphere");
+	Sphere light_sphere_two(light_shader, camera, "Second Sphere");
+	light_sphere_two.sphere_mesh.position = glm::vec3(10.0f, 0.0f, 0.0f);
 	light_sphere.sphere_mesh.position = glm::vec3(5, 0.0f, -2);
 
 	while (!glfwWindowShouldClose(window)) {
@@ -102,6 +88,7 @@ int main() {
 		Gui_Settings::call_new_frame();
 		
 		light_sphere.draw(sphere);
+		light_sphere_two.draw(sphere);
 		sphere.draw();
 
 		Gui_Settings::render_frame();

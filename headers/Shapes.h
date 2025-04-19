@@ -4,7 +4,6 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture.h"
-#include <functional>
 #include <iostream>
 #include <vector>
 
@@ -12,7 +11,7 @@ static enum fragment_shader_type {
 	STANDARD_SHADER, LIGHT_SHADER
 };
 
-class Sphere;
+extern class Sphere;
 
 class Shape {
 public:
@@ -44,8 +43,14 @@ public:
 
 	void set_MVP(Shader& shader, Camera& camera);
 
-	void set_color(Shader& shader, const char* uniform_name, float* color);
-	void set_position(Shader& shader, Camera& camera, const char* uniform_name, float* position);
+	void set_color(Shader& shader, const char* name, const char* uniform_name, glm::vec3& color);
+	void set_position(Shader& shader, Camera& camera, const char* uniform_name, glm::vec3& position);
+	void set_rotation(Sphere& sphere, const char* uniform_name, glm::vec3& rotation);
+	void set_float(Shader& shader, const char* float_name, const char* uniform_name, float& value, float min, float max);
+
+	void set_object_values(Sphere& object, Sphere& other);
+
+	void set_value(Shader& shader, const char* value_name, const char* uniform_name, glm::vec3& value, float min, float max);
 
 	void draw(Sphere& sphere_object, Sphere& other_sphere_object, const char* ImGui_object_name);
 	void draw(Sphere& sphere, const char* ImGui_object_name);

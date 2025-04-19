@@ -14,7 +14,8 @@ out vec3 normal_outputs;
 out vec3 fragment_positions;
 
 void main(){
-	gl_Position = projection * view * model * vec4(position + object_position, 1.0f);
-	normal_outputs = normals;
+	
+	normal_outputs = mat3(transpose(inverse(model))) * normals;
 	fragment_positions = vec3(model * vec4(position + object_position, 1.0f));
+	gl_Position = projection * view * model * vec4(fragment_positions,  1.0f);
 }

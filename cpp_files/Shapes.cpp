@@ -124,42 +124,71 @@ void Shape::draw(Shader& shader,unsigned int VAO, int number_of_indices) {
 	glDrawElements(GL_TRIANGLES, number_of_indices, GL_UNSIGNED_INT, 0);
 }
 
-void Shape::set_color(Shader& shader, const char* uniform_name, float* color) {
+void Shape::set_color(Shader& shader, const char* name, const char* uniform_name, glm::vec3& color) {
 
-	ImGui::Text("Color:");
+	ImGui::Text(name);
 	ImGui::SameLine();
 	ImGui::PushItemWidth(100);
 	//Use the starting position of the float pointer.
-	ImGui::ColorEdit3("Color Wheel", &color[0]);
+	std::string cw = "##" + (std::string)name;
+	ImGui::ColorEdit3(cw.c_str(), glm::value_ptr(color));
 	ImGui::PopItemWidth();
-	glm::vec3 c = glm::vec3{ color[0], color[1], color[2] };
 	//We access the float values and cast them to a vec 3.
-	shader.set_uniform_location(uniform_name, c);
+	shader.set_uniform_location(uniform_name, color);
 }
 
-void Shape::set_position(Shader& shader, Camera& camera, const char* uniform_name, float* position) {
+void Shape::set_position(Shader& shader, Camera& camera, const char* uniform_name, glm::vec3& position) {
 	float speed = 0.001f;
 	if (ImGui::GetKeyName(ImGuiKey_LeftShift)) {
 		speed = 0.1f;
 	}
 
-	ImGui::DragFloat3("Sphere Position", &position[0], speed, std::numeric_limits<float>::lowest(), (std::numeric_limits<float>::max)());
-	glm::vec3 p = glm::vec3{ position[0], position[1] , position[2] };
-	shader.set_uniform_location(uniform_name, p);
-	camera.reset_camera();
-	set_MVP(shader, camera);
+	ImGui::DragFloat3("Sphere Position", glm::value_ptr(position), speed, std::numeric_limits<float>::lowest(), (std::numeric_limits<float>::max)());
+	shader.set_uniform_location(uniform_name, position);
+}
+
+void Shape::set_float(Shader& shader,const char* float_name, const char* uniform_name, float& value, float min, float max) {
+	ImGui::DragFloat(float_name, &value, .1f, min, max);
+	shader.set_uniform_location(uniform_name, value);
+}
+
+void Shape::set_value(Shader& shader, const char* value_name, const char* uniform_name, glm::vec3& value, float min, float max) {
+	ImGui::DragFloat3(value_name, glm::value_ptr(value), .001f, min, max);
+	shader.set_uniform_location(uniform_name, value);
+}
+
+void Shape::set_rotation(Sphere& sphere, const char* uniform_name, glm::vec3& rotation) {
+	ImGui::DragFloat3("Rotation", glm::value_ptr(rotation), .1f, -180.0f, 180.0f);
+	glm::mat4 model = sphere.set_object_rotation();
+	model = glm::translate(model, sphere.sphere_mesh.position);
+	sphere.shader.set_uniform_location(uniform_name, model);
+}
+
+void Shape::set_object_values(Sphere& object, Sphere& other) {
+	set_color(object.shader, "color", "material.diffuse", object.sphere_mesh.color);
+	set_rotation(object, "model", object.sphere_mesh.rotation);
+	set_position(object.shader, object.camera, "object_position", object.sphere_mesh.position);
+	set_color(object.shader, "ambient: ", "material.ambient", object.ambience);
+	set_color(object.shader, "light ambient: ", "light.ambient", other.ambience);
+	set_float(object.shader, "shiny: ", "material.shininess", object.shininess, 0.001f, 100.0f);
+	set_color(object.shader, "specular", "material.specular", object.specular);
+	set_color(object.shader, "light specular", "light.specular", other.specular);
+	object.set_object_size();
+	object.set_object_scale();
 }
 
 void Shape::draw(Sphere& sphere, Sphere& other_sphere, const char* ImGui_object_name) {
 	sphere.shader.useProgram();
 	ImGui::Begin(ImGui_object_name);
-	set_color(sphere.shader, "object_color", &sphere.sphere_mesh.color[0]);
-	set_position(sphere.shader, sphere.camera, "object_position", &sphere.sphere_mesh.position[0]);
-	sphere.shader.set_uniform_location("light_color", other_sphere.sphere_mesh.color);
-	sphere.shader.set_uniform_location("light_position", other_sphere.sphere_mesh.position);
-	sphere.set_object_size();
-	sphere.set_object_scale();
+	
+	sphere.shader.set_uniform_location("light.diffuse", other_sphere.sphere_mesh.color);
+	sphere.shader.set_uniform_location("light.position", other_sphere.sphere_mesh.position);
+	sphere.shader.set_uniform_location("view_position", sphere.camera.camera_origin);
+	set_object_values(sphere, other_sphere);
+
 	ImGui::End();
+	
+	set_MVP(sphere.shader, sphere.camera);
 	glBindVertexArray(sphere.sphere_VAO);
 	glDrawElements(GL_TRIANGLES, sphere.sphere_mesh.indices.size(), GL_UNSIGNED_INT, 0);
 }
@@ -167,11 +196,12 @@ void Shape::draw(Sphere& sphere, Sphere& other_sphere, const char* ImGui_object_
 void Shape::draw(Sphere& sphere, const char* ImGui_object_name) {
 	sphere.shader.useProgram();
 	ImGui::Begin(ImGui_object_name);
-	set_color(sphere.shader, "object_color", &sphere.sphere_mesh.color[0]);
-	set_position(sphere.shader, sphere.camera, "object_position", &sphere.sphere_mesh.position[0]);
+	set_color(sphere.shader, "color", "object_color", sphere.sphere_mesh.color);
+	set_position(sphere.shader, sphere.camera, "object_position", sphere.sphere_mesh.position);
 	sphere.set_object_size();
 	sphere.set_object_scale();
 	ImGui::End();
+	set_MVP(sphere.shader, sphere.camera);
 	glBindVertexArray(sphere.sphere_VAO);
 	glDrawElements(GL_TRIANGLES, sphere.sphere_mesh.indices.size(), GL_UNSIGNED_INT, 0);
 }

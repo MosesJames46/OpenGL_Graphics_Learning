@@ -35,6 +35,7 @@ public:
 
 	void set_object_size();
 	void set_object_scale();
+	glm::mat4 set_object_rotation();
 
 	void draw(Sphere& sphere);
 	void draw();
@@ -43,9 +44,14 @@ public:
 	std::string sphere_name;
 	
 	unsigned int sphere_VAO, sphere_VBO, sphere_EBO;
+	//float specular = 0.5f;
+	//float ambience = 0.01f;
+	float shininess = 32.0f;
+
+	glm::vec3 ambience{ 0.1f, 0.1f, 0.1f };
+	glm::vec3 specular{ 0.5f, 0.5f, 0.5f };
 	
 	Shader shader;
-
 	Camera& camera;
 
 	//std::function is a way to store memeber variable functions. This allows us to set a callback to a instantiated type and calls its function.

@@ -24,7 +24,7 @@ public:
 	glm::vec3 color{ 1.0f, 1.0f, 1.0f };
 	glm::vec3 position{ 0.0f, 0.0f, 0.0f };
 	glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
-	glm::vec3 rotation{ 1.0f, 1.0f, 1.0f };
+	glm::vec3 rotation{ 0.0f, 0.0f, 0.0f };
 
 	float prev_x_scale = scale.x;
 	float prev_y_scale = scale.y;

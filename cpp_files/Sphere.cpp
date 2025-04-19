@@ -1,6 +1,6 @@
 #include "../headers/Sphere.h"
 
-float pi = 3.14159;
+constexpr const float pi = 3.14159;
 
 void Sphere::initialize_mesh(float sectors, float stacks) {
 	sphere_mesh.generate_sphere(stacks, sectors);
@@ -45,6 +45,16 @@ void Sphere::ready_buffers() {
 	set_attributes(1, 3, 9, 3);
 	set_attributes(2, 3, 9, 6);
 	unbind_buffers_and_attribute_pointer();
+}
+
+glm::mat4 Sphere::set_object_rotation() {
+	glm::mat4 model = glm::mat4(1.0f);
+
+	model = glm::rotate(model, sphere_mesh.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, sphere_mesh.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, sphere_mesh.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+	return model;
 }
 
 void Sphere::set_object_size() {
