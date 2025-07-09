@@ -48,19 +48,7 @@
     <ClInclude Include="headers\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\Triangle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Square.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="headers\Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\Camera.h">
@@ -69,37 +57,40 @@
     <ClInclude Include="headers\Sphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="extern\imgui\backends\imgui_impl_glfw.h">
+    <ClInclude Include="headers\Gui_Settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="extern\imgui\backends\imgui_impl_opengl3.h">
+    <ClInclude Include="headers\Icosphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="extern\imgui\backends\imgui_impl_win32.h">
+    <ClInclude Include="headers\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="extern\imgui\imconfig.h">
+    <ClInclude Include="headers\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="extern\imgui\imgui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="extern\imgui\backends\imgui_impl_opengl3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\imgui\backends\imgui_impl_glfw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\imgui\imconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\imgui\backends\imgui_impl_dx10.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="extern\imgui\imgui_internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="extern\imgui\imstb_rectpack.h">
+    <ClInclude Include="extern\imgui\misc\cpp\imgui_stdlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="extern\imgui\imstb_textedit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="extern\imgui\imstb_truetype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Gui_Settings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Icosphere.h">
+    <ClInclude Include="extern\imgui\backends\imgui_impl_win32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -125,15 +116,6 @@
     <ClCompile Include="cpp_files\Shapes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cpp_files\Triangle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp_files\Square.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp_files\Cube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp_files\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -146,19 +128,19 @@
     <ClCompile Include="cpp_files\Gui_Settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="extern\imgui\backends\imgui_impl_glfw.cpp">
+    <ClCompile Include="cpp_files\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="extern\imgui\backends\imgui_impl_opengl3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="extern\imgui\backends\imgui_impl_win32.cpp">
+    <ClCompile Include="cpp_files\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="extern\imgui\imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="extern\imgui\imgui_demo.cpp">
+    <ClCompile Include="extern\imgui\backends\imgui_impl_opengl3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="extern\imgui\backends\imgui_impl_glfw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="extern\imgui\imgui_draw.cpp">
@@ -170,6 +152,21 @@
     <ClCompile Include="extern\imgui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="extern\imgui\backends\imgui_impl_dx10.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="extern\imgui\backends\imgui_impl_dx11.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="extern\imgui\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="extern\imgui\misc\cpp\imgui_stdlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="extern\imgui\backends\imgui_impl_win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\vertex_shader.glsl">
@@ -178,9 +175,10 @@
     <None Include="shaders\fragment_shader.glsl">
       <Filter>shaders</Filter>
     </None>
-    <None Include="extern\imgui\misc\debuggers\imgui.natstepfilter" />
     <None Include="shaders\light_fragment_shader.glsl" />
     <None Include="shaders\light_vertex_shader.glsl" />
+    <None Include="shaders\line_vertex_shader.glsl" />
+    <None Include="shaders\line_fragment_shader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="pictures\wall.jpg">
@@ -189,8 +187,5 @@
     <Image Include="pictures\awesomeface.png">
       <Filter>Resource Files</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="extern\imgui\misc\debuggers\imgui.natvis" />
   </ItemGroup>
 </Project>

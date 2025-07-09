@@ -19,40 +19,39 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="extern\imgui\backends\imgui_impl_dx10.h" />
     <ClInclude Include="extern\imgui\backends\imgui_impl_glfw.h" />
     <ClInclude Include="extern\imgui\backends\imgui_impl_opengl3.h" />
     <ClInclude Include="extern\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="extern\imgui\imconfig.h" />
     <ClInclude Include="extern\imgui\imgui.h" />
     <ClInclude Include="extern\imgui\imgui_internal.h" />
-    <ClInclude Include="extern\imgui\imstb_rectpack.h" />
-    <ClInclude Include="extern\imgui\imstb_textedit.h" />
-    <ClInclude Include="extern\imgui\imstb_truetype.h" />
+    <ClInclude Include="extern\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="glad3.3\include\glad\glad.h" />
     <ClInclude Include="glad3.3\include\KHR\khrplatform.h" />
     <ClInclude Include="headers\Camera.h" />
-    <ClInclude Include="headers\Cube.h" />
     <ClInclude Include="headers\Gui_Settings.h" />
     <ClInclude Include="headers\Icosphere.h" />
     <ClInclude Include="headers\libs.h" />
+    <ClInclude Include="headers\Material.h" />
     <ClInclude Include="headers\Mesh.h" />
+    <ClInclude Include="headers\Renderer.h" />
     <ClInclude Include="headers\Shader.h" />
     <ClInclude Include="headers\Shapes.h" />
     <ClInclude Include="headers\Image.h" />
     <ClInclude Include="headers\Sphere.h" />
-    <ClInclude Include="headers\Square.h" />
-    <ClInclude Include="headers\Triangle.h" />
-    <ClInclude Include="headers\Vertex.h" />
     <ClInclude Include="stb_imageloader_header\stb_image.h" />
     <ClInclude Include="headers\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cpp_files\Camera.cpp" />
-    <ClCompile Include="cpp_files\Cube.cpp" />
     <ClCompile Include="cpp_files\Gui_Settings.cpp" />
+    <ClCompile Include="cpp_files\Material.cpp" />
     <ClCompile Include="cpp_files\Mesh.cpp" />
+    <ClCompile Include="cpp_files\Renderer.cpp" />
     <ClCompile Include="cpp_files\Sphere.cpp" />
-    <ClCompile Include="cpp_files\Square.cpp" />
+    <ClCompile Include="extern\imgui\backends\imgui_impl_dx10.cpp" />
+    <ClCompile Include="extern\imgui\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="extern\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="extern\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="extern\imgui\backends\imgui_impl_win32.cpp" />
@@ -61,6 +60,7 @@
     <ClCompile Include="extern\imgui\imgui_draw.cpp" />
     <ClCompile Include="extern\imgui\imgui_tables.cpp" />
     <ClCompile Include="extern\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="extern\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="glad3.3\src\glad.c" />
     <ClCompile Include="cpp_files\Image.cpp" />
     <ClCompile Include="main.cpp" />
@@ -68,21 +68,18 @@
     <ClCompile Include="cpp_files\Shapes.cpp" />
     <ClCompile Include="cpp_files\stb_image.cpp" />
     <ClCompile Include="cpp_files\Texture.cpp" />
-    <ClCompile Include="cpp_files\Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="extern\imgui\misc\debuggers\imgui.natstepfilter" />
     <None Include="shaders\fragment_shader.glsl" />
     <None Include="shaders\light_fragment_shader.glsl" />
     <None Include="shaders\light_vertex_shader.glsl" />
+    <None Include="shaders\line_fragment_shader.glsl" />
+    <None Include="shaders\line_vertex_shader.glsl" />
     <None Include="shaders\vertex_shader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="pictures\awesomeface.png" />
     <Image Include="pictures\wall.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="extern\imgui\misc\debuggers\imgui.natvis" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

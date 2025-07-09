@@ -1,59 +1,35 @@
 #pragma once
 #include "libs.h"
 #include "Shapes.h"
-#include "Mesh.h"
-#include "Shader.h"
-#include "Camera.h"
-#include "Texture.h"
 #include "Gui_Settings.h"
 #include <sstream>
-#include <cmath>
-#include <functional>
-
-
 
 class Sphere : public Shape {
 public:
-	Sphere(Shader& shader, Camera& camera, const char* name) : shader(shader), camera(camera){
+	
+	Sphere(const std::string& name, int stacks, int slices, int scale) : sphere_name(name)
+	, stacks(stacks), slices(slices), radius(radius){
 		//Good tip for transforming the this pointer into a string. Static case to a const void*.
 		const void* a = static_cast<const void*>(this);
 		std::stringstream ss;
 		ss << a;
 		std::string hash = "##";
 		sphere_name = name + hash + ss.str();
-		initialize_mesh(36, 36);
-		ready_buffers();
-		unbind_buffers_and_attribute_pointer();
 	}
 
-	void initialize_mesh(float stacks, float sectors);
+	void generate_mesh(Mesh& mesh) override;
 
-	void ready_buffers();
+	void set_radius(std::vector<float>& vertices);
 
-	void set_radius();
-	void set_scale();
+	void generate_indices(std::vector<unsigned int>& indices) override;
+	void generate_vertices(std::vector<float>& vertices) override;
 
-	void set_object_size();
-	void set_object_scale();
-	glm::mat4 set_object_rotation();
-
-	void draw(Sphere& sphere);
-	void draw();
-
-	Mesh sphere_mesh;
 	std::string sphere_name;
-	
-	unsigned int sphere_VAO, sphere_VBO, sphere_EBO;
-	//float specular = 0.5f;
-	//float ambience = 0.01f;
-	float shininess = 32.0f;
 
-	glm::vec3 ambience{ 0.1f, 0.1f, 0.1f };
-	glm::vec3 specular{ 0.5f, 0.5f, 0.5f };
-	
-	Shader shader;
-	Camera& camera;
-
-	//std::function is a way to store memeber variable functions. This allows us to set a callback to a instantiated type and calls its function.
-	//We capture the this pointer in the capture clause and call the set_object_size() of the this pointer.
+	/*
+		Stacks for a sphere are the vertical squares that show how many squares are "stacked" vertically.
+		Slices are the horizontal squares that span the spheres.
+	*/
+	int stacks, slices;
+	float radius = 1;
 };

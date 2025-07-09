@@ -1,21 +1,21 @@
 #include "headers/libs.h"
-#include "headers/Triangle.h"
-#include "headers/Square.h"
-#include "headers/Cube.h"
 #include "headers/Shader.h"
-#include "headers/Texture.h"
+#include "headers/Material.h"
 #include "headers/Sphere.h"
 #include "headers/Camera.h"
+#include "headers/Mesh.h"
 #include "extern/imgui/imgui.h"
 #include "extern/imgui/backends/imgui_impl_glfw.h"
 #include "extern/imgui/backends/imgui_impl_opengl3.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include "extern/imgui/backends/imgui_impl_win32.h"
-#include <windows.h>
 #include "../headers/Gui_Settings.h"
-#include "../headers/Icosphere.h"
+#include "../headers/Renderer.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
+constexpr const float WINDOW_WIDTH = 800.0f;
+constexpr const float WINDOW_HEIGHT = 600.0f;
 
 int main() {
 	glfwInit();
@@ -23,7 +23,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGL", NULL, NULL);
 
 	if (window == NULL) {
 		std::cout << "Failed to open window.\n";
@@ -66,12 +66,15 @@ int main() {
 	Shader standard_shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
 	Shader light_shader("shaders/light_vertex_shader.glsl", "shaders/light_fragment_shader.glsl");
 
-	Sphere sphere(standard_shader, camera, "Regular Sphere");
-	Sphere light_sphere(light_shader, camera, "Light Sphere");
-	Sphere light_sphere_two(light_shader, camera, "Second Sphere");
-	light_sphere_two.sphere_mesh.position = glm::vec3(10.0f, 0.0f, 0.0f);
-	light_sphere.sphere_mesh.position = glm::vec3(5, 0.0f, -2);
+	Mesh sphere("Regular Sphere", SPHERE);
+	Material material(standard_shader, LIGHT, sphere);
+	Renderer r(material, camera, sphere);
 
+	Mesh light("light sphere", SPHERE);
+	Material shiny(light_shader, SHINY, light, camera);
+	shiny.attach_mesh(sphere);
+	Renderer r_shiny(shiny, camera, light);
+	
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
 
@@ -79,20 +82,19 @@ int main() {
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-		camera.get_camera_input(window);	
+		
+		camera.get_camera_input(window);
 		camera.view_through_camera();
 
 		glfwPollEvents();
 		
 		Gui_Settings::call_new_frame();
-		
-		light_sphere.draw(sphere);
-		light_sphere_two.draw(sphere);
-		sphere.draw();
+
+		r.draw();
+		r_shiny.draw();
 
 		Gui_Settings::render_frame();
-		
+				
 		glfwSwapBuffers(window);
 	}
 	standard_shader.delete_program_shader();

@@ -1,89 +1,131 @@
 #include "../headers/Sphere.h"
+#include "../headers/Mesh.h"
 
-constexpr const float pi = 3.14159;
+constexpr const float pi = 3.1415926;
 
-void Sphere::initialize_mesh(float sectors, float stacks) {
-	sphere_mesh.generate_sphere(stacks, sectors);
-	sphere_mesh.generate_indices(stacks, sectors);
-	sphere_mesh.generate_basic_normals();
-	//generate_normals();
-	sphere_mesh.load_vertices_and_normals();
-}
+void Sphere::generate_vertices(std::vector<float>& vertices) {
+	//Adding the top vertex of our sphere.
+	vertices.push_back(0.f); 
+	vertices.push_back(1.f);
+	vertices.push_back(0.f);
 
-void Sphere::set_radius() {
-	if (sphere_mesh.prev_scale == sphere_mesh.uniform_scale) return;
-	for (int i = 0; i < sphere_mesh.mesh.size(); i+= 9) {
-		sphere_mesh.mesh[i] = (sphere_mesh.mesh[i] / sphere_mesh.prev_scale) * sphere_mesh.uniform_scale;
-		sphere_mesh.mesh[i + 1] = (sphere_mesh.mesh[i + 1] / sphere_mesh.prev_scale) * sphere_mesh.uniform_scale;
-		sphere_mesh.mesh[i + 2] = (sphere_mesh.mesh[i + 2] / sphere_mesh.prev_scale) * sphere_mesh.uniform_scale;
+	/*
+	float current_stack_angle = half_pi - i * stack_step;
+
+	Obtains a percentage of half a circle.
+	when i is 0 only have influence in the y.
+	When i is half of our sector count, we have both x and y distances equal to unit 1.
+	Only when i is equal to the stack count do we enter -half_pi which gives us influence
+	in the -y direction. This effectively acts as a force from pi/2 to -pi / 2;
+	*/
+	 
+	for (int i = 0; i < stacks - 1; i++) {
+		//Calculates the percentage from top to bottom.
+		float phi = pi * static_cast<float>(i + 1) / static_cast<float>(stacks);
+		for (int j = 0; j < slices; j++) {
+			// 2 * pi is used because we need a full sphere. 
+			float theta = 2.f * pi * static_cast<float>(j) / static_cast<float>(slices);
+			float x = std::sin(phi) * std::cos(theta);
+			float y = std::cos(phi);
+			float z = std::sin(phi) * std::sin(theta);
+			vertices.push_back(x);
+			vertices.push_back(y);
+			vertices.push_back(z);
+		}
 	}
 
-	sphere_mesh.prev_scale = sphere_mesh.uniform_scale;
-	redraw(shader, sphere_VBO, sphere_mesh);
-	unbind_buffers_and_attribute_pointer();
+	//Adding the bottom vertex of our sphere.
+	vertices.push_back(0.f);
+	vertices.push_back(-1.f);
+	vertices.push_back(0.f);
 }
 
-void Sphere::set_scale() {
-	if (sphere_mesh.prev_x_scale == sphere_mesh.scale.x && sphere_mesh.prev_y_scale == sphere_mesh.scale.y && sphere_mesh.prev_z_scale == sphere_mesh.scale.z) return;
+void Sphere::generate_indices(std::vector<unsigned int>& indices) {
 
-	for (int i = 0; i < sphere_mesh.mesh.size(); i+=9) {
-		sphere_mesh.mesh[i] = (sphere_mesh.mesh[i] / sphere_mesh.prev_x_scale) * sphere_mesh.scale.x;
-		sphere_mesh.mesh[i + 1] = (sphere_mesh.mesh[i + 1] / sphere_mesh.prev_y_scale) * sphere_mesh.scale.y;
-		sphere_mesh.mesh[i + 2] = (sphere_mesh.mesh[i + 2] / sphere_mesh.prev_z_scale) * sphere_mesh.scale.z;
+	// generate CCW index list of sphere triangles
+	// k1--k1+1
+	// |  / |
+	// | /  |
+	// k2--k2+1
+
+	int k1, k2;
+	for (int i = 0; i < stacks; ++i)
+	{
+		k1 = i * (slices + 1);     // beginning of current stack
+		k2 = k1 + slices + 1;      // beginning of next stack
+
+		for (int j = 0; j < stacks; ++j, ++k1, ++k2)
+		{
+			// 2 triangles per sector excluding first and last stacks
+			// k1 => k2 => k1+1
+			if (i != 0)
+			{
+				indices.push_back(k1);
+				indices.push_back(k2);
+				indices.push_back(k1 + 1);
+			}
+
+			// k1+1 => k2 => k2+1
+			if (i != (stacks - 1))
+			{
+				indices.push_back(k1 + 1);
+				indices.push_back(k2);
+				indices.push_back(k2 + 1);
+			}
+
+		}
+	}
+}
+
+void Sphere::generate_mesh(Mesh& mesh) {
+	mesh.vertex_data.clear();
+	float x, y, z, xy;                              // vertex position
+	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
+	float s, t;                                     // vertex texCoord
+
+	float sectorStep = 2 * pi / slices;
+	float stackStep = pi / stacks;
+	float sectorAngle, stackAngle;
+
+	for (int i = 0; i <= stacks; ++i)
+	{
+		stackAngle = (pi / 2.f) - i * stackStep;        // starting from pi/2 to -pi/2
+		xy = cosf(stackAngle);             // r * cos(u)
+		z =  sinf(stackAngle);              // r * sin(u)
+
+		// add (sectorCount+1) vertices per stack
+		// first and last vertices have same position and normal, but different tex coords
+		for (int j = 0; j <= slices; ++j)
+		{
+			sectorAngle = j * sectorStep;           // starting from 0 to 2pi
+
+			// vertex position (x, y, z)
+			x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
+			y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
+			mesh.vertex_data.push_back(x);
+			mesh.vertex_data.push_back(y);
+			mesh.vertex_data.push_back(z);
+
+			// vertex color
+			mesh.vertex_data.push_back(mesh.color[0]);
+			mesh.vertex_data.push_back(mesh.color[1]);
+			mesh.vertex_data.push_back(mesh.color[2]);
+
+			// vertex tex coord (s, t) range between [0, 1]
+			/*s = (float)j / slices;
+			t = (float)i / stacks;
+			mesh.vertex_data.push_back(s);
+			mesh.vertex_data.push_back(t);*/
+
+			// normalized vertex normal (nx, ny, nz)
+			nx = x * lengthInv;
+			ny = y * lengthInv;
+			nz = z * lengthInv;
+			mesh.vertex_data.push_back(nx);
+			mesh.vertex_data.push_back(ny);
+			mesh.vertex_data.push_back(nz);
+		}
 	}
 
-	sphere_mesh.prev_x_scale = sphere_mesh.scale.x;
-	sphere_mesh.prev_y_scale = sphere_mesh.scale.y;
-	sphere_mesh.prev_z_scale = sphere_mesh.scale.z;
-	redraw(shader, sphere_VBO, sphere_mesh);
-	unbind_buffers_and_attribute_pointer();
-}
-
-void Sphere::ready_buffers() {
-	gen_bind_format(sphere_mesh, sphere_mesh.indices, sphere_VAO, sphere_VBO, sphere_EBO);
-	set_attributes(0, 3, 9, 0);
-	set_attributes(1, 3, 9, 3);
-	set_attributes(2, 3, 9, 6);
-	unbind_buffers_and_attribute_pointer();
-}
-
-glm::mat4 Sphere::set_object_rotation() {
-	glm::mat4 model = glm::mat4(1.0f);
-
-	model = glm::rotate(model, sphere_mesh.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::rotate(model, sphere_mesh.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, sphere_mesh.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-
-	return model;
-}
-
-void Sphere::set_object_size() {
-	ImGui::Text("Radius: ");
-	ImGui::PushItemWidth(60);
-	ImGui::SameLine();
-	ImGui::DragFloat("##float", &sphere_mesh.uniform_scale, 0.01f, 0.1f, (std::numeric_limits<float>::max)());
-	ImGui::PopItemWidth();
-
-	set_radius();
-}
-
-void Sphere::set_object_scale() {
-	ImGui::Text("Scale:");
-	ImGui::PushItemWidth(100);
-	ImGui::SameLine();
-	ImGui::DragFloat3("X, Y, Z", &sphere_mesh.scale[0], .01f, 0.001f, (std::numeric_limits<float>::max)());
-	ImGui::PopItemWidth();
-	if (sphere_mesh.scale.x < 0.001f) sphere_mesh.scale.x = 1.0f;
-	if (sphere_mesh.scale.y < 0.001f) sphere_mesh.scale.y = 1.0f;
-	if (sphere_mesh.scale.z < 0.001f) sphere_mesh.scale.z = 1.0f;
-	
-	set_scale();
-}
-
-void Sphere::draw(Sphere& sphere) {
-	Shape::draw(*this, sphere, sphere_name.c_str());
-}
-
-void Sphere::draw() {
-	Shape::draw(*this, sphere_name.c_str());
+	generate_indices(mesh.indices);
 }

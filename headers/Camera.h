@@ -1,13 +1,9 @@
 #pragma once
 #include "libs.h"
-#include "../extern/imgui/imgui.h"
-#include "../extern/imgui/backends/imgui_impl_glfw.h"
-#include "../extern/imgui/backends/imgui_impl_opengl3.h"
 #include <vector>
 #include <iostream>
 #include <thread>
-#include "Windows.h"
-#include <iomanip>
+
 
 
 class Camera {
@@ -41,6 +37,45 @@ public:
 	GLenum last_edit_mode = is_edit_mode;
 
 	bool does_ImGui_have_control = true;
+	void perspective(float FOV, float n, float f, float aspect, float l, float r, float b, float t, glm::vec3& in) {
+		FOV = std::tanf(FOV / 2.f * (3.1415f / 180.f)) * n;
+		r = aspect * FOV * r;
+		l = -r;
+		t = FOV * t;
+		b = -t;
+		glm::mat4 proj;
+		in.x = in.x * proj[0][0] + in.x * proj[0][2];
+		in.y = in.y * proj[1][1] + proj[1][2];
+		in.z = in.z * proj[2][2] + proj[2][3];
+
+		float w = in.x * proj[3][0] + in.y * proj[3][1] + in.z * proj[3][2] + proj[3][3];
+
+		if (w != 0) {
+			in.x /= w;
+			in.y /= w;
+			in.z /= w;
+		}
+	}
+
+	glm::mat4 frustum(float n, float f, float fov, float aspect) {
+		fov = std::tanf(fov / 2.f) * n;
+		float r = aspect * fov;
+		float l = -r;
+		float t = fov;
+		float b = -t;
+		glm::mat4 frust;
+		frust[0][0] = 2 * n / (r - l);
+		frust[0][2] = (r + l) / (r - l);
+
+		frust[1][1] = 2 * n / (t - b);
+		frust[1][2] = t + b / (t - b);
+
+		frust[2][2] = -(f + n) / (f - n);
+		frust[2][3] = -2 * f * n / (f - n);
+
+		frust[3][3] = -1;
+		return frust;
+	}
 
 	void get_camera_input(GLFWwindow* window);
 	void mouse_callback(GLFWwindow* window, double x_position, double y_position);

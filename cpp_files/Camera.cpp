@@ -1,4 +1,7 @@
 #include "../headers/Camera.h"
+#include "../extern/imgui/imgui.h"
+#include "../extern/imgui/backends/imgui_impl_glfw.h"
+#include "../extern/imgui/backends/imgui_impl_opengl3.h"
 
 void Camera::get_camera_input(GLFWwindow* window) {
 	float current_time = glfwGetTime();
@@ -75,12 +78,13 @@ void Camera::mouse_callback(GLFWwindow* window, double x_position, double y_posi
 
 void Camera::view_through_camera() {
 	
-	projection = glm::perspective(glm::radians(45.0f), 1980.0f / 1080.0f, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(45.0f), 1980.0f / 1080.0f, .01f, 100.0f);
+
 	view = glm::lookAt(camera_origin, camera_origin + camera_forward, camera_up);
+
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, camera_origin);
 	reset_camera();
-	
 }
 
 void Camera::reset_camera() {
