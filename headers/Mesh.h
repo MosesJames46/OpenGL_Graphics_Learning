@@ -6,6 +6,8 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include <sstream>
+#include <memory>
 
 class Sphere;
 
@@ -14,6 +16,7 @@ enum shape_type{SPHERE};
 class Mesh : public Shape{
 public:
 	Mesh(const std::string& name, shape_type shape);
+
 	~Mesh() {};
 	
 	void initialize_mesh(Sphere& sphere);
@@ -49,6 +52,7 @@ public:
 	std::vector<float> vertex_data;
 
 	std::string name;
+	
 
 	unsigned int VAO, VBO, EBO;
 

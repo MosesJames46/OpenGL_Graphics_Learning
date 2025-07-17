@@ -6,6 +6,18 @@
 #include "../headers/Mesh.h"
 #include "../headers/Gui_Settings.h"
 
+
+Renderer::Renderer(std::unique_ptr<Material> material, Camera* camera) : unique_material(std::move(material)), camera(*camera), 
+mesh((*unique_material->info.mesh)), material((*unique_material.get())) {
+	//std::cout << unique_material->info.mesh->name << std::endl;
+	gen_bind_format();
+	set_attributes(0, 3, 11, 0);
+	set_attributes(1, 3, 11, 3);
+	set_attributes(2, 2, 11, 6);
+	set_attributes(3, 3, 11, 8);
+	unbind_buffers_and_attribute_pointer();
+}
+
 void Renderer::generate_and_bind_buffers(unsigned int& uninitialized_VAO, unsigned int& uninitialized_VBO, unsigned int& uninitialized_EBO) {
 	glGenVertexArrays(1, &uninitialized_VAO);
 	glGenBuffers(1, &uninitialized_VBO);
@@ -67,31 +79,29 @@ void Renderer::attach_uniform(const char* uniform_name, std::vector<float>&& col
 	glUniform4f(uniform_location, color[0], color[1], color[2], 1.0f);
 }
 
-void Renderer::bind_textures(std::vector<const char*>& uniform_names, std::vector<Texture>& texture_vector) {
-	if (!texture_vector.empty()) {
-		for (int i = 0; i < texture_vector.size(); i++) {
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, texture_vector[i].texture);
-			material.info.shader->set_uniform_location(uniform_names[i], (int)i);
-		}
+void Renderer::bind_textures(std::vector<const char*>& uniform_names) {
+	for (int i = 0; i < textures.size(); i++) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, textures[i].texture);
+		material.info.shader->set_uniform_location(uniform_names[i], i);
 	}
 }
-void Renderer::bind_textures(std::vector<const char*>&& uniform_names, std::vector<Texture>& texture_vector) {
-	if (!texture_vector.empty()) {
-		for (int i = 0; i < texture_vector.size(); i++) {
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, texture_vector[i].texture);
-			material.info.shader->set_uniform_location(uniform_names[i], (int)i);
-		}
+void Renderer::bind_textures(std::vector<const char*>&& uniform_names) {
+	for (int i = 0; i < textures.size(); i++) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, textures[i].texture);
+		material.info.shader->set_uniform_location(uniform_names[i], i);
 	}
 }
 
-void Renderer::add_textures(std::vector<const char*> file_paths, std::vector<Texture>& texture_vector) {
+void Renderer::add_textures(std::vector<const char*> file_paths, std::vector<const char*> uniform_locations) {
 	for (int i = 0; i < file_paths.size(); i++) {
 		Texture T;
-		texture_vector.push_back(T);
-		texture_vector[i].create_texture(file_paths[i]);
+		textures.push_back(T);
+		textures[i].create_texture(file_paths[i]);
 	}
+
+	bind_textures(uniform_locations);
 }
 
 void Renderer::set_MVP() {
@@ -100,15 +110,30 @@ void Renderer::set_MVP() {
 	material.info.shader->set_uniform_location("projection", camera.projection);
 }
 
-void Renderer::draw() {
+
+/*
+	When invoking a pointer to functoin memeber:
+	(material.*material.activate_material((*material.info.camera, render)))((*material.info.camera, render))
+		1. material. looks at available memebers of the this pointer
+		2.*material.activate_material dereferences the address of the poniter to function memeber
+		3. the parameter list following step 2. is the parameter list needed for the function pointer.
+		4. enclose all of steps 1 - 3 in parenthesis 
+		5. invoke with proper parameters.
+*/
+void Renderer::draw(bool render) {
 	material.info.shader->useProgram();
-	if (material.info.camera) {
-		(material.*material.activate_material((*material.info.camera)))((*material.info.camera));
+	switch (material.material) {
+	case LIGHT:
+		(material.*material.activate_material(render))(render);
+		break;
+	case COMPLEX:
+		(material.*material.activate_material((*material.info.camera), render))((*material.info.camera), render);
+		break;
+	case TEXTURED:
+		(material.*material.activate_material((*material.info.camera), render))((*material.info.camera), render);
+		break;
 	}
-	else {
-		(material.*material.activate_material())();
-	}
-	
+
 	set_MVP();
 	glBindVertexArray(mesh.VAO);
 	glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);

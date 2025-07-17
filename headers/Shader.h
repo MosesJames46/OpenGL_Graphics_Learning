@@ -23,6 +23,19 @@ public:
 	void delete_shader(unsigned int shader);
 	void delete_program_shader();
 
+
+	/*
+		A uniform location corresponds to the value in the GPU that can be modified on the CPU.
+		
+		The format is as follows:
+			glUniform1i(glGetUniformLocation(programShaderID, uniform_location_name), value);
+
+			1. Shader ID is the shader program.
+			2. The const char* of the location as named on the gpu and the value to be used.
+
+		The glUniform* has different typings it can proccess. ranging from an int to matrices.
+			
+	*/
 	void set_uniform_location(const char* uniform_name, int value);
 	void set_uniform_location(const char* uniform_name, float value);
 	void set_uniform_location(const char* uniform_name, bool value);

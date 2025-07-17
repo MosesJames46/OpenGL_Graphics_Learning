@@ -64,16 +64,17 @@ int main() {
 	ImGui::StyleColorsDark();
 
 	Shader standard_shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
-	Shader light_shader("shaders/light_vertex_shader.glsl", "shaders/light_fragment_shader.glsl");
+	Shader light_shader("shaders/sphere_vertex_shader.glsl", "shaders/sphere_fragment_shader.glsl");
 
 	Mesh sphere("Regular Sphere", SPHERE);
-	Material material(standard_shader, LIGHT, sphere);
+	Material material(standard_shader, sphere, LIGHT);
 	Renderer r(material, camera, sphere);
 
 	Mesh light("light sphere", SPHERE);
-	Material shiny(light_shader, SHINY, light, camera);
+	Material shiny(light_shader, light, camera, COMPLEX);
 	shiny.attach_mesh(sphere);
 	Renderer r_shiny(shiny, camera, light);
+	//r_shiny.add_textures({ "./pictures/moon_texture_2.png" }, { "material.diffuse" });
 	
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -89,10 +90,15 @@ int main() {
 		glfwPollEvents();
 		
 		Gui_Settings::call_new_frame();
+		Gui_Settings::gui_test(camera);
+		//Gui_Settings::gui_test_type();
 
-		r.draw();
-		r_shiny.draw();
+		r.draw(false);
+		r_shiny.draw(false);
 
+		ImGui::ShowDemoWindow();
+
+		ImGui::EndFrame();
 		Gui_Settings::render_frame();
 				
 		glfwSwapBuffers(window);

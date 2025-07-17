@@ -112,10 +112,10 @@ void Sphere::generate_mesh(Mesh& mesh) {
 			mesh.vertex_data.push_back(mesh.color[2]);
 
 			// vertex tex coord (s, t) range between [0, 1]
-			/*s = (float)j / slices;
-			t = (float)i / stacks;
+			s = static_cast<float>(j) / slices;
+			t = static_cast<float>(i) / stacks;
 			mesh.vertex_data.push_back(s);
-			mesh.vertex_data.push_back(t);*/
+			mesh.vertex_data.push_back(t);
 
 			// normalized vertex normal (nx, ny, nz)
 			nx = x * lengthInv;

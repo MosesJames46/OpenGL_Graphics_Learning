@@ -37,6 +37,18 @@ void Texture::create_texture(const char* image_path) {
 }
 
 int Texture::get_color_channel(Image& image) {
+	//std::cout << image.color_channels << std::endl;
+	switch (image.color_channels) {
+	case 1:
+		return GL_RED;
+	case 3:
+		return GL_RGB;
+	case 4:
+		return GL_RGBA;
+	default:
+		return GL_RGBA;
+	}
+	/*if (image.color_channels == 1) return GL_RED;
 	if (image.color_channels == 3) return GL_RGB;
-	if (image.color_channels == 4) return GL_RGBA;
+	if (image.color_channels == 4) return GL_RGBA;*/
 }

@@ -177,8 +177,8 @@
     </None>
     <None Include="shaders\light_fragment_shader.glsl" />
     <None Include="shaders\light_vertex_shader.glsl" />
-    <None Include="shaders\line_vertex_shader.glsl" />
-    <None Include="shaders\line_fragment_shader.glsl" />
+    <None Include="shaders\sphere_vertex_shader.glsl" />
+    <None Include="shaders\sphere_fragment_shader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="pictures\wall.jpg">
@@ -187,5 +187,17 @@
     <Image Include="pictures\awesomeface.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="pictures\moon_texture_2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="pictures\moon texture.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="pictures\Nasa Moon.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="glfw3.lib" />
   </ItemGroup>
 </Project>

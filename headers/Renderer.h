@@ -18,12 +18,25 @@ class Renderer {
 public:
 	Renderer(Material& material, Camera& camera, Mesh& mesh) : material(material), camera(camera), mesh(mesh) {
 		gen_bind_format();
-		set_attributes(0, 3, 9, 0);
-		//set_attributes(1, 6, 11, 3);
-		set_attributes(1, 3, 9, 3);
-		set_attributes(2, 3, 9, 6);
+		set_attributes(0, 3, 11, 0);
+		set_attributes(1, 3, 11, 3);
+		set_attributes(2, 2, 11, 6);
+		set_attributes(3, 3, 11, 8);
 		unbind_buffers_and_attribute_pointer();
 	}
+
+	Renderer(Material* material, Camera* camera, Mesh* mesh) : material(*material), camera(*camera), mesh(*mesh) {
+		gen_bind_format();
+		set_attributes(0, 3, 11, 0);
+		set_attributes(1, 3, 11, 3);
+		set_attributes(2, 2, 11, 6);
+		set_attributes(3, 3, 11, 8);
+		unbind_buffers_and_attribute_pointer();
+	}
+
+	Renderer(std::unique_ptr<Material> material, Camera* camera);
+
+	~Renderer(){}
 	void unbind_buffers_and_attribute_pointer();
 
 	/*
@@ -82,10 +95,10 @@ public:
 	void attach_uniform(const char* uniform_name, std::vector<float>& color);
 	void attach_uniform(const char* uniform_name, std::vector<float>&& color);
 
-	void bind_textures(std::vector<const char*>&& uniform_names, std::vector<Texture>& texture_vector);
-	void bind_textures(std::vector<const char*>& uniform_names, std::vector<Texture>& texture_vector);
+	void bind_textures(std::vector<const char*>&& uniform_names);
+	void bind_textures(std::vector<const char*>& uniform_names);
 
-	void add_textures(std::vector<const char*> file_paths, std::vector<Texture>& texture_vector);
+	void add_textures(std::vector<const char*> file_paths, std::vector<const char*> uniform_locations);
 
 	void set_MVP();
 
@@ -100,12 +113,16 @@ public:
 			glBindVertexArray(VAO);
 			glDrawElements(Primitive type, amount of vertices/indices to draw, GL_UNSIGNED_BYTE, 0);
 	*/
-	void draw();
+	void draw(bool renderer_gui = false);
 	void redraw();
 
 	const char* get_shader_type(fragment_shader_type);
 	
+	std::unique_ptr<Material> unique_material;
+
 	Mesh& mesh;
 	Material& material;
 	Camera& camera;
+
+	std::vector<Texture> textures;
 };

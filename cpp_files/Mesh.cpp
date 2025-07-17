@@ -3,6 +3,13 @@
 
 Mesh::Mesh(const std::string& name, shape_type shape) : name(name) {
 	id = mesh_number();
+	/*
+		Give the Mesh a unique address. This avoids name duplicates.
+	*/
+	const void* n = static_cast<const void*>(this);
+	std::ostringstream ss;
+	ss << n;
+	this->name += std::string(" " +  ss.str());
 	switch (shape) {
 	case shape_type::SPHERE:
 		Sphere sphere(name, 16, 16, 1);
@@ -16,13 +23,10 @@ void Mesh::initialize_mesh(Sphere& sphere) {
 }
 
 void Mesh::set_color() {
-
-	ImGui::Text(name.c_str());
-	ImGui::SameLine();
-	ImGui::PushItemWidth(100);
 	//Use the starting position of the float pointer.
-	std::string cw = "Color##" + (std::string)name + std::to_string(id);
-	ImGui::ColorEdit3(cw.c_str(), glm::value_ptr(color));
+	ImGui::PushItemWidth(300);
+	ImGui::SeparatorText("Color");
+	ImGui::ColorEdit3("##Color", glm::value_ptr(color));
 	ImGui::PopItemWidth();
 	//We access the float values and cast them to a vec 3.
 }
@@ -32,8 +36,8 @@ void Mesh::set_position() {
 	if (ImGui::GetKeyName(ImGuiKey_LeftShift)) {
 		speed = 0.1f;
 	}
-
-	ImGui::DragFloat3("Sphere Position", glm::value_ptr(position), speed, std::numeric_limits<float>::lowest(), (std::numeric_limits<float>::max)());
+	ImGui::SeparatorText("Position");
+	ImGui::DragFloat3("##Position", glm::value_ptr(position), speed, std::numeric_limits<float>::lowest(), (std::numeric_limits<float>::max)());
 }
 
 void Mesh::set_float() {
@@ -42,9 +46,8 @@ void Mesh::set_float() {
 }
 
 void Mesh::set_ambient() {
-	ImGui::Text("Ambient Value");
-	std::string cw = "Ambient##" + (std::string)name + std::to_string(id);
-	ImGui::ColorEdit3(cw.c_str(), glm::value_ptr(ambience));
+	ImGui::SeparatorText("Ambient");
+	ImGui::ColorEdit3("##Ambient", glm::value_ptr(ambience));
 }
 
 void Mesh::set_shininess() {

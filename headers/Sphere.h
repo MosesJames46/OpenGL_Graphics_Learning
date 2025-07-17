@@ -13,9 +13,10 @@ public:
 		const void* a = static_cast<const void*>(this);
 		std::stringstream ss;
 		ss << a;
-		std::string hash = "##";
+		std::string hash = "";
 		sphere_name = name + hash + ss.str();
 	}
+	~Sphere() {}
 
 	void generate_mesh(Mesh& mesh) override;
 

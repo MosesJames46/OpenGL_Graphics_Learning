@@ -2,7 +2,8 @@
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 colors;
-layout (location = 2) in vec3 normals;
+layout (location = 2) in vec2 tex_coords;
+layout (location = 3) in vec3 normals;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -12,10 +13,11 @@ uniform vec3 object_position;
 
 out vec3 normal_outputs;
 out vec3 fragment_positions;
+out vec2 texture_coordinates;
 
 void main(){
-	
 	normal_outputs = mat3(transpose(inverse(model))) * normals;
 	fragment_positions = vec3(model * vec4(position + object_position, 1.0f));
+	texture_coordinates = tex_coords;
 	gl_Position = projection * view * model * vec4(fragment_positions,  1.0f);
 }
