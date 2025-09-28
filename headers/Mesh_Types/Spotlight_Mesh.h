@@ -17,6 +17,8 @@ public:
 	~Spotlight_Mesh() {};
 
 	float cutoff_radius{ 12.0f};
+	float radius_multiplier{ 1.2f };
+	float outer_cutoff_radius{ cutoff_radius * radius_multiplier };
 	glm::vec3 flashlight_color{ 1.0f, 1.0f, 1.0f };
 	glm::vec3 flashlight_ambient{ .1f, .1f, .1f };
 	glm::vec3 flashlight_specular{ 1.0f, 1.0f, 1.0f };
@@ -24,7 +26,8 @@ public:
 	Camera& camera;
 	//std::unique_ptr<Flashlight> flashlight;
 
-	void set_cuttoff_radius();
+	void set_cuttoff_radius(); 
+	void set_outer_cutoff_radius();
 	void activate_cuttoff_mesh();
 	void set_flashlight_color();
 };

@@ -53,6 +53,9 @@ void Material::flashlight(Spotlight_Mesh* spotlight) {
 
 	shader->set_uniform_location("light.position", spotlight->camera.camera_origin);
 	shader->set_uniform_location("light.cutoff", glm::cos(glm::radians(spotlight->cutoff_radius)));
+	shader->set_uniform_location("light.outerCutoff", glm::cos(glm::radians(spotlight->outer_cutoff_radius)));
+	shader->set_uniform_location("light.radiusMultiplier", glm::cos(glm::radians(spotlight->radius_multiplier)));
+
 	shader->set_uniform_location("light.direction", spotlight->camera.camera_forward);
 
 }

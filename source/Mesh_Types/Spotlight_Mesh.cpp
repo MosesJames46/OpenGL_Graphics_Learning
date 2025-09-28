@@ -13,6 +13,13 @@ void Spotlight_Mesh::set_cuttoff_radius() {
 	ImGui::SliderFloat("##cutoff", &cutoff_radius, 0.001f, 90.0f);
 }
 
+void Spotlight_Mesh::set_outer_cutoff_radius() {
+	ImGui::SeparatorText("Outer Cutoff Radius");
+	ImGui::SliderFloat("##outercutoff", &outer_cutoff_radius, 0.001f, 90.0f);
+	ImGui::Text("Radius Multiplier");
+	ImGui::SliderFloat("##radiusmultiplier", &radius_multiplier, 1.0f, 25.0f);
+}
+
 void Spotlight_Mesh::set_flashlight_color() {
 	ImGui::SeparatorText("Flashlight Color");
 	ImGui::ColorEdit3("##flashlight", glm::value_ptr(flashlight_color));
@@ -24,4 +31,5 @@ void Spotlight_Mesh::activate_cuttoff_mesh() {
 	set_specular();
 	set_shininess();
 	set_cuttoff_radius();
+	set_outer_cutoff_radius();
 }
