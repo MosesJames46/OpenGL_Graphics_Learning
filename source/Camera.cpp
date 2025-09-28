@@ -38,6 +38,10 @@ void Camera::get_camera_input(GLFWwindow* window) {
 			camera_origin -= glm::normalize(glm::cross(camera_forward, camera_up)) * cameraSpeed;
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 			camera_origin += glm::normalize(glm::cross(camera_forward, camera_up)) * cameraSpeed;
+		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+			camera_origin += camera_up * cameraSpeed;
+		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+			camera_origin += -camera_up * cameraSpeed;
 	}
 }
 

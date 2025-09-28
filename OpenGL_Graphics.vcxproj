@@ -30,26 +30,35 @@
     <ClInclude Include="glad3.3\include\glad\glad.h" />
     <ClInclude Include="glad3.3\include\KHR\khrplatform.h" />
     <ClInclude Include="headers\Camera.h" />
+    <ClInclude Include="headers\Flashlight.h" />
+    <ClInclude Include="headers\Mesh_Types\Complex_Mesh.h" />
     <ClInclude Include="headers\Gui_Settings.h" />
     <ClInclude Include="headers\Icosphere.h" />
     <ClInclude Include="headers\libs.h" />
+    <ClInclude Include="headers\Mesh_Types\Light_Mesh.h" />
     <ClInclude Include="headers\Material.h" />
     <ClInclude Include="headers\Mesh.h" />
+    <ClInclude Include="headers\Mesh_Types\Texture_Mesh.h" />
     <ClInclude Include="headers\Renderer.h" />
     <ClInclude Include="headers\Shader.h" />
     <ClInclude Include="headers\Shapes.h" />
     <ClInclude Include="headers\Image.h" />
     <ClInclude Include="headers\Sphere.h" />
+    <ClInclude Include="headers\Mesh_Types\Spotlight_Mesh.h" />
     <ClInclude Include="stb_imageloader_header\stb_image.h" />
     <ClInclude Include="headers\Texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cpp_files\Camera.cpp" />
-    <ClCompile Include="cpp_files\Gui_Settings.cpp" />
-    <ClCompile Include="cpp_files\Material.cpp" />
-    <ClCompile Include="cpp_files\Mesh.cpp" />
-    <ClCompile Include="cpp_files\Renderer.cpp" />
-    <ClCompile Include="cpp_files\Sphere.cpp" />
+    <ClCompile Include="source\Camera.cpp" />
+    <ClCompile Include="source\Flashlight.cpp" />
+    <ClCompile Include="source\Gui_Settings.cpp" />
+    <ClCompile Include="source\Material.cpp" />
+    <ClCompile Include="source\Mesh.cpp" />
+    <ClCompile Include="source\Mesh_Types\Complex_Mesh.cpp" />
+    <ClCompile Include="source\Mesh_Types\Light_Mesh.cpp" />
+    <ClCompile Include="source\Mesh_Types\Texture_Mesh.cpp" />
+    <ClCompile Include="source\Renderer.cpp" />
+    <ClCompile Include="source\Sphere.cpp" />
     <ClCompile Include="extern\imgui\backends\imgui_impl_dx10.cpp" />
     <ClCompile Include="extern\imgui\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="extern\imgui\backends\imgui_impl_glfw.cpp" />
@@ -62,20 +71,25 @@
     <ClCompile Include="extern\imgui\imgui_widgets.cpp" />
     <ClCompile Include="extern\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="glad3.3\src\glad.c" />
-    <ClCompile Include="cpp_files\Image.cpp" />
+    <ClCompile Include="source\Image.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="cpp_files\Shader.cpp" />
-    <ClCompile Include="cpp_files\Shapes.cpp" />
-    <ClCompile Include="cpp_files\stb_image.cpp" />
-    <ClCompile Include="cpp_files\Texture.cpp" />
+    <ClCompile Include="source\Shader.cpp" />
+    <ClCompile Include="source\Shapes.cpp" />
+    <ClCompile Include="source\Mesh_Types\Spotlight_Mesh.cpp" />
+    <ClCompile Include="source\stb_image.cpp" />
+    <ClCompile Include="source\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\fragment_shader.glsl" />
-    <None Include="shaders\light_fragment_shader.glsl" />
-    <None Include="shaders\light_vertex_shader.glsl" />
-    <None Include="shaders\sphere_fragment_shader.glsl" />
-    <None Include="shaders\sphere_vertex_shader.glsl" />
-    <None Include="shaders\vertex_shader.glsl" />
+    <None Include="shaders\direction_light_fs.glsl" />
+    <None Include="shaders\direction_light_vs.glsl" />
+    <None Include="shaders\light_fs.glsl" />
+    <None Include="shaders\spotlight_fs.glsl" />
+    <None Include="shaders\spotlight_vs.glsl" />
+    <None Include="shaders\textured_fs.glsl" />
+    <None Include="shaders\textured_vs.glsl" />
+    <None Include="shaders\complex_fs.glsl" />
+    <None Include="shaders\complex_vs.glsl" />
+    <None Include="shaders\light_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="pictures\awesomeface.png" />

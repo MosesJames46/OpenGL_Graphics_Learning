@@ -11,12 +11,14 @@ Mesh::Mesh(const std::string& name, shape_type shape) : name(name) {
 	ss << n;
 	this->name += std::string(" " +  ss.str());
 	switch (shape) {
-	case shape_type::SPHERE:
+	case SPHERE: {
 		Sphere sphere(name, 16, 16, 1);
 		initialize_mesh(sphere);
-		return;
+		break;
+	}	
 	}
 }
+
 
 void Mesh::initialize_mesh(Sphere& sphere) {
 	sphere.generate_mesh((*this));
@@ -24,10 +26,8 @@ void Mesh::initialize_mesh(Sphere& sphere) {
 
 void Mesh::set_color() {
 	//Use the starting position of the float pointer.
-	ImGui::PushItemWidth(300);
 	ImGui::SeparatorText("Color");
 	ImGui::ColorEdit3("##Color", glm::value_ptr(color));
-	ImGui::PopItemWidth();
 	//We access the float values and cast them to a vec 3.
 }
 
@@ -47,12 +47,17 @@ void Mesh::set_float() {
 
 void Mesh::set_ambient() {
 	ImGui::SeparatorText("Ambient");
-	ImGui::ColorEdit3("##Ambient", glm::value_ptr(ambience));
+	ImGui::ColorEdit3("##Ambient", glm::value_ptr(ambient));
+}
+
+void Mesh::set_specular() {
+	ImGui::SeparatorText("Specular");
+	ImGui::ColorEdit3("##Specular", glm::value_ptr(specular));
 }
 
 void Mesh::set_shininess() {
 	ImGui::Text("Shininess");
 	ImGui::PushItemWidth(100);
-	ImGui::DragFloat("Shininess: ", &shininess, slider_speed,.0001, 100.0f);
+	ImGui::DragFloat("Shininess: ", &shininess, slider_speed, .0001, 100.0f);
 	ImGui::PopItemWidth();
 }

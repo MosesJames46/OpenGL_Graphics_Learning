@@ -17,7 +17,7 @@ out vec2 texture_coordinates;
 
 void main(){
 	normal_outputs = mat3(transpose(inverse(model))) * normals;
-	fragment_positions = vec3(model * vec4(position + object_position, 1.0f));
+	fragment_positions =while3 vec3(model * vec4(position + object_position, 1.0f));
 	texture_coordinates = tex_coords;
 	gl_Position = projection * view * model * vec4(fragment_positions,  1.0f);
 }

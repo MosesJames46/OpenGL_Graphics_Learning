@@ -48,6 +48,8 @@ class Mesh;
 class Material;
 class Renderer;
 
+class Spotlight;
+
 enum material_type;
 
 /*
@@ -75,10 +77,7 @@ public:
 	static void gui_test(Camera& camera);
 	static void gui_test_type();
 
-	inline static bool is_complex(std::string string) {
-		return string == "Textured";
-	}
-
+	
 	/*
 		Should create a renderer based on the material type requested.
 
@@ -90,12 +89,24 @@ public:
 	*/
 
 
+private:
+	inline static bool is_complex(std::string string) {
+		return string == "Textured";
+	}
+
 
 	static std::unique_ptr<Renderer> create_renderer(Renderer_Data& render_data, const std::string& file = " ");
 
 	static std::unique_ptr<Renderer> create_light(Renderer_Data& render_data);
 	static std::unique_ptr<Renderer> create_complex(Renderer_Data& render_data);
 	static std::unique_ptr<Renderer> create_textured(Renderer_Data& render_data, const std::string& file);
+	static std::unique_ptr<Renderer> create_directional(Renderer_Data& render_data);
+	static std::unique_ptr<Renderer> create_spotlight(Renderer_Data& render_data);
+
+
+	/*Function utility to make selecting proper shaders easier*/
+	static void attach_shader(std::string& vertex_shader, std::string& fragment_shader, material_type material_index);
+
 
 	/*
 		The use combo function generalizes combo boxes to one function for ease.
@@ -107,8 +118,7 @@ public:
 
 	//Function to take a new renderer and attach current renderer meshes
 	static void initialize_renderer(Renderer* renderer);
-
-	static void get_world_position();
+	static void get_world_position(Camera& camera);
 	/*
 		TODO: Implement deleting of a Renderer.
 		TODO: Add dynamic texture application.
@@ -146,7 +156,7 @@ public:
 	static std::vector<std::string> vertex;
 	static std::vector<std::string> shape;
 	static std::vector<std::string> material;
-	static std::vector<std::string>renderer_names;
+	static std::vector<std::string> renderer_names;
 
 	static std::vector<std::filesystem::path> texture_file_paths;
 	

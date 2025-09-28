@@ -9,10 +9,20 @@
 
 class Shader;
 class Mesh;
-class Camera;
+
+/*
+	Spotlight is a combo type that has all elements of a camera with the inclusion of a cutoff.
+	This is done for name simplicity. Having a type of spotlight felt easier than adding a cutoff to the camera class.
+	Did not want to bloat the camera class for something so simple.
+*/
+
+class Light_Mesh;
+class Complex_Mesh;
+class Texture_Mesh;
+class Spotlight_Mesh;
 
 enum  material_type {
-	LIGHT, COMPLEX, TEXTURED
+	LIGHT, COMPLEX, TEXTURED, DIRECTIONAL, SPOTLIGHT
 };
 
 /*
@@ -38,56 +48,70 @@ enum  material_type {
 		
 */
 
-struct data {
-	Shader* shader;
-	Mesh* mesh;
-	Camera* camera;
-};
 
-struct material_data_unique {
-	std::unique_ptr<Shader> shader;
-	std::unique_ptr<Mesh> mesh;
-	Camera* camera;
-};
-
+/*
+	EDITS TO BE DONE:
+	Make the material data like camera, mesh, shaders etc simpler to use.
+*/
 
 class Material {
 public:
-	using light = void (Material::*)(bool render);
-	using complex = void (Material::*)(Camera& camera, bool render);
+	using light = void (Material::*)(Light_Mesh& light_mesh, bool render);
+	using complex = void (Material::*)(Complex_Mesh& complex_mesh, bool render);
+	using spotlight = void (Material::*)(Spotlight_Mesh& spotlight, bool renderer);
 
-	Material(Shader& shader, Mesh& mesh, material_type mate5rial) : info{ &shader, &mesh, nullptr },
-		material_data{ nullptr, nullptr, nullptr }, material(material) {
-	}
-	Material(Shader& shader, Mesh& mesh, Camera& camera, material_type material) : info{&shader, &mesh, &camera}, material(material){}
-	Material(Shader* shader, Mesh* mesh, Camera* camera, material_type material) : info{ shader, mesh, camera }, material(material) {}
-	Material(std::unique_ptr<Shader> shader, std::unique_ptr<Mesh> mesh, Camera* camera, material_type material);
-	Material(std::unique_ptr<Shader> shader, std::unique_ptr<Mesh> mesh, material_type material);
+	Material(std::unique_ptr<Shader> shader, material_type material);
+
 	~Material() {}
 		
 	/*
 		Pointer to Member function operation that selects the function to load based on enum passed to constructor.
 	*/
-	light activate_material(bool render) {
+	light activate_material(Light_Mesh& light_mesh, bool render) {
 		return &Material::light_material;
 	}
 
-	complex activate_material(Camera& camera, bool render) {
+	complex activate_material(Complex_Mesh& complex_mesh, bool render) {
 		return &Material::complex_material;
 	}
 
-	void attach_mesh(Mesh& material);
+	spotlight activate_material(Spotlight_Mesh& spotlight, bool render) {
+		return &Material::spotlight_material;
+	}
 
-	material_type material;
-	std::vector<Mesh*> mesh_objects;
-	data info;
+	void attach_mesh(Light_Mesh& light_mesh);
 	
 
-private:
-	material_data_unique material_data;
-	void light_material(bool render = true);
-	void light_material_data();
+	void apply_shader(Light_Mesh& light_mesh, bool render = true) {
+		light_material(light_mesh, render);
+	};
+	void apply_shader(Complex_Mesh& complex_mesh, bool render = true) {
+		complex_material(complex_mesh, render);
+	};
+	void apply_shader(Texture_Mesh& texture_mesh, bool render = true) {
+		texture_material(texture_mesh, render);
+	};
+	void apply_shader(Spotlight_Mesh& spotlight_mesh, bool render = true) {
+		spotlight_material(spotlight_mesh, render);
+	};
 
-	void complex_material(Camera& camera, bool render = true);
-	void complex_material_data();
+	material_type material;
+	std::unique_ptr<Shader> shader;
+	std::vector<Light_Mesh*> mesh_objects;
+
+private:
+	void light_material(Light_Mesh& light_mesh, bool render = true);
+	void light_material_data(Light_Mesh& light_mesh);
+
+	void complex_material(Complex_Mesh& complex_mesh, bool render = true);
+	void complex_material_data(Complex_Mesh& complex_mesh);
+
+	void texture_material(Texture_Mesh& texture_mesh, bool render = true);
+	void texture_material_data(Texture_Mesh& texture_mesh);
+
+	void spotlight_material(Spotlight_Mesh& spotlight, bool render = true);
+	void spotlight_material_data(Spotlight_Mesh& spotlight);
+
+	void light_effects();
+	void flashlight(Spotlight_Mesh* spotlight);
 };

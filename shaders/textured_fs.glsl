@@ -27,10 +27,19 @@ struct Material{
 uniform Material material;
 
 struct Light{
+	vec3 position;
+
+	/*
+		Light simulation using the Phong Lighting Model.
+	*/
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
-	vec3 position;
+	
+	//Variables used for calculating attenuation.
+	float constant;
+	float quadratic;
+	float linear;
 };
 
 uniform Light light;
@@ -50,7 +59,11 @@ void main(){
 
 	//Ambient is the most basic calculation being a constant value of light and material color.
 	//The texture function takes in as arguments the uniform location and the texture_coordinates.
-	vec3 ambient = vec3(texture(material.diffuse, texture_coordinates)) * light.ambient;
+
+	float dist = length(light.position - fragment_positions);
+	float attenuation = 1.f / (light.constant + light.linear * dist +  light.quadratic *  (dist * dist));
+
+	vec3 ambient = vec3(texture(material.diffuse, texture_coordinates)) * light.ambient * attenuation;
 
 	/*
 		We use the normals and light_direction to calculate the diffuse values.
@@ -61,7 +74,7 @@ void main(){
 	float diffuse = max(dot(norm, light_direction), 0.0f);
 
 	//The texture function takes in as arguments the uniform location and the texture_coordinates.
-	vec3 diff = diffuse * vec3(texture(material.diffuse, texture_coordinates)) * light.diffuse;
+	vec3 diff = diffuse * vec3(texture(material.diffuse, texture_coordinates)) * light.diffuse  * attenuation;
 
 
 	//There is a documentation of reflection online.
@@ -69,7 +82,9 @@ void main(){
 	vec3 reflect_direction = reflect(light_direction, norm);  
 
 	float spec = pow(max(dot(view_direction, reflect_direction), 0.0), material.shininess);
-	vec3 specular = vec3(texture(material.specular, texture_coordinates)) * spec * light.specular; 
+	vec3 specular = vec3(texture(material.specular, texture_coordinates)) * spec * light.specular  * attenuation; 
+
+	
 
 	vec3 result = ambient + diff + specular;
 

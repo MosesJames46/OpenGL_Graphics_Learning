@@ -13,30 +13,26 @@ class Camera;
 class Mesh;
 class Material;
 class Texture;
+class Shader;
+
+class Light_Mesh;
+class Spotlight_Mesh;
+class Complex_Mesh;
+class Texture_Mesh;
 
 class Renderer {
 public:
-	Renderer(Material& material, Camera& camera, Mesh& mesh) : material(material), camera(camera), mesh(mesh) {
-		gen_bind_format();
-		set_attributes(0, 3, 11, 0);
-		set_attributes(1, 3, 11, 3);
-		set_attributes(2, 2, 11, 6);
-		set_attributes(3, 3, 11, 8);
-		unbind_buffers_and_attribute_pointer();
-	}
+	Renderer(std::unique_ptr<Mesh> mesh, std::unique_ptr<Material> material, Camera& camera);
 
-	Renderer(Material* material, Camera* camera, Mesh* mesh) : material(*material), camera(*camera), mesh(*mesh) {
-		gen_bind_format();
-		set_attributes(0, 3, 11, 0);
-		set_attributes(1, 3, 11, 3);
-		set_attributes(2, 2, 11, 6);
-		set_attributes(3, 3, 11, 8);
-		unbind_buffers_and_attribute_pointer();
-	}
-
-	Renderer(std::unique_ptr<Material> material, Camera* camera);
 
 	~Renderer(){}
+
+	std::unique_ptr<Mesh> mesh;
+	std::unique_ptr<Material> material;
+	Camera& camera;
+
+	void initiate_renderer();
+
 	void unbind_buffers_and_attribute_pointer();
 
 	/*
@@ -58,7 +54,7 @@ public:
 	*/
 	void generate_and_bind_buffers(unsigned int& uninitialized_VAO, unsigned int& uninitialized_VBO, unsigned int& uninitialized_EBO);
 	void generate_and_bind_buffers(unsigned int& uninitialized_VAO, unsigned int& uninitialized_VBO);
-	void generate_and_bind_buffers();
+	void generate_and_bind_buffers(Mesh& mesh);
 
 	/*
 		The format buffer function uses the glBufferData function and can take at most 2 types of construction.
@@ -69,7 +65,7 @@ public:
 		The data corresponds to the buffer type listed above, the size in bytes of the buffer, a pointer to the begining of the buffer,
 		and the GL_ENUM draw type.
 	*/
-	void format_buffer(GLenum draw_type);
+	void format_buffer(Mesh& mesh, GLenum draw_type);
 
 	/*
 		The set_attributes function is used to simplify vertex data to be sent to the gpu.
@@ -88,19 +84,21 @@ public:
 	void set_attributes(int attribute_position, int attribute_size, int stried_size, int offset);
 
 	//Calls the generate_and_bind_buffers and the format_buffer functions in one call.
-	virtual void gen_bind_format();
+	virtual void gen_bind_format(Mesh& mesh);
 
 	virtual void ready_buffers() {};
 	
-	void attach_uniform(const char* uniform_name, std::vector<float>& color);
-	void attach_uniform(const char* uniform_name, std::vector<float>&& color);
+	void attach_uniform(Shader& shader, const char* uniform_name, std::vector<float>& color);
+	void attach_uniform(Shader& shader, const char* uniform_name, std::vector<float>&& color);
 
-	void bind_textures(std::vector<const char*>&& uniform_names);
-	void bind_textures(std::vector<const char*>& uniform_names);
+	void bind_textures(Shader& shader, std::vector<const char*>&& uniform_names);
+	void bind_textures(Shader& shader, std::vector<const char*>& uniform_names);
 
-	void add_textures(std::vector<const char*> file_paths, std::vector<const char*> uniform_locations);
+	void add_textures(Shader& shader, std::vector<const char*> file_paths, std::vector<const char*> uniform_locations);
 
-	void set_MVP();
+	void set_MVP(Shader& shader, Camera& camera);
+
+	void apply_materials();
 
 	void set_object_values(Mesh& object, Mesh& other);
 
@@ -113,16 +111,12 @@ public:
 			glBindVertexArray(VAO);
 			glDrawElements(Primitive type, amount of vertices/indices to draw, GL_UNSIGNED_BYTE, 0);
 	*/
+
 	void draw(bool renderer_gui = false);
+
 	void redraw();
 
 	const char* get_shader_type(fragment_shader_type);
 	
-	std::unique_ptr<Material> unique_material;
-
-	Mesh& mesh;
-	Material& material;
-	Camera& camera;
-
 	std::vector<Texture> textures;
 };

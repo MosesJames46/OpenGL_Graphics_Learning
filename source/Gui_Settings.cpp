@@ -1,10 +1,14 @@
 #include "../headers/Gui_Settings.h"
 #include "../headers/Renderer.h"
 #include "../headers/Mesh.h"
+#include "../headers/Mesh_Types/Light_Mesh.h"
+#include "../headers/Mesh_Types/Complex_Mesh.h"
+#include "../headers/Mesh_Types/Texture_Mesh.h"
+#include "../headers/Mesh_Types/Spotlight_Mesh.h"
+#include "../headers/Flashlight.h"
 #include "../headers/Material.h"
 #include "../headers/Shader.h"
 #include "../headers/Camera.h"
-
 
 struct Renderer_Data {
     std::string v;
@@ -54,13 +58,6 @@ void Gui_Settings::gui_test(Camera& camera) {
     static bool create = false;
 
     if (button_clicked & 1) {
-        ImGui::SeparatorText("Shader Selection");
-        static int vertex_index = 0;
-        std::string v = use_combo(vertex, "Vertex", vertex_index); ImGui::SameLine();
-
-        static int fragment_index = 0;
-        std::string f = use_combo(fragment, "Fragment", fragment_index);
-
         ImGui::SeparatorText("Mesh");
         static char mesh_name[64];
         ImGui::InputText("Mesh Name", mesh_name, 64); ImGui::SameLine();
@@ -72,7 +69,20 @@ void Gui_Settings::gui_test(Camera& camera) {
         static int material_index = 0;
         use_combo(material, "Material", material_index);
 
-        
+        /*
+            Small enough logic that a function is not needed.
+            Select the propoer shaders based on material type.
+        */
+
+        //string values for vertex and fragment shaders
+        std::string v;
+        std::string f;
+
+        /*
+            Whenever we add a new shader this should be updated.
+        */
+        attach_shader(v, f, static_cast<material_type>(material_index));
+
         std::string selected_file = process_textures();
 
         Renderer_Data render_data{ v, f, mesh_name, static_cast<shape_type>(shape_index),
@@ -82,14 +92,13 @@ void Gui_Settings::gui_test(Camera& camera) {
             
             std::unique_ptr<Renderer> renderer = std::move(create_renderer(render_data, selected_file));
             renderers.emplace_back(std::move(renderer));
-            renderer_names.emplace_back(renderers.back()->mesh.name);
+            renderer_names.emplace_back(renderers.back()->mesh->name);
         }
     }
-
-
-   
     
     draw_meshes();
+    get_world_position(camera);
+
     ImGui::End();
 }
 
@@ -117,40 +126,87 @@ std::unique_ptr<Renderer> Gui_Settings::create_renderer(Renderer_Data& render_da
         return create_complex(render_data);
     case TEXTURED:
         return create_textured(render_data, file);
+    case DIRECTIONAL:
+        return create_directional(render_data);
+    case SPOTLIGHT:
+        return create_spotlight(render_data);
     }
 }
 
-
 std::unique_ptr<Renderer> Gui_Settings::create_light(Renderer_Data& render_data) {
-    std::unique_ptr<Mesh> mesh = std::make_unique<Mesh>(render_data.mesh_name, render_data.shape_ind);
+    std::unique_ptr<Light_Mesh> light_mesh = std::make_unique<Light_Mesh>(render_data.mesh_name, render_data.shape_ind);
     std::unique_ptr<Shader> shader = std::make_unique<Shader>(render_data.v.c_str(), render_data.f.c_str());
-    std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), std::move(mesh), &render_data.camera, render_data.material_ind);
-    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(material), material->info.camera);
+    std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), render_data.material_ind);
+    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(light_mesh), std::move(material), render_data.camera);
     return renderer;
 }
 
+
+/*
+    Anytime there is a c2661 error within a header that states "no overloadded function takes n arguments", it most likely means
+    there is an error with a unique pointer instantiation. 
+*/
 std::unique_ptr<Renderer> Gui_Settings::create_complex(Renderer_Data& render_data) {
-    std::unique_ptr<Mesh> mesh = std::make_unique<Mesh>(render_data.mesh_name, render_data.shape_ind);;
+    std::unique_ptr<Complex_Mesh> complex_mesh = std::make_unique<Complex_Mesh>(render_data.camera, render_data.mesh_name, render_data.shape_ind);;
     std::unique_ptr<Shader> shader = std::make_unique<Shader>(render_data.v.c_str(), render_data.f.c_str());
-    std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), std::move(mesh), &render_data.camera, render_data.material_ind);
-    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(material), material->info.camera);
+    std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), render_data.material_ind);
+    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(complex_mesh), std::move(material), render_data.camera);
     initialize_renderer(renderer.get());
 
     return renderer;
 }
 
+//Textured is a complex model that uses textures to improves that look of an object.
 std::unique_ptr<Renderer> Gui_Settings::create_textured(Renderer_Data& render_data, const std::string& file){
-    std::unique_ptr<Mesh> mesh = std::make_unique<Mesh>(render_data.mesh_name, render_data.shape_ind);
+    std::unique_ptr<Mesh> texture_mesh = std::make_unique<Mesh>(render_data.mesh_name, render_data.shape_ind);
     std::unique_ptr<Shader> shader = std::make_unique<Shader>(render_data.v.c_str(), render_data.f.c_str());
-    std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), std::move(mesh), &render_data.camera, render_data.material_ind);
-    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(material), material->info.camera);
+    std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), render_data.material_ind);
+    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(texture_mesh), std::move(material), render_data.camera);
     
     //Apply textures selected in GUI
-    renderer->add_textures({ file.c_str() }, { "material.diffuse" });
+    
+    renderer->add_textures(*renderer->material->shader.get() , {file.c_str()}, {"material.diffuse"});
     initialize_renderer(renderer.get());
     return renderer;
 }
 
+//Directional is a type of lighting calculation that only uses direction.
+std::unique_ptr<Renderer> Gui_Settings::create_directional(Renderer_Data& render_data) {
+    return create_complex(render_data);
+}
+
+std::unique_ptr<Renderer> Gui_Settings::create_spotlight(Renderer_Data& render_data) {
+    std::unique_ptr<Spotlight_Mesh> spotlight_mesh = std::make_unique<Spotlight_Mesh>(render_data.camera, render_data.mesh_name, render_data.shape_ind);
+    std::unique_ptr<Shader> shader = std::make_unique<Shader>(render_data.v.c_str(), render_data.f.c_str());
+    std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), render_data.material_ind);
+    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(spotlight_mesh), std::move(material), render_data.camera);
+    return renderer;
+}
+
+void Gui_Settings::attach_shader(std::string& vertex_shader, std::string& fragment_shader, material_type material_index) {
+    switch (static_cast<material_type>(material_index)) {
+    case LIGHT:
+        vertex_shader = vertex[0];
+        fragment_shader = fragment[0];
+        break;
+    case COMPLEX:
+        vertex_shader = vertex[1];
+        fragment_shader = fragment[1];
+        break;
+    case TEXTURED:
+        vertex_shader = vertex[2];
+        fragment_shader = fragment[2];
+        break;
+    case DIRECTIONAL:
+        vertex_shader = vertex[3];
+        fragment_shader = fragment[3];
+        break;
+    case SPOTLIGHT:
+        vertex_shader = vertex[4];
+        fragment_shader = fragment[4];
+        break;
+    }
+}
 
 std::string Gui_Settings::use_combo(std::vector<std::string>& arr, const char* name, int& ind) {
     std::string preview = arr[ind];
@@ -187,12 +243,17 @@ std::string Gui_Settings::use_combo(std::vector<std::filesystem::path>& arr, con
     return preview;
 }
 
-
 void Gui_Settings::initialize_renderer(Renderer* renderer) {
     if (!renderers.empty()) {
         for (const auto& r : renderers) {
-            if (r->material.material == LIGHT)
-                renderer->material.attach_mesh(r->mesh);
+            switch (r->material->material) {
+            case LIGHT:
+                renderer->material->attach_mesh(dynamic_cast<Light_Mesh&>(*r->mesh.get()));
+                break;
+            case SPOTLIGHT:
+                renderer->material->attach_mesh(dynamic_cast<Spotlight_Mesh&>(*r->mesh.get()));
+                break;
+            }
         }
     }
 }
@@ -203,7 +264,7 @@ void Gui_Settings::draw_meshes() {
         for (auto& i : renderers) {
             //Every mesh attaches the most recent mesh to the end.
             //i->material.attach_mesh(renderers.back()->mesh);
-            if (i->mesh.name == selected) {
+            if (i->mesh->name == selected) {
                 i->draw(true);
             }
             else {
@@ -217,13 +278,26 @@ void Gui_Settings::draw_meshes() {
     }
 }
 
+void Gui_Settings::get_world_position(Camera& camera) {
+    static int f2_press = 0;
+    if (ImGui::IsKeyPressed(ImGuiKey_F2))++f2_press;
+    if (f2_press & 1) {
+        ImGui::Begin("Camera Info");
+        ImGui::Text("Camera Positions: (%g, %g, %g)", camera.camera_origin.x, camera.camera_origin.y, camera.camera_origin.z);
+        ImGui::Text("Camera Forward: (%g, %g, %g)", camera.camera_forward.x, camera.camera_forward.y, camera.camera_forward.z);
+        ImGui::End();
+    }
+    
+}
 
-std::vector<std::string> Gui_Settings::fragment = { "shaders/fragment_shader.glsl", 
- "shaders/sphere_fragment_shader.glsl","shaders/light_fragment_shader.glsl"};
-std::vector<std::string> Gui_Settings::vertex = { "shaders/vertex_shader.glsl","shaders/sphere_vertex_shader.glsl" 
-,"shaders/light_vertex_shader.glsl" };
-std::vector<std::string> Gui_Settings::shape = { "Sphere" };
-std::vector<std::string> Gui_Settings::material = { "Light", "Complex", "Textured"};
+
+std::vector<std::string> Gui_Settings::fragment = { "shaders/light_fs.glsl", 
+ "shaders/complex_fs.glsl","shaders/textured_fs.glsl", "shaders/direction_light_fs.glsl",
+    "shaders/spotlight_fs.glsl" };
+std::vector<std::string> Gui_Settings::vertex = { "shaders/light_vs.glsl","shaders/complex_vs.glsl" 
+,"shaders/textured_vs.glsl", "shaders/direction_light_vs.glsl","shaders/spotlight_vs.glsl" };
+std::vector<std::string> Gui_Settings::shape = { "Sphere"};
+std::vector<std::string> Gui_Settings::material = { "Light", "Complex", "Textured", "Directional", "Spotlight"};
 std::vector<std::string> Gui_Settings::renderer_names;
 std::vector<std::filesystem::path> Gui_Settings::texture_file_paths;
 

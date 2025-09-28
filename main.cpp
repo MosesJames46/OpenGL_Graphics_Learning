@@ -11,6 +11,10 @@
 #include "extern/imgui/backends/imgui_impl_win32.h"
 #include "../headers/Gui_Settings.h"
 #include "../headers/Renderer.h"
+#include "../headers/Mesh_Types/Light_Mesh.h"
+#include "../headers/Mesh_Types/Complex_Mesh.h"
+#include "../headers/Mesh_Types/Texture_Mesh.h"
+#include "../headers/Mesh_Types/Spotlight_Mesh.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -63,22 +67,22 @@ int main() {
 
 	ImGui::StyleColorsDark();
 
-	Shader standard_shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
-	Shader light_shader("shaders/sphere_vertex_shader.glsl", "shaders/sphere_fragment_shader.glsl");
-
-	Mesh sphere("Regular Sphere", SPHERE);
-	Material material(standard_shader, sphere, LIGHT);
-	Renderer r(material, camera, sphere);
-
-	Mesh light("light sphere", SPHERE);
-	Material shiny(light_shader, light, camera, COMPLEX);
-	shiny.attach_mesh(sphere);
-	Renderer r_shiny(shiny, camera, light);
+	//std::unique_ptr<Shader> standard_shader = std::make_unique<Shader>("shaders/light_vs.glsl", "shaders/light_fs.glsl");
+	//std::unique_ptr<Shader> light_shader = std::make_unique<Shader>("shaders/complex_vs.glsl", "shaders/complex_fs.glsl");
+	//
+	//std::unique_ptr<Light_Mesh> light = std::make_unique<Light_Mesh>("Regular Sphere", SPHERE);
+	//std::unique_ptr<Material> material = std::make_unique<Material>(std::move(standard_shader), LIGHT);
+	//Renderer r(std::move(light), std::move(material), camera);
+	//
+	//std::unique_ptr<Complex_Mesh> complex_sphere = std::make_unique<Complex_Mesh>(camera, "light sphere", SPHERE);
+	//std::unique_ptr<Material> shiny = std::make_unique<Material>(std::move(light_shader), COMPLEX);
+	//shiny->attach_mesh(dynamic_cast<Light_Mesh&>(*r.mesh.get()));
+	//Renderer r_shiny(std::move(complex_sphere), std::move(shiny), camera);
 	//r_shiny.add_textures({ "./pictures/moon_texture_2.png" }, { "material.diffuse" });
 	
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
-
+		
 		glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -93,8 +97,8 @@ int main() {
 		Gui_Settings::gui_test(camera);
 		//Gui_Settings::gui_test_type();
 
-		r.draw(false);
-		r_shiny.draw(false);
+		//r.draw(false);
+		//r_shiny.draw(false);
 
 		ImGui::ShowDemoWindow();
 
@@ -103,7 +107,7 @@ int main() {
 				
 		glfwSwapBuffers(window);
 	}
-	standard_shader.delete_program_shader();
+
 	glfwTerminate();
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplWin32_Shutdown();
