@@ -42,6 +42,7 @@ struct Light{
 uniform Light light;
 
 struct Material{
+	sampler2D diffuse_texture;
 	vec3 diffuse;
 	vec3 ambient;
 	vec3 specular;
@@ -51,8 +52,12 @@ uniform Material material;
 
 in vec3 fragment_position;
 in vec3 fragment_normal;
+in vec2 texture_coordinates;
 
 uniform vec3 view_position;
+
+//Check during creation if the material is textured or not.
+uniform bool is_textured;
 
 vec3 get_ambient();
 vec3 get_diffuse(vec3 normal);
@@ -67,7 +72,7 @@ void main(){
 	
 	//spotlight
 	float theta = dot(light_direction, normalize(-light.direction));
-	float I = get_spotlight(theta);
+	float intensity = get_spotlight(theta);
 
 	if (theta > light.cutoff){
 		vec3 normal = normalize(fragment_normal);
@@ -76,29 +81,41 @@ void main(){
 		vec3 ambient = get_ambient();
 
 		//diffuse
-		vec3 diffuse = get_diffuse(normal) * I;
+		vec3 diffuse = get_diffuse(normal) * intensity;
 		
 		//specular
-		vec3 specular = get_specular(normal) * I;
+		vec3 specular = get_specular(normal) * intensity;
 
 		//attenuation
 		float attenuation = get_attenuation();
 
 		vec3 result = (ambient + diffuse + specular) * attenuation;
-
 		fragment_color = vec4(result, 1.0f);
 	}else{
-		fragment_color = vec4(light.ambient * material.diffuse, 1.0f);
+		if (is_textured){
+			fragment_color = vec4(light.ambient * vec3(texture( material.diffuse_texture, texture_coordinates)), 1.0f);
+		}else{
+			fragment_color = vec4(light.ambient * material.diffuse, 1.0f);
+		}
 	}
 }
 
 vec3 get_ambient(){
+	if(is_textured){
+		return light.ambient * vec3(texture(material.diffuse_texture, texture_coordinates));
+	}
+
 	return light.ambient * material.ambient;
 }
 
 vec3 get_diffuse(vec3 normal){
 	vec3 light_direction = normalize(light.position - fragment_position);
 	float diff = max(dot(normal, -light_direction), 0.0f);
+
+	if (is_textured) {
+		return light.diffuse * vec3(texture(material.diffuse_texture, texture_coordinates)) * diff;
+	}
+
 	return light.diffuse * material.diffuse * diff;
 }
 

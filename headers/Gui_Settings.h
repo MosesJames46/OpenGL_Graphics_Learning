@@ -95,13 +95,13 @@ private:
 	}
 
 
-	static std::unique_ptr<Renderer> create_renderer(Renderer_Data& render_data, const std::string& file = " ");
+	static std::unique_ptr<Renderer> create_renderer(Renderer_Data& render_data, bool is_textured);
 
 	static std::unique_ptr<Renderer> create_light(Renderer_Data& render_data);
-	static std::unique_ptr<Renderer> create_complex(Renderer_Data& render_data);
+	static std::unique_ptr<Renderer> create_complex(Renderer_Data& render_data, bool is_complex);
 	static std::unique_ptr<Renderer> create_textured(Renderer_Data& render_data, const std::string& file);
-	static std::unique_ptr<Renderer> create_directional(Renderer_Data& render_data);
-	static std::unique_ptr<Renderer> create_spotlight(Renderer_Data& render_data);
+	static std::unique_ptr<Renderer> create_directional(Renderer_Data& render_data, bool is_textured);
+	static std::unique_ptr<Renderer> create_spotlight(Renderer_Data& render_data, bool is_complex);
 
 
 	/*Function utility to make selecting proper shaders easier*/
@@ -114,7 +114,7 @@ private:
 		For reference see line 1270 in the ImGui_demo.cpp file.
 	*/
 	static std::string use_combo(std::vector<std::string>& v, const char* name, int& idx);
-	static std::string use_combo(std::vector<std::filesystem::path>& v, const char* name, int& idx);
+	static std::string select_texture_file(const char* name, int& idx);
 
 	//Function to take a new renderer and attach current renderer meshes
 	static void initialize_renderer(Renderer* renderer);
@@ -127,24 +127,7 @@ private:
 	/*
 		Uses the pictures directory to show useable textures to apply to a mesh.
 	*/
-	inline static std::string process_textures() {
-		static int complex_ind = 0;
-		static std::string directory_path = "./pictures/";
-		std::string selected_file = "";
-		if (complex) {
-			//process_textures = std::filesystem::exists(director_path) || !std::filesystem::is_directory(director_path);
-			if (texture_file_paths.empty())
-				for (const auto& entry : std::filesystem::directory_iterator(directory_path)) {
-					texture_file_paths.push_back(entry.path());
-				}
-			selected_file = use_combo(texture_file_paths, "textures", complex_ind);
-		}
-		else {
-			return "";
-		}
-		return selected_file;
-	}
-
+	static void process_textures();
 	static void input_text();
 
 	static std::vector<std::unique_ptr<Renderer>> renderers;
@@ -158,7 +141,7 @@ private:
 	static std::vector<std::string> material;
 	static std::vector<std::string> renderer_names;
 
-	static std::vector<std::filesystem::path> texture_file_paths;
+	static std::vector<std::string> texture_file_paths;
 	
 	static std::vector<window> windows;
 };

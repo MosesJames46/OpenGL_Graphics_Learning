@@ -11,10 +11,13 @@ class Flashlight;
 
 class Spotlight_Mesh : public Light_Mesh {
 public:
-	Spotlight_Mesh(Camera& camera, const std::string& name, shape_type shape) : camera(camera), Light_Mesh(name, shape) {}
+	Spotlight_Mesh(Camera& camera, const std::string& name, shape_type shape, bool is_textured) : camera(camera), Light_Mesh(name, shape)
+	, is_textured(is_textured){}
 	//Spotlight_Mesh(Camera& camera, std::unique_ptr<Flashlight> flashlight, const std::string& name, shape_type shape);
 	
 	~Spotlight_Mesh() {};
+
+	bool is_textured;
 
 	float cutoff_radius{ 12.0f};
 	float radius_multiplier{ 1.2f };

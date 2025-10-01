@@ -99,6 +99,8 @@ public:
 	std::unique_ptr<Shader> shader;
 	std::vector<Light_Mesh*> mesh_objects;
 
+	bool is_textured = false;
+
 private:
 	void light_material(Light_Mesh& light_mesh, bool render = true);
 	void light_material_data(Light_Mesh& light_mesh);

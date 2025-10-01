@@ -16,6 +16,7 @@ struct Renderer_Data {
     std::string mesh_name;
     shape_type shape_ind;
     material_type material_ind;
+    std::string texture_file;
     Camera& camera;
 };
 
@@ -31,6 +32,7 @@ void Gui_Settings::render_frame() {
 }
 
 void Gui_Settings::gui_test(Camera& camera) {
+    process_textures();
     ImGui::Begin("Creation Window.");
     /*
         For all char arrays, they must be static in order to be modified as a single entity,
@@ -69,6 +71,18 @@ void Gui_Settings::gui_test(Camera& camera) {
         static int material_index = 0;
         use_combo(material, "Material", material_index);
 
+        static bool apply_texture;
+        if (material_index != 0) {
+            ImGui::Checkbox("Apply Texture", &apply_texture);
+        }
+
+        static std::string texture;
+        static int texture_id = 0;
+        if (apply_texture) {
+            ImGui::SeparatorText("Textures");
+            texture = select_texture_file("##Apply Texture", texture_id);
+        }
+
         /*
             Small enough logic that a function is not needed.
             Select the propoer shaders based on material type.
@@ -83,14 +97,12 @@ void Gui_Settings::gui_test(Camera& camera) {
         */
         attach_shader(v, f, static_cast<material_type>(material_index));
 
-        std::string selected_file = process_textures();
-
         Renderer_Data render_data{ v, f, mesh_name, static_cast<shape_type>(shape_index),
-        static_cast<material_type>(material_index), camera };
+        static_cast<material_type>(material_index), texture, camera };
 
         if (ImGui::Button("Create")) {
             
-            std::unique_ptr<Renderer> renderer = std::move(create_renderer(render_data, selected_file));
+            std::unique_ptr<Renderer> renderer = std::move(create_renderer(render_data, apply_texture));
             renderers.emplace_back(std::move(renderer));
             renderer_names.emplace_back(renderers.back()->mesh->name);
         }
@@ -118,18 +130,16 @@ void Gui_Settings::gui_test_type() {
    
 }
 
-std::unique_ptr<Renderer> Gui_Settings::create_renderer(Renderer_Data& render_data, const std::string& file) {
+std::unique_ptr<Renderer> Gui_Settings::create_renderer(Renderer_Data& render_data, bool is_textured) {
     switch (render_data.material_ind) {
     case LIGHT:
         return create_light(render_data);
     case COMPLEX:
-        return create_complex(render_data);
-    case TEXTURED:
-        return create_textured(render_data, file);
+        return create_complex(render_data, is_textured);
     case DIRECTIONAL:
-        return create_directional(render_data);
+        return create_directional(render_data, is_textured);
     case SPOTLIGHT:
-        return create_spotlight(render_data);
+        return create_spotlight(render_data, is_textured);
     }
 }
 
@@ -146,11 +156,16 @@ std::unique_ptr<Renderer> Gui_Settings::create_light(Renderer_Data& render_data)
     Anytime there is a c2661 error within a header that states "no overloadded function takes n arguments", it most likely means
     there is an error with a unique pointer instantiation. 
 */
-std::unique_ptr<Renderer> Gui_Settings::create_complex(Renderer_Data& render_data) {
+std::unique_ptr<Renderer> Gui_Settings::create_complex(Renderer_Data& render_data, bool is_textured) {
     std::unique_ptr<Complex_Mesh> complex_mesh = std::make_unique<Complex_Mesh>(render_data.camera, render_data.mesh_name, render_data.shape_ind);;
     std::unique_ptr<Shader> shader = std::make_unique<Shader>(render_data.v.c_str(), render_data.f.c_str());
     std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), render_data.material_ind);
     std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(complex_mesh), std::move(material), render_data.camera);
+
+    if (is_textured) {
+        renderer->add_textures(*renderer->material->shader.get(), { render_data.texture_file.c_str() }, { "material.diffuse" });
+    }
+
     initialize_renderer(renderer.get());
 
     return renderer;
@@ -171,15 +186,19 @@ std::unique_ptr<Renderer> Gui_Settings::create_textured(Renderer_Data& render_da
 }
 
 //Directional is a type of lighting calculation that only uses direction.
-std::unique_ptr<Renderer> Gui_Settings::create_directional(Renderer_Data& render_data) {
-    return create_complex(render_data);
+std::unique_ptr<Renderer> Gui_Settings::create_directional(Renderer_Data& render_data, bool is_bool) {
+    return create_complex(render_data, is_bool);
 }
 
-std::unique_ptr<Renderer> Gui_Settings::create_spotlight(Renderer_Data& render_data) {
-    std::unique_ptr<Spotlight_Mesh> spotlight_mesh = std::make_unique<Spotlight_Mesh>(render_data.camera, render_data.mesh_name, render_data.shape_ind);
+std::unique_ptr<Renderer> Gui_Settings::create_spotlight(Renderer_Data& render_data, bool is_textured) {
+    std::unique_ptr<Spotlight_Mesh> spotlight_mesh = std::make_unique<Spotlight_Mesh>(render_data.camera, render_data.mesh_name, render_data.shape_ind, is_textured);
     std::unique_ptr<Shader> shader = std::make_unique<Shader>(render_data.v.c_str(), render_data.f.c_str());
     std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), render_data.material_ind);
     std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(spotlight_mesh), std::move(material), render_data.camera);
+
+    if (is_textured) {
+        renderer->add_textures(*renderer->material->shader.get(), { render_data.texture_file.c_str() }, { "material.diffuse" });
+    }
     return renderer;
 }
 
@@ -208,6 +227,9 @@ void Gui_Settings::attach_shader(std::string& vertex_shader, std::string& fragme
     }
 }
 
+/*
+    Generalization function for combo boxes. Just input your vector of strings and the function will make a dropdown box.
+*/
 std::string Gui_Settings::use_combo(std::vector<std::string>& arr, const char* name, int& ind) {
     std::string preview = arr[ind];
     if (ImGui::BeginCombo(name, preview.c_str(), ImGuiComboFlags_WidthFitPreview)) {
@@ -227,20 +249,17 @@ std::string Gui_Settings::use_combo(std::vector<std::string>& arr, const char* n
     return preview;
 }
 
-std::string Gui_Settings::use_combo(std::vector<std::filesystem::path>& arr, const char* name, int& ind) {
-    std::string preview = arr[ind].string();
-    if (ImGui::BeginCombo(name, preview.c_str(), ImGuiComboFlags_WidthFitPreview)) {
-        for (int i = 0; i < arr.size(); ++i) {
-            const bool is_shape = (ind == i);
-            if (ImGui::Selectable(arr[i].string().c_str(), is_shape))
-                ind = i;
-            if (is_shape)
-                ImGui::SetItemDefaultFocus();
-        } 
-        ImGui::EndCombo();
-    }
+std::string Gui_Settings::select_texture_file(const char* name, int& ind) {
+    return use_combo(texture_file_paths, name, ind);
+}
 
-    return preview;
+void Gui_Settings::process_textures() {
+    static int complex_ind = 0;
+    static std::string directory_path = "./pictures/";
+    if (texture_file_paths.empty())
+        for (const auto& entry : std::filesystem::directory_iterator(directory_path)) {
+            texture_file_paths.push_back(entry.path().string());
+        }
 }
 
 void Gui_Settings::initialize_renderer(Renderer* renderer) {
@@ -299,7 +318,7 @@ std::vector<std::string> Gui_Settings::vertex = { "shaders/light_vs.glsl","shade
 std::vector<std::string> Gui_Settings::shape = { "Sphere"};
 std::vector<std::string> Gui_Settings::material = { "Light", "Complex", "Textured", "Directional", "Spotlight"};
 std::vector<std::string> Gui_Settings::renderer_names;
-std::vector<std::filesystem::path> Gui_Settings::texture_file_paths;
+std::vector<std::string> Gui_Settings::texture_file_paths;
 
 std::vector<std::unique_ptr<Renderer>> Gui_Settings::renderers;
 std::list<std::unique_ptr<Renderer>> Gui_Settings::renderer_list;

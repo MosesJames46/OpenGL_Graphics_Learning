@@ -8,7 +8,7 @@
 #include "../headers/Mesh_Types/Texture_Mesh.h"
 
 Material::Material(std::unique_ptr<Shader> shader, material_type material) :
-	shader(std::move(shader)), material(material) {}
+	shader(std::move(shader)), material(material), is_textured(is_textured) {}
 
 
 void Material::light_material(Light_Mesh& light_mesh, bool render) {
@@ -103,7 +103,10 @@ void Material::spotlight_material(Spotlight_Mesh& spotlight, bool render) {
 	shader->set_uniform_location("material.diffuse", spotlight.color);
 	shader->set_uniform_location("material.specular", spotlight.specular);
 	shader->set_uniform_location("material.shininess", spotlight.shininess);
+
 	shader->set_uniform_location("view_position", spotlight.camera.camera_origin);
+
+	shader->set_uniform_location("is_textured", spotlight.is_textured);
 	if (render)
 		spotlight_material_data(spotlight);
 	flashlight(&spotlight);

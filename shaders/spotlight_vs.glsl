@@ -13,6 +13,7 @@ uniform vec3 object_position;
 
 out vec3 fragment_position;
 out vec3 fragment_normal;
+out vec2 texture_coordinates;
 
 void main(){
 	//World space position
@@ -21,6 +22,8 @@ void main(){
 	fragment_position = vec3( world_space_position);
 	
 	fragment_normal = normal;
+
+	texture_coordinates = texture_coordinate;
 	
 	gl_Position = projection * view * world_space_position;
 }
