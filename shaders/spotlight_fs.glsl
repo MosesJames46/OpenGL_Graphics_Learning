@@ -63,7 +63,7 @@ vec3 get_ambient();
 vec3 get_diffuse(vec3 normal);
 vec3 get_specular(vec3 normal);
 float get_attenuation();
-float get_spotlight(float theta);
+float get_radius_intensity(float theta);
 
 vec3 smooth_edge_lighting(float intensity);
 vec3 hard_edge_lighting(float theta, float intensity);
@@ -75,7 +75,7 @@ void main(){
 	
 	//spotlight
 	float theta = dot(light_direction, normalize(-light.direction));
-	float intensity = get_spotlight(theta);
+	float intensity = get_radius_intensity(theta);
 
 	fragment_color = vec4(smooth_edge_lighting(intensity), 1.0f);
 }
@@ -111,7 +111,7 @@ float get_attenuation(){
 	return 1.f / (light.constant + light.linear * attenuation_distance + light.quadratic * (attenuation_distance * attenuation_distance));
 }
 
-float get_spotlight(float theta){
+float get_radius_intensity(float theta){
 	/*
 		The distance between the outer and cutoff is always the same.
 
@@ -127,6 +127,10 @@ vec3 hard_edge_lighting(float theta, float intensity){
 	}
 }
 
+
+/*
+	Does not use a hard cutoff, instead, measures intensity based off our epsilon from get_spotlight.
+*/
 vec3 smooth_edge_lighting(float intensity){
 	vec3 normal = normalize(fragment_normal);
 
