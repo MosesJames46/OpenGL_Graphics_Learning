@@ -66,19 +66,6 @@ int main() {
 	ImGui_ImplOpenGL3_Init("#version 330");
 
 	ImGui::StyleColorsDark();
-
-	//std::unique_ptr<Shader> standard_shader = std::make_unique<Shader>("shaders/light_vs.glsl", "shaders/light_fs.glsl");
-	//std::unique_ptr<Shader> light_shader = std::make_unique<Shader>("shaders/complex_vs.glsl", "shaders/complex_fs.glsl");
-	//
-	//std::unique_ptr<Light_Mesh> light = std::make_unique<Light_Mesh>("Regular Sphere", SPHERE);
-	//std::unique_ptr<Material> material = std::make_unique<Material>(std::move(standard_shader), LIGHT);
-	//Renderer r(std::move(light), std::move(material), camera);
-	//
-	//std::unique_ptr<Complex_Mesh> complex_sphere = std::make_unique<Complex_Mesh>(camera, "light sphere", SPHERE);
-	//std::unique_ptr<Material> shiny = std::make_unique<Material>(std::move(light_shader), COMPLEX);
-	//shiny->attach_mesh(dynamic_cast<Light_Mesh&>(*r.mesh.get()));
-	//Renderer r_shiny(std::move(complex_sphere), std::move(shiny), camera);
-	//r_shiny.add_textures({ "./pictures/moon_texture_2.png" }, { "material.diffuse" });
 	
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);

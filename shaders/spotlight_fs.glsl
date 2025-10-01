@@ -65,6 +65,9 @@ vec3 get_specular(vec3 normal);
 float get_attenuation();
 float get_spotlight(float theta);
 
+vec3 smooth_edge_lighting(float intensity);
+vec3 hard_edge_lighting(float theta, float intensity);
+
 void main(){
 	//Calculate the direction from every fragment.
 	vec3 light_direction = normalize(light.position - fragment_position);
@@ -74,35 +77,12 @@ void main(){
 	float theta = dot(light_direction, normalize(-light.direction));
 	float intensity = get_spotlight(theta);
 
-	if (theta > light.cutoff){
-		vec3 normal = normalize(fragment_normal);
-
-		//ambient
-		vec3 ambient = get_ambient();
-
-		//diffuse
-		vec3 diffuse = get_diffuse(normal) * intensity;
-		
-		//specular
-		vec3 specular = get_specular(normal) * intensity;
-
-		//attenuation
-		float attenuation = get_attenuation();
-
-		vec3 result = (ambient + diffuse + specular) * attenuation;
-		fragment_color = vec4(result, 1.0f);
-	}else{
-		if (is_textured){
-			fragment_color = vec4(light.ambient * vec3(texture( material.diffuse_texture, texture_coordinates)), 1.0f);
-		}else{
-			fragment_color = vec4(light.ambient * material.diffuse, 1.0f);
-		}
-	}
+	fragment_color = vec4(smooth_edge_lighting(intensity), 1.0f);
 }
 
 vec3 get_ambient(){
 	if(is_textured){
-		return light.ambient * vec3(texture(material.diffuse_texture, texture_coordinates));
+		return light.ambient * texture(material.diffuse_texture, texture_coordinates).rgb;
 	}
 
 	return light.ambient * material.ambient;
@@ -113,7 +93,7 @@ vec3 get_diffuse(vec3 normal){
 	float diff = max(dot(normal, -light_direction), 0.0f);
 
 	if (is_textured) {
-		return light.diffuse * vec3(texture(material.diffuse_texture, texture_coordinates)) * diff;
+		return light.diffuse * texture(material.diffuse_texture, texture_coordinates).rgb * diff;
 	}
 
 	return light.diffuse * material.diffuse * diff;
@@ -137,6 +117,31 @@ float get_spotlight(float theta){
 
 		There is a linear interpolation calculater between these values for where the fragments lie.
 	*/
-	float epsilon = light.cutoff - light.outerCutoff * light.radiusMultiplier;
+	float epsilon = light.cutoff - light.outerCutoff;
 	return smoothstep(0.0f, 1.0f, (theta - light.outerCutoff) / epsilon);
+}
+
+vec3 hard_edge_lighting(float theta, float intensity){
+	if (theta > light.cutoff){
+		return smooth_edge_lighting(intensity);
+	}
+}
+
+vec3 smooth_edge_lighting(float intensity){
+	vec3 normal = normalize(fragment_normal);
+
+	//ambient
+	vec3 ambient = get_ambient();
+
+	//diffuse
+	vec3 diffuse = get_diffuse(normal) * intensity;
+		
+	//specular
+	vec3 specular = get_specular(normal) * intensity;
+
+	//attenuation
+	float attenuation = get_attenuation();
+
+	vec3 result = (ambient + diffuse + specular) * attenuation;
+	return result;
 }
