@@ -11,8 +11,8 @@ class Flashlight;
 
 class Spotlight_Mesh : public Light_Mesh {
 public:
-	Spotlight_Mesh(GLFWwindow* window, Camera& camera, const std::string& name, shape_type shape, bool is_textured) : camera(camera), 
-		Light_Mesh(window, name, shape) , is_textured(is_textured){}
+	Spotlight_Mesh(GLFWwindow* window, Camera& camera, const std::string& name, shape_type shape, bool is_textured) :
+		Light_Mesh(window, name, shape, camera) , is_textured(is_textured){}
 	//Spotlight_Mesh(Camera& camera, std::unique_ptr<Flashlight> flashlight, const std::string& name, shape_type shape);
 	
 	~Spotlight_Mesh() {};
@@ -25,9 +25,6 @@ public:
 	glm::vec3 flashlight_color{ 1.0f, 1.0f, 1.0f };
 	glm::vec3 flashlight_ambient{ .1f, .1f, .1f };
 	glm::vec3 flashlight_specular{ 1.0f, 1.0f, 1.0f };
-
-	Camera& camera;
-	//std::unique_ptr<Flashlight> flashlight;
 
 	void set_cuttoff_radius(); 
 	void set_outer_cutoff_radius();

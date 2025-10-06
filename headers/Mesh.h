@@ -12,6 +12,7 @@
 class Sphere;
 class GLFWwindow;
 class ImVec2;
+class Camera;
 
 enum shape_type{SPHERE, FLASHLIGHT};
 
@@ -22,8 +23,8 @@ enum shape_type{SPHERE, FLASHLIGHT};
 
 class Mesh : public Shape{
 public:
-	Mesh(const std::string& name, shape_type shape);
-	Mesh(GLFWwindow* window, const std::string& name, shape_type shape);
+	Mesh(const std::string& name, shape_type shape, Camera& camera);
+	Mesh(GLFWwindow* window, const std::string& name, shape_type shape, Camera& camera);
 	Mesh(shape_type shape);
 
 	~Mesh() {};
@@ -36,6 +37,15 @@ public:
 	void set_specular();
 	void set_rotation();
 	void set_shininess();
+
+	void get_screencoordiantes();
+
+	/*
+		The NDC will contain z coordinates as well. 
+	*/
+	void get_NDC();
+
+	void clip_to_worldspace();
 
 	void UI_get_cursor_position();
 	
@@ -60,7 +70,7 @@ public:
 	glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
 	glm::vec3 rotation{ 0.0f, 0.0f, 0.0f };
 
-	
+	Camera& camera;
 
 	float shininess = 32.0f;
 	float slider_speed = 0.01f;
@@ -81,4 +91,10 @@ private:
 	//Necessary for the mesh to use callback functions for needs like cursor position.
 	GLFWwindow* window;
 	unsigned int id;
+	double x_position, y_position;
+	float x_NDC, y_NDC, z_NDC;
+	glm::vec4 ray_in_clipspace;
+	glm::vec4 ray_in_eyespace;
+	glm::vec3 ray_in_worldspace;
+	
 };

@@ -23,6 +23,7 @@ void Camera::get_camera_input(GLFWwindow* window) {
 	}
 
 	/*
+		
 		for glfwSetInputMode: window, input_value, what input_value should be now.
 	*/
 	if (is_edit_mode != last_edit_mode) {
@@ -30,6 +31,9 @@ void Camera::get_camera_input(GLFWwindow* window) {
 		last_edit_mode = is_edit_mode;
 	}
 
+	/*
+		10/6/25: Ensures the mouse position is not reset to the center of the screen after toggle. 
+	*/
 	if (is_edit_mode == GLFW_CURSOR_NORMAL && ImGui::IsKeyPressed(ImGuiKey_CapsLock)) {
 		first_mouse = true;
 	}

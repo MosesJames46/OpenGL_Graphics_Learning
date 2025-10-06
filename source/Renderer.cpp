@@ -135,9 +135,6 @@ void Renderer::draw(bool render) {
 	case COMPLEX:
 		material->apply_shader(dynamic_cast<Complex_Mesh&>(*mesh.get()), render);
 		break;
-	case TEXTURED:
-		material->apply_shader(dynamic_cast<Texture_Mesh&>(*mesh.get()), render);
-		break;
 	case SPOTLIGHT:
 		material->apply_shader(dynamic_cast<Spotlight_Mesh&>(*mesh.get()), render);
 		break;

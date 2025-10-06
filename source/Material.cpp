@@ -74,21 +74,6 @@ void Material::complex_material(Complex_Mesh& complex_mesh, bool render) {
 	light_effects();
 }
 
-void Material::texture_material(Texture_Mesh& texture_mesh, bool render) {
-	shader->set_uniform_location("object_position", texture_mesh.position);
-	shader->set_uniform_location("material.specular", texture_mesh.specular);
-	shader->set_uniform_location("material.shininess", texture_mesh.shininess);
-	shader->set_uniform_location("view_position", texture_mesh.camera.camera_origin);
-	if (render)
-		texture_material_data(texture_mesh);
-	if (mesh_objects.empty()) return;
-	light_effects();
-}
-
-void Material::texture_material_data(Texture_Mesh& texture_mesh) {
-	ImGui::Begin(texture_mesh.name.c_str());
-}
-
 void Material::complex_material_data(Complex_Mesh& complex_mesh) {
 	ImGui::Begin(std::string(complex_mesh.name).c_str());
 	complex_mesh.object_calculations();

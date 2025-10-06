@@ -88,9 +88,6 @@ public:
 	void apply_shader(Complex_Mesh& complex_mesh, bool render = true) {
 		complex_material(complex_mesh, render);
 	};
-	void apply_shader(Texture_Mesh& texture_mesh, bool render = true) {
-		texture_material(texture_mesh, render);
-	};
 	void apply_shader(Spotlight_Mesh& spotlight_mesh, bool render = true) {
 		spotlight_material(spotlight_mesh, render);
 	};
@@ -107,9 +104,6 @@ private:
 
 	void complex_material(Complex_Mesh& complex_mesh, bool render = true);
 	void complex_material_data(Complex_Mesh& complex_mesh);
-
-	void texture_material(Texture_Mesh& texture_mesh, bool render = true);
-	void texture_material_data(Texture_Mesh& texture_mesh);
 
 	void spotlight_material(Spotlight_Mesh& spotlight, bool render = true);
 	void spotlight_material_data(Spotlight_Mesh& spotlight);

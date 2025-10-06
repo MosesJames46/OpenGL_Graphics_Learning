@@ -218,7 +218,7 @@ void Gui_Settings::initialize_renderer(Renderer* renderer) {
 std::unique_ptr<Mesh> Gui_Settings::create_mesh(Renderer_Data& render_data) {
     switch (render_data.material_ind) {
     case LIGHT:
-		return std::make_unique<Light_Mesh>(window, render_data.mesh_name, render_data.shape_ind);
+		return std::make_unique<Light_Mesh>(window, render_data.mesh_name, render_data.shape_ind, render_data.camera);
 	case COMPLEX:
 		return std::make_unique<Complex_Mesh>(window, render_data.camera, render_data.mesh_name, render_data.shape_ind, render_data.is_textured);
 	case SPOTLIGHT:
