@@ -115,6 +115,7 @@ void Material::spotlight_material(Spotlight_Mesh& spotlight, bool render) {
 void Material::spotlight_material_data(Spotlight_Mesh& spotlight) {
 	ImGui::Begin(spotlight.name.c_str());
 	spotlight.activate_cuttoff_mesh();
+	spotlight.UI_get_cursor_position();
 	ImGui::End();
 }
 

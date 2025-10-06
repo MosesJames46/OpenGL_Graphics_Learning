@@ -1,5 +1,6 @@
 #include "../headers/Mesh.h"
 #include "../headers/Sphere.h"
+#include "../headers/libs.h"
 
 Mesh::Mesh(const std::string& name, shape_type shape) : name(name) {
 	id = mesh_number();
@@ -17,6 +18,15 @@ Mesh::Mesh(const std::string& name, shape_type shape) : name(name) {
 		break;
 	}	
 	}
+}
+
+//Just so I can remember this is called delegating constructors.
+Mesh::Mesh(GLFWwindow* window, const std::string& name, shape_type shape) : Mesh(name, shape) {
+	this->window = window;
+	//Further research is needed on this.
+	if (!window) std::cout << "Window is dead" << std::endl;
+	if (!this) std::cout << "The mesh is dead" << std::endl;
+	glfwSetWindowUserPointer(window, this);
 }
 
 
@@ -60,4 +70,23 @@ void Mesh::set_shininess() {
 	ImGui::PushItemWidth(100);
 	ImGui::DragFloat("Shininess: ", &shininess, slider_speed, .0001, 100.0f);
 	ImGui::PopItemWidth();
+}
+
+void Mesh::UI_get_cursor_position() {
+	static int show_cursor = 0;
+	ImGuiIO& io = ImGui::GetIO();
+	if (ImGui::IsKeyPressed(ImGuiKey_1)) ++show_cursor;
+	if (show_cursor & 1 && !io.WantCaptureMouse) {
+		double x_position, y_position;
+		//Use glfw for delta values.
+		glfwGetCursorPos(window, &x_position, &y_position);
+		ImGui::Begin("##Cursuor");
+		ImGui::SeparatorText("Cursor Position");
+		ImGui::Text("Cursor Position (%g, %g)", x_position, y_position);
+		ImGui::End();
+	}
+	else {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	
 }

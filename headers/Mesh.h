@@ -10,12 +10,20 @@
 #include <memory>
 
 class Sphere;
+class GLFWwindow;
+class ImVec2;
 
 enum shape_type{SPHERE, FLASHLIGHT};
+
+/*
+	10/4/25: 
+		- Introduce the window to the Mesh class to allow for callbacks for mouse position.
+*/
 
 class Mesh : public Shape{
 public:
 	Mesh(const std::string& name, shape_type shape);
+	Mesh(GLFWwindow* window, const std::string& name, shape_type shape);
 	Mesh(shape_type shape);
 
 	~Mesh() {};
@@ -28,6 +36,8 @@ public:
 	void set_specular();
 	void set_rotation();
 	void set_shininess();
+
+	void UI_get_cursor_position();
 	
 	void set_float();
 
@@ -50,6 +60,8 @@ public:
 	glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
 	glm::vec3 rotation{ 0.0f, 0.0f, 0.0f };
 
+	
+
 	float shininess = 32.0f;
 	float slider_speed = 0.01f;
 
@@ -66,5 +78,7 @@ public:
 	unsigned int VAO, VBO, EBO;
 
 private:
+	//Necessary for the mesh to use callback functions for needs like cursor position.
+	GLFWwindow* window;
 	unsigned int id;
 };

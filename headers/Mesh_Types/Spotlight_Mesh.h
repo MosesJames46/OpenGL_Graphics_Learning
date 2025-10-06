@@ -11,8 +11,8 @@ class Flashlight;
 
 class Spotlight_Mesh : public Light_Mesh {
 public:
-	Spotlight_Mesh(Camera& camera, const std::string& name, shape_type shape, bool is_textured) : camera(camera), Light_Mesh(name, shape)
-	, is_textured(is_textured){}
+	Spotlight_Mesh(GLFWwindow* window, Camera& camera, const std::string& name, shape_type shape, bool is_textured) : camera(camera), 
+		Light_Mesh(window, name, shape) , is_textured(is_textured){}
 	//Spotlight_Mesh(Camera& camera, std::unique_ptr<Flashlight> flashlight, const std::string& name, shape_type shape);
 	
 	~Spotlight_Mesh() {};

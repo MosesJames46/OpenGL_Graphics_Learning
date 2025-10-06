@@ -59,5 +59,5 @@ void main(){
 
 	vec3 result = (ambient + diffuse + specular) * attenuation;
 
-	fragment_colors = vec4(norm, 1.0f);
+	fragment_colors = vec4(result, 1.0f);
 }

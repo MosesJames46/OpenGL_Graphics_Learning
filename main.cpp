@@ -17,6 +17,7 @@
 #include "../headers/Mesh_Types/Spotlight_Mesh.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_button_callback(GLFWwindow* window, double x_position, double y_position);
 
 constexpr const float WINDOW_WIDTH = 800.0f;
 constexpr const float WINDOW_HEIGHT = 600.0f;
@@ -43,17 +44,10 @@ int main() {
 	}
 
 	
-	Camera camera(window);
+	
 
 	//Apparently, any callback I initialize after ImGui will be overwritten. Wished I knew this.
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetWindowUserPointer(window, &camera);
-
-	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
-		if (ImGui::GetIO().WantCaptureMouse) return;
-		Camera* camera = static_cast<Camera*>(glfwGetWindowUserPointer(window));
-		camera->mouse_callback(window, (float)xpos, (float)ypos);
-		});
 
 	IMGUI_CHECKVERSION();
 
@@ -61,12 +55,24 @@ int main() {
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
 
+	/*
+		When you set the callback install to true, we only let ImGui handle callbacks for OpenGL. 
+
+		This means that obtaining input can be safely handled through ImGui.
+
+		Important:
+			When used in conjuction with glfw mouse position, it should be noted that it does not take into consideration the reset to the center of the
+			screen when the mouse is disabled. This can cause confusion when switching between camera mode and input selection.
+	*/
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 
 	ImGui::StyleColorsDark();
 	
+	Gui_Settings::attach_window(window);
+	Camera camera(window);
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
 		
