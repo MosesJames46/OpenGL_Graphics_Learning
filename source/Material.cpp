@@ -36,9 +36,7 @@ void Material::light_effects() {
 		shader->set_uniform_location("light.linear", mesh_object->attenuation[1]);
 		shader->set_uniform_location("light.quadratic", mesh_object->attenuation[2]);
 
-		if (material == LIGHT) {
-			shader->set_uniform_location("light.positon", mesh_object->position);
-		}
+		shader->set_uniform_location("light.position", mesh_object->position);
 	}
 }
 
@@ -99,8 +97,7 @@ void Material::spotlight_material(Spotlight_Mesh& spotlight, bool render) {
 
 void Material::spotlight_material_data(Spotlight_Mesh& spotlight) {
 	ImGui::Begin(spotlight.name.c_str());
-	spotlight.activate_cuttoff_mesh();
-	spotlight.UI_get_cursor_position();
+	spotlight.show_UI();
 	ImGui::End();
 }
 

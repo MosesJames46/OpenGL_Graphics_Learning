@@ -133,5 +133,7 @@ private:
 	static std::vector<std::string> material;
 	static std::vector<std::string> renderer_names;
 
+	static std::vector<std::string> object_files;
+
 	static std::vector<std::string> texture_file_paths;
 };

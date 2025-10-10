@@ -3,7 +3,7 @@
 #include "../headers/libs.h"
 #include "../headers/Camera.h"
 
-Mesh::Mesh(const std::string& name, shape_type shape, Camera& camera) : name(name), camera(camera) {
+Mesh::Mesh(const std::string& name, shape_type shape, Camera& camera) : name(name), camera(camera), shape(shape) {
 	id = mesh_number();
 	/*
 		Give the Mesh a unique address. This avoids name duplicates.
@@ -21,6 +21,119 @@ Mesh::Mesh(const std::string& name, shape_type shape, Camera& camera) : name(nam
 	}
 }
 
+Mesh::Mesh(GLFWwindow* window, std::string file, const std::string& name, shape_type shape, Camera& camera): Mesh(window, name, shape, camera) {
+	std::ifstream file_stream(file);
+	if (!file_stream.is_open()) {
+		std::cout << "Could not open file." << std::endl;
+		return;
+	}
+
+	std::string line;
+	int id = -1;
+	while (!file_stream.eof()) {
+		std::getline(file_stream, line);
+		std::istringstream part(line);
+		std::string l;
+		//part << line;
+		//std::cout << part.str() << std::endl;
+		//std::cout << line << std::endl;
+
+		if (line.compare(0, 2, "v ") == 0) {
+			std::string x, y, z, w;
+			part >> l;
+			std::string::difference_type n = std::count(line.begin(), line.end(), ' ');
+			int count = static_cast<int>(n);
+			//std::cout << count << std::endl;
+
+			if (count == 3) {
+				part >> x >> y >> z;
+				vertices.push_back(std::stof(x));
+				vertices.push_back(std::stof(y));
+				vertices.push_back(std::stof(z));
+			}
+			else {
+				part >> x >> y >> z >> w;
+				int fx, fy, fz, fw;
+				fx = std::stof(x);
+				fy = std::stof(y);
+				fz = std::stof(z);
+				fw = std::stof(w);
+				if (fw != 0) {
+					fx /= fw;
+					fy /= fw;
+					fz /= fw;
+				}
+				vertices.push_back(fx);
+				vertices.push_back(fy);
+				vertices.push_back(fz);
+			}
+			
+			//glm::vec3 v(std::stof(x), std::stof(y), std::stof(z));
+			
+			//std::cout << x << " " << y << " " << z << std::endl;
+			
+			++id;
+		}else if (line.compare(0, 3, "vn ") == 0) {
+			part >> l;
+			std::string x, y, z;
+			part >> x >> y >> z;
+			normals.push_back(std::stof(x));
+			normals.push_back(std::stof(y));
+			normals.push_back(std::stof(z));
+			//std::cout << x << " " << y << " " << z << std::endl;
+		} else if (line.compare(0, 2, "f ") == 0) {
+			//std::cout << part.str() << " ";
+			while (!part.eof()) {
+				part >> l;
+				//std::cout << part.str() << std::endl;
+				//Find substring containing correct face index. Then shorten the string to fit.
+				if (l.find('/') < std::string::npos) {
+					//std::string num(l.begin() + 2, l.begin() + l.find('/'));
+					l = l.substr(0, l.find('/'));
+					indices.push_back(std::stoi(l) - 1);
+					//std::cout << l;
+				}
+				else {
+					//indices.push_back(std::stoi(l));
+					if (!isalpha(l[0]))
+						std::cout << std::stoi(l) << std::endl;
+				}
+				//std::cout << std::endl;
+			}
+		} else if (line.compare(0, 3, "vt ") == 0) {
+			part >> l;
+			std::string u, t;
+			part >> u >> t;
+			texture_coordinates.push_back(std::stof(u));
+			texture_coordinates.push_back(std::stof(t));
+		}
+	}
+
+	vertex_data.clear();
+
+	for (int i = 0, j = 0; i < vertices.size() && i < normals.size(); i += 3, j += 2) {
+		vertex_data.push_back(vertices[i]);
+		vertex_data.push_back(vertices[i + 1]);
+		vertex_data.push_back(vertices[i + 2]);
+
+		vertex_data.push_back(0);
+		vertex_data.push_back(0);
+		vertex_data.push_back(0);
+
+		vertex_data.push_back(normals[i]);
+		vertex_data.push_back(normals[i + 1]);
+		vertex_data.push_back(normals[i + 2]);
+
+		if (j < texture_coordinates.size()) {
+			vertex_data.push_back(texture_coordinates[j]);
+			vertex_data.push_back(texture_coordinates[j + 1]);
+		}
+	}
+
+	std::cout << "# v: " << vertices.size() / 3 << " f: " << indices.size() << "#vt: " << texture_coordinates.size() / 2  << "vn: " << normals.size()/3 << std::endl;
+	//std::cout << "Vertices: " << vertex_data.size() << std::endl;
+}
+
 //Just so I can remember this is called delegating constructors.
 Mesh::Mesh(GLFWwindow* window, const std::string& name, shape_type shape, Camera& camera) : Mesh(name, shape, camera) {
 	this->window = window;
@@ -32,7 +145,7 @@ Mesh::Mesh(GLFWwindow* window, const std::string& name, shape_type shape, Camera
 
 
 void Mesh::initialize_mesh(Sphere& sphere) {
-	sphere.generate_mesh((*this));
+	sphere.generate_mesh((*this), bounds);
 }
 
 void Mesh::get_screencoordiantes() {
@@ -60,11 +173,55 @@ void Mesh::get_NDC() {
 	Convert from clip space to world space by inversing our pipeline.
 */
 void Mesh::clip_to_worldspace() {
-	ray_in_eyespace = ray_in_clipspace * glm::inverse(camera.projection);
-	ray_in_eyespace = glm::vec4{ ray_in_eyespace.x, ray_in_eyespace.y, -1.f, 1.f };
-	ray_in_worldspace = glm::inverse(camera.view) * ray_in_eyespace;
+	glm::mat4 inverse_projection_view = glm::inverse(camera.projection) * glm::inverse(camera.view);
+
+	glm::vec3 near = inverse_projection_view * glm::vec4{ x_NDC, y_NDC, -1.f, 1.f };
+	glm::vec3 far = inverse_projection_view * glm::vec4{ x_NDC, y_NDC, 1.f, 1.f };
+
+	ray_direction = glm::normalize(far - near);
+	ray_in_worldspace = near;
 }
 
+
+void Mesh::sphere_intersection_test() {
+
+}
+
+/*
+	The equation for a point on a bounding box is:
+		O + dt = x, where O is the origin from the object, d is the direction that ray is pointing, t is the scalar value that determines how many,
+		points are on the ray, and x is the destination target on the plane.
+
+		Therefore, we solve for t to get, (x - O) / d.
+*/
+
+bool Mesh::bounding_box_intersection_test() {
+	glm::vec3 ray_origin = camera.camera_origin;
+	glm::vec3 ray_direction = glm::normalize((ray_in_worldspace + camera.camera_forward) - ray_origin);
+	glm::vec3 inverse_ray_direction{ 1 / ray_direction.x, 1 / ray_direction.y, 1 / ray_direction.z };
+
+	float minimums[3]{ bounds.min_x, bounds.min_y, bounds.min_z };
+	float maximums[3]{ bounds.max_x, bounds.max_y, bounds.max_z };
+
+	float t_min = 0.0f; float t_max = INFINITY;
+
+	for (int i = 0; i < 3; ++i) {
+		float t1 = (minimums[i] - ray_origin[i]) * inverse_ray_direction[i];
+		float t2 = (maximums[i] - ray_origin[i]) * inverse_ray_direction[i];
+
+		t_min = std::max(t_min, std::min(t1, t2));
+		t_max = std::min(t_max, std::max(t1, t2));
+	}
+
+	return t_min < t_max;
+}
+
+void Mesh::UI_get_bounding_box() {
+	
+	ImGui::SeparatorText("Bounding Box");
+	ImGui::Text("Bounding Box values x (%g, %g) , y (%g, %g), z (%g, %g)", bounds.min_x, bounds.max_x
+		, bounds.min_y, bounds.max_y, bounds.min_z, bounds.max_z);
+}
 
 void Mesh::set_color() {
 	//Use the starting position of the float pointer.
@@ -108,15 +265,24 @@ void Mesh::UI_get_cursor_position() {
 	static int show_cursor = 0;
 	ImGuiIO& io = ImGui::GetIO();
 	if (ImGui::IsKeyPressed(ImGuiKey_1)) ++show_cursor;
+	get_screencoordiantes();
+	get_NDC();
+	clip_to_worldspace();
+
 	if (show_cursor & 1) {
 		//double x_position, y_position;
 		//Use glfw for delta values.
-		get_screencoordiantes();
-		get_NDC();
-		clip_to_worldspace();
+		
 		ImGui::SeparatorText("Cursor Position");
 		ImGui::Text("Cursor Position (%g, %g)", x_position , y_position);
 		ImGui::Text("Cursor in Worldspace (%g, %g, %g)", ray_in_worldspace.x, ray_in_worldspace.y, ray_in_worldspace.z);
+		ImGui::Text("Cursor Direction (%g, %g, %g)", ray_direction.x, ray_direction.y, ray_direction.z);
+		
 	}
-	
+
+	if (bounding_box_intersection_test()) {
+		ImGui::Text("Intersect Hit");
+	}else {
+		ImGui::Text("Intersect Miss");
+	}
 }

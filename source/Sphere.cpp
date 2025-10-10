@@ -77,7 +77,7 @@ void Sphere::generate_indices(std::vector<unsigned int>& indices) {
 	}
 }
 
-void Sphere::generate_mesh(Mesh& mesh) {
+void Sphere::generate_mesh(Mesh& mesh, BoundingBox& bounds) {
 	mesh.vertex_data.clear();
 	float x, y, z, xy;                              // vertex position
 	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
@@ -87,11 +87,13 @@ void Sphere::generate_mesh(Mesh& mesh) {
 	float stackStep = pi / stacks;
 	float sectorAngle, stackAngle;
 
+
+
 	for (int i = 0; i <= stacks; ++i)
 	{
 		stackAngle = (pi / 2.f) - i * stackStep;        // starting from pi/2 to -pi/2
-		xy = cosf(stackAngle);             // r * cos(u)
-		z =  sinf(stackAngle);              // r * sin(u)
+		xy = cosf(stackAngle);							// r * cos(u)
+		z =  sinf(stackAngle);							// r * sin(u)
 
 		// add (sectorCount+1) vertices per stack
 		// first and last vertices have same position and normal, but different tex coords
@@ -105,6 +107,9 @@ void Sphere::generate_mesh(Mesh& mesh) {
 			mesh.vertex_data.push_back(x);
 			mesh.vertex_data.push_back(y);
 			mesh.vertex_data.push_back(z);
+
+			glm::vec3 vertex{ x, y, z };
+			mesh.create_bounding_box(vertex);
 
 			// vertex color
 			mesh.vertex_data.push_back(mesh.color[0]);

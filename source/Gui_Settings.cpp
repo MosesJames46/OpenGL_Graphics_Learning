@@ -20,6 +20,7 @@ struct Renderer_Data {
     material_type material_ind;
 
     bool is_textured = false;
+    bool is_model = false;
 
     std::string texture_file;
 
@@ -86,6 +87,16 @@ void Gui_Settings::gui_test(Camera& camera) {
             ImGui::Checkbox("Apply Texture", &apply_texture);
         }
 
+        static int model = 0;
+        static bool is_model = false;
+        if (shape_index == 1) {
+            use_combo(object_files, "Model", model);
+            is_model = true;
+        }
+        else {
+            is_model = false;
+        }
+
         static std::string texture;
         static int texture_id = 0;
         if (apply_texture) {
@@ -108,7 +119,7 @@ void Gui_Settings::gui_test(Camera& camera) {
         attach_shader(v, f, static_cast<material_type>(material_index));
 
         Renderer_Data render_data{ v, f, mesh_name, static_cast<shape_type>(shape_index),
-        static_cast<material_type>(material_index), apply_texture, texture, camera };
+        static_cast<material_type>(material_index), apply_texture, is_model, texture, camera };
 
         if (ImGui::Button("Create")) {
             
@@ -131,6 +142,9 @@ std::unique_ptr<Renderer> Gui_Settings::create_renderer(Renderer_Data& render_da
 
     if (render_data.is_textured)
         renderer->add_textures(*renderer->material->shader.get(), { render_data.texture_file.c_str() }, { "material.diffuse" });
+    if (renderer->material->material == COMPLEX) {
+        initialize_renderer(renderer.get());
+    }
     return renderer;
 }
 
@@ -216,13 +230,25 @@ void Gui_Settings::initialize_renderer(Renderer* renderer) {
     Simple switch case function to select proper mesh type.
 */
 std::unique_ptr<Mesh> Gui_Settings::create_mesh(Renderer_Data& render_data) {
-    switch (render_data.material_ind) {
-    case LIGHT:
-		return std::make_unique<Light_Mesh>(window, render_data.mesh_name, render_data.shape_ind, render_data.camera);
-	case COMPLEX:
-		return std::make_unique<Complex_Mesh>(window, render_data.camera, render_data.mesh_name, render_data.shape_ind, render_data.is_textured);
-	case SPOTLIGHT:
-        return std::make_unique<Spotlight_Mesh>(window, render_data.camera, render_data.mesh_name, render_data.shape_ind, render_data.is_textured);
+    if (render_data.is_model) {
+        switch (render_data.material_ind) {
+        case LIGHT:
+            return std::make_unique<Light_Mesh>(window, object_files[0], render_data.mesh_name, render_data.shape_ind, render_data.camera);
+        case COMPLEX:
+            return std::make_unique<Complex_Mesh>(window, render_data.camera, object_files[0], render_data.mesh_name, render_data.shape_ind, render_data.is_textured);
+        case SPOTLIGHT:
+            return std::make_unique<Spotlight_Mesh>(window, render_data.camera, object_files[0], render_data.mesh_name, render_data.shape_ind, render_data.is_textured);
+        }
+    }
+    else {
+        switch (render_data.material_ind) {
+        case LIGHT:
+            return std::make_unique<Light_Mesh>(window, render_data.mesh_name, render_data.shape_ind, render_data.camera);
+        case COMPLEX:
+            return std::make_unique<Complex_Mesh>(window, render_data.camera, render_data.mesh_name, render_data.shape_ind, render_data.is_textured);
+        case SPOTLIGHT:
+            return std::make_unique<Spotlight_Mesh>(window, render_data.camera, render_data.mesh_name, render_data.shape_ind, render_data.is_textured);
+        }
     }
 }
 
@@ -264,10 +290,12 @@ std::vector<std::string> Gui_Settings::fragment = { "shaders/light_fs.glsl",
     "shaders/spotlight_fs.glsl" };
 std::vector<std::string> Gui_Settings::vertex = { "shaders/light_vs.glsl","shaders/complex_vs.glsl" 
 ,"shaders/textured_vs.glsl", "shaders/direction_light_vs.glsl","shaders/spotlight_vs.glsl" };
-std::vector<std::string> Gui_Settings::shape = { "Sphere"};
+std::vector<std::string> Gui_Settings::shape = { "Sphere", "Model"};
 std::vector<std::string> Gui_Settings::material = { "Light", "Complex", "Textured", "Directional", "Spotlight"};
 std::vector<std::string> Gui_Settings::renderer_names;
 std::vector<std::string> Gui_Settings::texture_file_paths;
+
+std::vector<std::string> Gui_Settings::object_files = { "Sword-Two.obj" };
 
 std::vector<std::unique_ptr<Renderer>> Gui_Settings::renderers;
 std::list<std::unique_ptr<Renderer>> Gui_Settings::renderer_list;

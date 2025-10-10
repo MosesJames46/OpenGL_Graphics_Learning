@@ -73,6 +73,7 @@ int main() {
 	
 	Gui_Settings::attach_window(window);
 	Camera camera(window);
+
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
 		

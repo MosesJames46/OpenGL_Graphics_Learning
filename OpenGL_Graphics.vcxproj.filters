@@ -213,6 +213,8 @@
     <None Include="shaders\direction_light_fs.glsl" />
     <None Include="shaders\spotlight_fs.glsl" />
     <None Include="shaders\spotlight_vs.glsl" />
+    <None Include="shaders\model_vs.glsl" />
+    <None Include="shaders\model_fs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="pictures\wall.jpg">

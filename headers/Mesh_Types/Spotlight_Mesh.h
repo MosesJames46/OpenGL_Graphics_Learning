@@ -13,6 +13,8 @@ class Spotlight_Mesh : public Light_Mesh {
 public:
 	Spotlight_Mesh(GLFWwindow* window, Camera& camera, const std::string& name, shape_type shape, bool is_textured) :
 		Light_Mesh(window, name, shape, camera) , is_textured(is_textured){}
+	Spotlight_Mesh(GLFWwindow* window, Camera& camera, std::string file, const std::string& name, shape_type shape, bool is_textured) :
+		Light_Mesh(window, file, name, shape, camera), is_textured(is_textured) {}
 	//Spotlight_Mesh(Camera& camera, std::unique_ptr<Flashlight> flashlight, const std::string& name, shape_type shape);
 	
 	~Spotlight_Mesh() {};
@@ -30,4 +32,8 @@ public:
 	void set_outer_cutoff_radius();
 	void activate_cuttoff_mesh();
 	void set_flashlight_color();
+
+	void show_UI() {
+		activate_cuttoff_mesh();
+	}
 };

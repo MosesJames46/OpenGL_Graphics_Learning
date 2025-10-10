@@ -5,6 +5,7 @@
 #include "Texture.h"
 
 class Mesh;
+struct BoundingBox;
 
 class Shape {
 public:
@@ -13,7 +14,7 @@ public:
 	virtual void generate_indices(std::vector<unsigned int>& indices) {};
 	virtual void generate_vertices(std::vector<float>& vertices) {};
 
-	virtual void generate_mesh(Mesh& mesh) {};
+	virtual void generate_mesh(Mesh& mesh, BoundingBox& bounds) {};
 
 	virtual void set_scale(float scalar, glm::vec3& scale);
 

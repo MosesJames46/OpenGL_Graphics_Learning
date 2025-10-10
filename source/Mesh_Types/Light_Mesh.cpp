@@ -13,4 +13,7 @@ void Light_Mesh::calculate_light_material() {
 	set_color();
 
 	set_attenuation();
+
+	UI_get_bounding_box();
+	UI_get_cursor_position();
 }

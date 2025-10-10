@@ -52,10 +52,8 @@ void main(){
 	vec3 specular = material.specular * spec;
 
 	//Attenuation
-	float dist = length(fragment_positions - light_direction);
+	float dist = length(fragment_positions - light.position);
 	float attenuation = 1.f / (light.constant + light.linear * dist + light.quadratic * (dist * dist));
-
-	
 
 	vec3 result = (ambient + diffuse + specular) * attenuation;
 

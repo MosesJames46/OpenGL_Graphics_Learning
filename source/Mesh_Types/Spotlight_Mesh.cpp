@@ -28,8 +28,6 @@ void Spotlight_Mesh::set_flashlight_color() {
 void Spotlight_Mesh::activate_cuttoff_mesh() {
 	calculate_light_material();
 	set_flashlight_color();
-	set_specular();
-	set_shininess();
 	set_cuttoff_radius();
 	set_outer_cutoff_radius();
 }
