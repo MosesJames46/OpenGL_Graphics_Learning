@@ -13,9 +13,11 @@ out vec3 fragment_positions;
 out vec3 normal_output;
 
 uniform vec3 object_position;
+uniform float scale;
+uniform mat4 scale_matrix;
 
 void main(){
-	gl_Position = projection * view * model * vec4(position + object_position, 1.0f);
+	gl_Position = projection * view * model * scale_matrix * vec4((position + object_position) * scale, 1.0f);
 	normal_output = mat3(transpose(inverse(model))) * normal;
 	fragment_positions = vec3(model * vec4(position + object_position, 1.0f));
 }

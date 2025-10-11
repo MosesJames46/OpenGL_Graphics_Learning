@@ -101,7 +101,7 @@ vec3 get_diffuse(vec3 normal){
 
 vec3 get_specular(vec3 normal){
 	vec3 view_direction = normalize(view_position - fragment_position);
-	vec3 reflect_direction = reflect(-light.direction, normal);  
+	vec3 reflect_direction = reflect(light.direction, normal);  
 	float spec = pow(max(dot(view_direction, reflect_direction), 0.0), material.shininess);
 	return light.specular * material.specular * spec;
 }

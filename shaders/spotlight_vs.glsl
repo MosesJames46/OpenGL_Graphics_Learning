@@ -10,6 +10,8 @@ uniform mat4 view;
 uniform mat4 projection;
 
 uniform vec3 object_position;
+uniform float scale;
+uniform mat4 scale_matrix;
 
 out vec3 fragment_position;
 out vec3 fragment_normal;
@@ -17,7 +19,7 @@ out vec2 texture_coordinates;
 
 void main(){
 	//World space position
-	vec4 world_space_position = model * vec4(position + object_position, 1.0f);
+	vec4 world_space_position =  model * scale_matrix * vec4((position + object_position) * scale, 1.0f);;
 
 	fragment_position = vec3( world_space_position);
 	
