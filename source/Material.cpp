@@ -13,6 +13,8 @@ Material::Material(std::unique_ptr<Shader> shader, material_type material) :
 
 void Material::light_material(Light_Mesh& light_mesh, bool render) {
 	shader->set_uniform_location("light_position", light_mesh.position);
+	shader->set_uniform_location("scale", light_mesh.scale);
+	shader->set_uniform_location("scale_matrix", light_mesh.scale_matrix);
 	shader->set_uniform_location("light_color", light_mesh.color);
 
 	if (render)

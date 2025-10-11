@@ -50,7 +50,15 @@ public:
 	void set_ambient();
 	void set_position();
 	void set_specular();
-	void set_rotation();
+	void set_scale() {
+		ImGui::SeparatorText("Scale");
+		ImGui::DragFloat("##Scale", &scale, slider_speed, 0.01, 50.0f);
+		ImGui::SeparatorText("Scale Matrix");
+		ImGui::DragFloat3("##Scale Matrix", scale_matrix_values, 0.01f, 50.0f);
+		scale_matrix[0][0] = scale_matrix_values[0];
+		scale_matrix[1][1] = scale_matrix_values[1];
+		scale_matrix[2][2] = scale_matrix_values[2];
+	};
 	void set_shininess();
 
 	void get_screencoordiantes();
@@ -94,8 +102,11 @@ public:
 	glm::vec3 color{ 1.0f, 0.55f, 1.0f };
 	glm::vec3 position{ 0.0f, 0.0f, 0.0f };
 	glm::vec3 specular{ 1.0f, 1.0f, 1.0f };
-	glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
 	glm::vec3 rotation{ 0.0f, 0.0f, 0.0f };
+	glm::vec3 scale_mat_values{ 1.0f, 1.0f, 1.0f };
+
+	glm::mat4 scale_matrix = glm::mat4(1.0f);
+	float scale_matrix_values[3] = {scale_matrix[0][0], scale_matrix[1][1], scale_matrix[2][2]};
 
 	inline BoundingBox& get_bounds() {
 		return bounds;
@@ -105,6 +116,8 @@ public:
 
 	float shininess = 32.0f;
 	float slider_speed = 0.01f;
+
+	float scale = 1.0f;
 
 	std::vector<unsigned int> indices;
 

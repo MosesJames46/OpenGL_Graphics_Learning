@@ -5,6 +5,8 @@ layout (location = 1) in vec3 color;
 layout (location = 2) in vec3 normals;
 
 uniform vec3 light_position;
+uniform mat4 scale_matrix;
+uniform float scale;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -12,5 +14,5 @@ uniform mat4 projection;
 
 void main(){
 	
-	gl_Position = projection * view * model * vec4(position + light_position, 1.0f);
+	gl_Position = projection * view * model * scale_matrix * vec4((position + light_position) * scale, 1.0f);
 }
