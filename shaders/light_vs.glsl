@@ -12,10 +12,13 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 scale;
 uniform mat4 translation;
+uniform mat4 rotation;
 
 out vec3 normals;
 
+
+//Take note of the order that we perform transformations. 
 void main(){
 	normals = normal;
-	gl_Position = projection * view * model *  translation * scale * vec4(position * scalar, 1.0f);
+	gl_Position = projection * view * model * translation * rotation * scale * vec4(position * scalar, 1.0f);
 }

@@ -10,6 +10,7 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 scale;
 uniform mat4 translate;
+uniform mat4 rotation;
 
 uniform float scalar;
 
@@ -19,11 +20,11 @@ out vec2 texture_coordinates;
 
 void main(){
 	//World space position
-	vec4 world_space_position =  model * translate * scale * vec4(position * scalar, 1.0f);;
+	vec4 world_space_position =  model * translate * rotation * scale * vec4(position * scalar, 1.0f);
 
 	fragment_position = vec3( world_space_position);
 	
-	fragment_normal = mat3(transpose(inverse(model))) * normal;;
+	fragment_normal = mat3(transpose(inverse(model))) * normal;
 
 	texture_coordinates = texture_coordinate;
 	

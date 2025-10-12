@@ -230,15 +230,6 @@ void Mesh::set_color() {
 	//We access the float values and cast them to a vec 3.
 }
 
-void Mesh::set_position(){
-	float speed = 0.001f;
-	if (ImGui::GetKeyName(ImGuiKey_LeftShift)) {
-		speed = 0.1f;
-	}
-	ImGui::SeparatorText("Position");
-	ImGui::DragFloat3("##Position", glm::value_ptr(position), speed, std::numeric_limits<float>::lowest(), (std::numeric_limits<float>::max)());
-}
-
 void Mesh::set_float() {
 	//ImGui::DragFloat(float_name, &value, .1f, min, max);
 	//shader.set_uniform_location(uniform_name, value);

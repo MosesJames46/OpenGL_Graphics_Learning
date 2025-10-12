@@ -2,9 +2,9 @@
 #include <iostream>
 #include "libs.h"
 #include <vector>
-#include "../extern/imgui/imgui.h"
-#include "../extern/imgui/backends/imgui_impl_glfw.h"
-#include "../extern/imgui/backends/imgui_impl_opengl3.h"
+#include "../imgui/imgui.h"
+#include "../imgui/backends/imgui_impl_glfw.h"
+#include "../imgui/backends/imgui_impl_opengl3.h"
 #include <memory>
 
 class Shader;

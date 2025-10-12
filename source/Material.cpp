@@ -17,6 +17,7 @@ void Material::light_material(Light_Mesh& light_mesh, bool render) {
 	shader->set_uniform_location("scale", light_mesh.scale_matrix);
 	shader->set_uniform_location("light_color", light_mesh.color);
 	shader->set_uniform_location("translation", light_mesh.translation_matrix);
+	shader->set_uniform_location("rotation", light_mesh.rotation_matrix);
 
 	//apply_highlight_shader(&light_mesh);
 
@@ -67,6 +68,7 @@ void Material::complex_material(Complex_Mesh& complex_mesh, bool render) {
 	shader->set_uniform_location("scalar", complex_mesh.scale);
 	shader->set_uniform_location("scale", complex_mesh.scale_matrix);
 	shader->set_uniform_location("translate", complex_mesh.translation_matrix);
+	shader->set_uniform_location("rotation", complex_mesh.rotation_matrix);
 	shader->set_uniform_location("material.ambient", complex_mesh.ambient);
 	shader->set_uniform_location("material.diffuse", complex_mesh.color);
 	shader->set_uniform_location("material.specular", complex_mesh.specular);
@@ -91,6 +93,7 @@ void Material::spotlight_material(Spotlight_Mesh& spotlight, bool render) {
 	shader->set_uniform_location("scalar", spotlight.scale);
 	shader->set_uniform_location("scale", spotlight.scale_matrix);
 	shader->set_uniform_location("translate", spotlight.translation_matrix);
+	shader->set_uniform_location("rotation", spotlight.rotation_matrix);
 	shader->set_uniform_location("material.ambient", spotlight.ambient);
 	shader->set_uniform_location("material.diffuse", spotlight.color);
 	shader->set_uniform_location("material.specular", spotlight.specular);

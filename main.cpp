@@ -4,11 +4,11 @@
 #include "headers/Sphere.h"
 #include "headers/Camera.h"
 #include "headers/Mesh.h"
-#include "extern/imgui/imgui.h"
-#include "extern/imgui/backends/imgui_impl_glfw.h"
-#include "extern/imgui/backends/imgui_impl_opengl3.h"
-#include "misc/cpp/imgui_stdlib.h"
-#include "extern/imgui/backends/imgui_impl_win32.h"
+#include "imgui/imgui.h"
+#include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
+#include "imgui/misc/cpp/imgui_stdlib.h"
+#include "imgui/backends/imgui_impl_win32.h"
 #include "../headers/Gui_Settings.h"
 #include "../headers/Renderer.h"
 #include "../headers/Mesh_Types/Light_Mesh.h"
@@ -56,6 +56,7 @@ int main() {
 
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	/*
 		When you set the callback install to true, we only let ImGui handle callbacks for OpenGL. 

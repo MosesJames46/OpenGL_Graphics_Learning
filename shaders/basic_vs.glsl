@@ -12,9 +12,11 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 translation;
 uniform mat4 scale;
+uniform mat4 rotation;
 
 uniform float scalar;
 void main(){
 	normals = normal;
-	gl_Position = projection * view * model * translation * scale * vec4((position * scalar) * 1.08 , 1.0);
+	//By implementing the translation matrix we removed the bug of our stencil highlighting algorithim not working.
+	gl_Position = projection * view * model * translation * rotation * scale * vec4((position * scalar) * 1.08 , 1.0);
 }

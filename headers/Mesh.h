@@ -5,9 +5,9 @@
 #include <iostream>
 #include "Shapes.h"
 #include <../glm/gtc/type_ptr.hpp>
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include "../imgui/imgui.h"
+#include "../imgui/backends/imgui_impl_glfw.h"
+#include "../imgui/backends/imgui_impl_opengl3.h"
 #include <sstream>
 #include <memory>
 
@@ -48,7 +48,6 @@ public:
 
 	void set_color();
 	void set_ambient();
-	void set_position();
 	void set_specular();
 	void set_scale() {
 		ImGui::SeparatorText("Scale");
@@ -62,11 +61,30 @@ public:
 
 	void set_translation() {
 		ImGui::SeparatorText("Translation");
-		ImGui::DragFloat3("##Translation", translation_matrix_values, slider_speed, -10000000, std::numeric_limits<float>::max());
-		translation_matrix[3][0] = translation_matrix_values[0];
-		translation_matrix[3][1] = translation_matrix_values[1];
-		translation_matrix[3][2] = translation_matrix_values[2];
+		ImGui::DragFloat3("##Translation", glm::value_ptr(position), slider_speed, -10000000, std::numeric_limits<float>::max());
+		translation_matrix[3][0] = position[0];
+		translation_matrix[3][1] = position[1];
+		translation_matrix[3][2] = position[2];
 	}
+	
+	//The rotation must update from the model matrix every frame. Else it will be continous or only update the last matrix.
+	void set_rotation() {
+		ImGui::SeparatorText("Rotation");
+		ImGui::DragFloat3("##Rotation", rotation_matrix_values, slider_speed  * 5, -100000, 100000);
+		glm::mat4 model = glm::mat4(1.0f);
+		rotation_matrix = glm::rotate(model, glm::radians(rotation_matrix_values[0]), glm::vec3{1.0f, 0.0f, 0.0f});
+		rotation_matrix = glm::rotate(rotation_matrix, glm::radians(rotation_matrix_values[1]), glm::vec3{ 0.0f, 1.0f, 0.0f });
+		rotation_matrix = glm::rotate(rotation_matrix, glm::radians(rotation_matrix_values[2]), glm::vec3{ 0.0f, 0.0f,1.0f });
+	}
+
+	void object_calculations() {
+		set_scale();
+		set_translation();
+		set_rotation();
+
+		set_color();
+	}
+
 	void set_shininess();
 
 	void get_screencoordiantes();
@@ -81,13 +99,6 @@ public:
 	void UI_get_bounding_box();
 
 	void set_float();
-
-	//GUI values that are sent to the GPU: Complex
-	virtual void object_calculations() {
-		set_color();
-		set_position();
-		set_ambient();
-	}
 
 	void create_bounding_box(glm::vec3& vertex) {
 		bounds.min_x = std::min(vertex.x, bounds.min_x);
@@ -118,6 +129,9 @@ public:
 
 	glm::mat4 translation_matrix = glm::mat4(1.0f);
 	float translation_matrix_values[3] = { 0, 0 , 0 };
+
+	glm::mat4 rotation_matrix = glm::mat4(1.0f);
+	float rotation_matrix_values[3] = { 0.0f, 0.0f, 0.0f };
 
 	inline BoundingBox& get_bounds() {
 		return bounds;
