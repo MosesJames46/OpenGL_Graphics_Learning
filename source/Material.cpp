@@ -110,6 +110,12 @@ void Material::spotlight_material(Spotlight_Mesh& spotlight, bool render) {
 }
 
 Shader Material::apply_highlight_shader(Mesh* mesh) {
+	//After the draw call, use the glStnecilFunc to check if any values are not equal.
+	//Depth testing is disabled to that our newly rendered object is behind our current object.
+	//The stencil mask is set to zero which basically stops the stencil mask from updating.
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilMask(0x00);
+	glDisable(GL_DEPTH_TEST);
 	Shader highlight_shader("shaders/basic_vs.glsl", "shaders/basic_fs.glsl");
 	highlight_shader.useProgram();
 	highlight_shader.set_uniform_location("model", mesh->camera.model);
@@ -120,6 +126,15 @@ Shader Material::apply_highlight_shader(Mesh* mesh) {
 	highlight_shader.set_uniform_location("scale", mesh->scale_matrix);
 	highlight_shader.set_uniform_location("object_position", mesh->position);
 	highlight_shader.set_uniform_location("scalar", mesh->scale);
+
+	//Render the triangle but with the newly attached shader. 
+	glBindVertexArray(mesh->VAO);
+	glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+
+	//At this point we want to turn the stencil buffer back on to overwrite the values that are zero.
+	glStencilMask(0xFF);
+	glStencilFunc(GL_ALWAYS, 0, 0xFF);
+	glEnable(GL_DEPTH_TEST);
 	return highlight_shader;
 }
 
