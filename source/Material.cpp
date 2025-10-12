@@ -64,9 +64,9 @@ void Material::flashlight(Spotlight_Mesh* spotlight) {
 }
 
 void Material::complex_material(Complex_Mesh& complex_mesh, bool render) {
-	shader->set_uniform_location("object_position", complex_mesh.position);
-	shader->set_uniform_location("scale", complex_mesh.scale);
-	shader->set_uniform_location("scale_matrix", complex_mesh.scale_matrix);
+	shader->set_uniform_location("scalar", complex_mesh.scale);
+	shader->set_uniform_location("scale", complex_mesh.scale_matrix);
+	shader->set_uniform_location("translate", complex_mesh.translation_matrix);
 	shader->set_uniform_location("material.ambient", complex_mesh.ambient);
 	shader->set_uniform_location("material.diffuse", complex_mesh.color);
 	shader->set_uniform_location("material.specular", complex_mesh.specular);
@@ -88,9 +88,9 @@ void Material::complex_material_data(Complex_Mesh& complex_mesh) {
 
 //Set the spotlight shader values and material data
 void Material::spotlight_material(Spotlight_Mesh& spotlight, bool render) {
-	shader->set_uniform_location("object_position", spotlight.position);
-	shader->set_uniform_location("scale", spotlight.scale);
-	shader->set_uniform_location("scale_matrix", spotlight.scale_matrix);
+	shader->set_uniform_location("scalar", spotlight.scale);
+	shader->set_uniform_location("scale", spotlight.scale_matrix);
+	shader->set_uniform_location("translate", spotlight.translation_matrix);
 	shader->set_uniform_location("material.ambient", spotlight.ambient);
 	shader->set_uniform_location("material.diffuse", spotlight.color);
 	shader->set_uniform_location("material.specular", spotlight.specular);

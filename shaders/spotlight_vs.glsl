@@ -8,10 +8,10 @@ layout (location = 3) in vec3 normal;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 scale;
+uniform mat4 translate;
 
-uniform vec3 object_position;
-uniform float scale;
-uniform mat4 scale_matrix;
+uniform float scalar;
 
 out vec3 fragment_position;
 out vec3 fragment_normal;
@@ -19,11 +19,11 @@ out vec2 texture_coordinates;
 
 void main(){
 	//World space position
-	vec4 world_space_position =  model * scale_matrix * vec4((position + object_position) * scale, 1.0f);;
+	vec4 world_space_position =  model * translate * scale * vec4(position * scalar, 1.0f);;
 
 	fragment_position = vec3( world_space_position);
 	
-	fragment_normal = normal;
+	fragment_normal = mat3(transpose(inverse(model))) * normal;;
 
 	texture_coordinates = texture_coordinate;
 	
