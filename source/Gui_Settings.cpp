@@ -259,7 +259,27 @@ void Gui_Settings::draw_meshes() {
             //Every mesh attaches the most recent mesh to the end.
             //i->material.attach_mesh(renderers.back()->mesh);
             if (i->mesh->name == selected) {
+                //Change stencil buffer to accept changes based on the glStencilFunc
+                //Set to GL_ALWAYS, 1, 0xFF
+                glEnable(GL_STENCIL_TEST);
+                glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+                glStencilFunc(GL_ALWAYS, 1, 0xFF);
+                glStencilMask(0xFF);
                 i->draw(true);
+                //After the draw call, use the glStnecilFunc to check if any values are not equal.
+                //We can disable depth testing and draw our containers scaled up via the vertex shader.
+                glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+                glStencilMask(0x00);
+                glDisable(GL_DEPTH_TEST);
+                Shader shader = i->material->apply_highlight_shader(i->mesh.get());
+                glBindVertexArray(i->mesh->VAO);
+                glDrawElements(GL_TRIANGLES, i->mesh->indices.size(), GL_UNSIGNED_INT, 0);
+                glStencilMask(0xFF);
+                glStencilFunc(GL_ALWAYS, 0, 0xFF);
+                glEnable(GL_DEPTH_TEST);
             }
             else {
                 i->draw(false);

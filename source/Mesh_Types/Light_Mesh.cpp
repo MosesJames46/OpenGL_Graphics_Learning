@@ -9,6 +9,7 @@ void Light_Mesh::set_attenuation() {
 void Light_Mesh::calculate_light_material() {
 	set_position();
 	set_scale();
+	set_translation();
 
 	set_ambient();
 	set_color();

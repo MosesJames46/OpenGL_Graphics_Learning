@@ -59,6 +59,14 @@ public:
 		scale_matrix[1][1] = scale_matrix_values[1];
 		scale_matrix[2][2] = scale_matrix_values[2];
 	};
+
+	void set_translation() {
+		ImGui::SeparatorText("Translation");
+		ImGui::DragFloat3("##Translation", translation_matrix_values, slider_speed, -10000000, std::numeric_limits<float>::max());
+		translation_matrix[3][0] = translation_matrix_values[0];
+		translation_matrix[3][1] = translation_matrix_values[1];
+		translation_matrix[3][2] = translation_matrix_values[2];
+	}
 	void set_shininess();
 
 	void get_screencoordiantes();
@@ -107,6 +115,9 @@ public:
 
 	glm::mat4 scale_matrix = glm::mat4(1.0f);
 	float scale_matrix_values[3] = {scale_matrix[0][0], scale_matrix[1][1], scale_matrix[2][2]};
+
+	glm::mat4 translation_matrix = glm::mat4(1.0f);
+	float translation_matrix_values[3] = { 0, 0 , 0 };
 
 	inline BoundingBox& get_bounds() {
 		return bounds;

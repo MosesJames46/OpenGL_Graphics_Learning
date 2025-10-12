@@ -12,10 +12,13 @@ Material::Material(std::unique_ptr<Shader> shader, material_type material) :
 
 
 void Material::light_material(Light_Mesh& light_mesh, bool render) {
-	shader->set_uniform_location("light_position", light_mesh.position);
-	shader->set_uniform_location("scale", light_mesh.scale);
-	shader->set_uniform_location("scale_matrix", light_mesh.scale_matrix);
+	//shader->set_uniform_location("light_position", light_mesh.position);
+	shader->set_uniform_location("scalar", light_mesh.scale);
+	shader->set_uniform_location("scale", light_mesh.scale_matrix);
 	shader->set_uniform_location("light_color", light_mesh.color);
+	shader->set_uniform_location("translation", light_mesh.translation_matrix);
+
+	//apply_highlight_shader(&light_mesh);
 
 	if (render)
 		light_material_data(light_mesh);
@@ -96,9 +99,24 @@ void Material::spotlight_material(Spotlight_Mesh& spotlight, bool render) {
 	shader->set_uniform_location("view_position", spotlight.camera.camera_origin);
 
 	shader->set_uniform_location("is_textured", spotlight.is_textured);
+
+	//apply_highlight_shader(&spotlight);
 	if (render)
 		spotlight_material_data(spotlight);
 	flashlight(&spotlight);
+}
+
+Shader Material::apply_highlight_shader(Mesh* mesh) {
+	Shader highlight_shader("shaders/basic_vs.glsl", "shaders/basic_fs.glsl");
+	highlight_shader.useProgram();
+	highlight_shader.set_uniform_location("model", mesh->camera.model);
+	highlight_shader.set_uniform_location("view", mesh->camera.view);
+	highlight_shader.set_uniform_location("projection", mesh->camera.projection);
+	highlight_shader.set_uniform_location("translation", mesh->translation_matrix);
+	highlight_shader.set_uniform_location("scale", mesh->scale_matrix);
+	highlight_shader.set_uniform_location("object_position", mesh->position);
+	highlight_shader.set_uniform_location("scalar", mesh->scale);
+	return highlight_shader;
 }
 
 void Material::spotlight_material_data(Spotlight_Mesh& spotlight) {

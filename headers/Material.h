@@ -94,9 +94,12 @@ public:
 
 	material_type material;
 	std::unique_ptr<Shader> shader;
+
 	std::vector<Light_Mesh*> mesh_objects;
 
 	bool is_textured = false;
+
+	Shader apply_highlight_shader(Mesh* mesh);
 
 private:
 	void light_material(Light_Mesh& light_mesh, bool render = true);
@@ -107,6 +110,8 @@ private:
 
 	void spotlight_material(Spotlight_Mesh& spotlight, bool render = true);
 	void spotlight_material_data(Spotlight_Mesh& spotlight);
+
+	
 
 	void light_effects();
 	void flashlight(Spotlight_Mesh* spotlight);

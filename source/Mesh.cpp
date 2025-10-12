@@ -14,7 +14,7 @@ Mesh::Mesh(const std::string& name, shape_type shape, Camera& camera) : name(nam
 	this->name += std::string(" " +  ss.str());
 	switch (shape) {
 	case SPHERE: {
-		Sphere sphere(name, 16, 16, 1);
+		Sphere sphere(name, 32, 32, 1);
 		initialize_mesh(sphere);
 		break;
 		}	

@@ -144,6 +144,7 @@ void outline() {
 		5. invoke with proper parameters.
 */
 void Renderer::draw(bool render) {
+
 	material->shader->useProgram();
 	switch (material->material) {
 	case LIGHT:
@@ -158,9 +159,11 @@ void Renderer::draw(bool render) {
 	default:
 		return;
 	}
+	
 	set_MVP(*material->shader.get(), camera);
 	glBindVertexArray(mesh->VAO);
 	glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+
 }
 
 void Renderer::redraw() {
