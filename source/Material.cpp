@@ -116,6 +116,7 @@ Shader Material::apply_highlight_shader(Mesh* mesh) {
 	highlight_shader.set_uniform_location("view", mesh->camera.view);
 	highlight_shader.set_uniform_location("projection", mesh->camera.projection);
 	highlight_shader.set_uniform_location("translation", mesh->translation_matrix);
+	highlight_shader.set_uniform_location("rotation", mesh->rotation_matrix);
 	highlight_shader.set_uniform_location("scale", mesh->scale_matrix);
 	highlight_shader.set_uniform_location("object_position", mesh->position);
 	highlight_shader.set_uniform_location("scalar", mesh->scale);
