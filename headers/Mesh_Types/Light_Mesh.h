@@ -6,7 +6,8 @@ public:
 	/*
 		Rememeber if a class is derived, it must also construct the parent/base class to work proper.
 	*/
-	Light_Mesh(const std::string& name, shape_type shape) : Mesh(name, shape) {};
+	Light_Mesh(GLFWwindow* window, const std::string& name, shape_type shape, Camera& camera) : Mesh(window, name, shape, camera) {};
+	Light_Mesh(GLFWwindow* window, std::string file, const std::string& name, shape_type shape, Camera& camera) : Mesh(window, file, name, shape, camera) {};
 	/*
 		Calculates attenuation :
 				1.0f

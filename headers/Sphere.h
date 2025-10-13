@@ -4,6 +4,8 @@
 #include "Gui_Settings.h"
 #include <sstream>
 
+struct BoundingBox;
+
 class Sphere : public Shape {
 public:
 	
@@ -18,12 +20,14 @@ public:
 	}
 	~Sphere() {}
 
-	void generate_mesh(Mesh& mesh) override;
+	void generate_mesh(Mesh& mesh, BoundingBox& bounds) override;
 
 	void set_radius(std::vector<float>& vertices);
 
 	void generate_indices(std::vector<unsigned int>& indices) override;
 	void generate_vertices(std::vector<float>& vertices) override;
+
+	
 
 	std::string sphere_name;
 
@@ -33,4 +37,6 @@ public:
 	*/
 	int stacks, slices;
 	float radius = 1;
+
+	
 };

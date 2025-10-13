@@ -3,13 +3,11 @@
 #include <vector>
 #include <iostream>
 
-
+class ImGuiIO;
 
 class Camera {
 public: 
-	Camera(GLFWwindow* window) {
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	}
+	Camera(GLFWwindow* window);
 
 	glm::vec3 camera_origin = glm::vec3{ 0.0f, 0.0f, 3.0f };
 	glm::vec3 camera_forward = glm::normalize(glm::vec3{ 0.0f, 0.0f, 1.0f });
@@ -21,12 +19,15 @@ public:
 	glm::mat4 projection;
 
 	std::vector<GLenum> cursor = { GLFW_CURSOR_DISABLED, GLFW_CURSOR_NORMAL };
+	
 
 	float yaw = 90.0f;
 	float pitch = 0.0f;
 	float last_x_position = 960, last_y_position = 540;
 	float last_frame = 0.0f;
 	float last_toggle = 0.0f;
+
+	double x_position, y_position;
 
 	int selector = 0;
 
@@ -77,9 +78,10 @@ public:
 	}
 
 	void get_camera_input(GLFWwindow* window);
-	void mouse_callback(GLFWwindow* window, double x_position, double y_position);
+	void mouse_callback();
 	void view_through_camera();
 	void reset_camera();
+	GLFWwindow* window;
 
 	glm::vec3 get_camera_direction(float yaw, float pitch);
 };

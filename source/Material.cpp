@@ -12,8 +12,14 @@ Material::Material(std::unique_ptr<Shader> shader, material_type material) :
 
 
 void Material::light_material(Light_Mesh& light_mesh, bool render) {
-	shader->set_uniform_location("light_position", light_mesh.position);
+	//shader->set_uniform_location("light_position", light_mesh.position);
+	shader->set_uniform_location("scalar", light_mesh.scale);
+	shader->set_uniform_location("scale", light_mesh.scale_matrix);
 	shader->set_uniform_location("light_color", light_mesh.color);
+	shader->set_uniform_location("translation", light_mesh.translation_matrix);
+	shader->set_uniform_location("rotation", light_mesh.rotation_matrix);
+
+	//apply_highlight_shader(&light_mesh);
 
 	if (render)
 		light_material_data(light_mesh);
@@ -36,9 +42,7 @@ void Material::light_effects() {
 		shader->set_uniform_location("light.linear", mesh_object->attenuation[1]);
 		shader->set_uniform_location("light.quadratic", mesh_object->attenuation[2]);
 
-		if (material == LIGHT) {
-			shader->set_uniform_location("light.positon", mesh_object->position);
-		}
+		shader->set_uniform_location("light.position", mesh_object->position);
 	}
 }
 
@@ -61,7 +65,10 @@ void Material::flashlight(Spotlight_Mesh* spotlight) {
 }
 
 void Material::complex_material(Complex_Mesh& complex_mesh, bool render) {
-	shader->set_uniform_location("object_position", complex_mesh.position);
+	shader->set_uniform_location("scalar", complex_mesh.scale);
+	shader->set_uniform_location("scale", complex_mesh.scale_matrix);
+	shader->set_uniform_location("translate", complex_mesh.translation_matrix);
+	shader->set_uniform_location("rotation", complex_mesh.rotation_matrix);
 	shader->set_uniform_location("material.ambient", complex_mesh.ambient);
 	shader->set_uniform_location("material.diffuse", complex_mesh.color);
 	shader->set_uniform_location("material.specular", complex_mesh.specular);
@@ -74,21 +81,6 @@ void Material::complex_material(Complex_Mesh& complex_mesh, bool render) {
 	light_effects();
 }
 
-void Material::texture_material(Texture_Mesh& texture_mesh, bool render) {
-	shader->set_uniform_location("object_position", texture_mesh.position);
-	shader->set_uniform_location("material.specular", texture_mesh.specular);
-	shader->set_uniform_location("material.shininess", texture_mesh.shininess);
-	shader->set_uniform_location("view_position", texture_mesh.camera.camera_origin);
-	if (render)
-		texture_material_data(texture_mesh);
-	if (mesh_objects.empty()) return;
-	light_effects();
-}
-
-void Material::texture_material_data(Texture_Mesh& texture_mesh) {
-	ImGui::Begin(texture_mesh.name.c_str());
-}
-
 void Material::complex_material_data(Complex_Mesh& complex_mesh) {
 	ImGui::Begin(std::string(complex_mesh.name).c_str());
 	complex_mesh.object_calculations();
@@ -98,7 +90,10 @@ void Material::complex_material_data(Complex_Mesh& complex_mesh) {
 
 //Set the spotlight shader values and material data
 void Material::spotlight_material(Spotlight_Mesh& spotlight, bool render) {
-	shader->set_uniform_location("object_position", spotlight.position);
+	shader->set_uniform_location("scalar", spotlight.scale);
+	shader->set_uniform_location("scale", spotlight.scale_matrix);
+	shader->set_uniform_location("translate", spotlight.translation_matrix);
+	shader->set_uniform_location("rotation", spotlight.rotation_matrix);
 	shader->set_uniform_location("material.ambient", spotlight.ambient);
 	shader->set_uniform_location("material.diffuse", spotlight.color);
 	shader->set_uniform_location("material.specular", spotlight.specular);
@@ -107,14 +102,68 @@ void Material::spotlight_material(Spotlight_Mesh& spotlight, bool render) {
 	shader->set_uniform_location("view_position", spotlight.camera.camera_origin);
 
 	shader->set_uniform_location("is_textured", spotlight.is_textured);
+
+	//apply_highlight_shader(&spotlight);
 	if (render)
 		spotlight_material_data(spotlight);
 	flashlight(&spotlight);
 }
 
+Shader Material::apply_highlight_shader(Mesh* mesh) {
+	//After the draw call, use the glStnecilFunc to check if any values are not equal.
+	//Depth testing is disabled to that our newly rendered object is behind our current object.
+	
+	//This tells OpenGL that whenever the stencil value of a fragment is equal (GL_NOTEQUAL) to the reference value 1, 
+	// the fragment passes the test and is drawn, otherwise discarded - LearnOpenGl. 
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilMask(0x00); //Bit in the stencil buffer becomes zero (disables writing).
+	glDisable(GL_DEPTH_TEST);
+	Shader highlight_shader("shaders/basic_vs.glsl", "shaders/basic_fs.glsl");
+	highlight_shader.useProgram();
+	highlight_shader.set_uniform_location("model", mesh->camera.model);
+	highlight_shader.set_uniform_location("view", mesh->camera.view);
+	highlight_shader.set_uniform_location("projection", mesh->camera.projection);
+	highlight_shader.set_uniform_location("translation", mesh->translation_matrix);
+	highlight_shader.set_uniform_location("rotation", mesh->rotation_matrix);
+	highlight_shader.set_uniform_location("scale", mesh->scale_matrix);
+	highlight_shader.set_uniform_location("object_position", mesh->position);
+	highlight_shader.set_uniform_location("scalar", mesh->scale);
+
+	//Render the triangle but with the newly attached shader. 
+	glBindVertexArray(mesh->VAO);
+	glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+
+	//At this point we want to enable writing to overwrite the values that are zero.
+	glStencilMask(0xFF);
+	glStencilFunc(GL_ALWAYS, 0, 0xFF);
+	glEnable(GL_DEPTH_TEST);
+	return highlight_shader;
+}
+
+Shader Material::apply_bounds_shader(Mesh* mesh) {
+	Shader bounds_shader("shaders/bounding_box_vs.glsl", "shaders/bounding_box_fs.glsl");
+
+	bounds_shader.useProgram();
+
+	bounds_shader.set_uniform_location("model", mesh->camera.model);
+	bounds_shader.set_uniform_location("view", mesh->camera.view);
+	bounds_shader.set_uniform_location("projection", mesh->camera.projection);
+
+	bounds_shader.set_uniform_location("translate", mesh->translation_matrix);
+	bounds_shader.set_uniform_location("scale", mesh->scale_matrix);
+	bounds_shader.set_uniform_location("rotate", mesh->rotation_matrix);
+
+	bounds_shader.set_uniform_location("scalar", mesh->scale);
+
+	glBindVertexArray(mesh->bounds_VAO);
+	glDrawElements(GL_LINES, mesh->bounding_box_indices.size(), GL_UNSIGNED_INT, 0);
+
+	return bounds_shader;
+}
+
 void Material::spotlight_material_data(Spotlight_Mesh& spotlight) {
 	ImGui::Begin(spotlight.name.c_str());
-	spotlight.activate_cuttoff_mesh();
+	spotlight.show_UI();
 	ImGui::End();
 }
 

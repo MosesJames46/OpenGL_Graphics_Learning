@@ -98,9 +98,7 @@ public:
 
 	void set_MVP(Shader& shader, Camera& camera);
 
-	void apply_materials();
-
-	void set_object_values(Mesh& object, Mesh& other);
+	
 
 	virtual void draw(const char* ImGui_object_name) {};
 	/*

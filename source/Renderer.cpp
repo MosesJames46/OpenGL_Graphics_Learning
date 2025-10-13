@@ -22,7 +22,24 @@ void Renderer::initiate_renderer() {
 	set_attributes(2, 2, 11, 6);
 	set_attributes(3, 3, 11, 8);
 	unbind_buffers_and_attribute_pointer();
+	//bound another VAO for the bounding box's shaders.
+
+	glGenVertexArrays(1, &(*mesh.get()).bounds_VAO);
+	glGenBuffers(1, &(*mesh.get()).bounds_VBO);
+	glGenBuffers(1, &(*mesh.get()).bounds_EBO);
+
+	glBindVertexArray((*mesh.get()).bounds_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, (*mesh.get()).bounds_VBO);
+	glBufferData(GL_ARRAY_BUFFER, (*mesh.get()).bounding_box_data.size() * sizeof(float), (*mesh.get()).bounding_box_data.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*mesh.get()).bounds_EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (*mesh.get()).bounding_box_indices.size() * sizeof(unsigned int), (*mesh.get()).bounding_box_indices.data(), GL_STATIC_DRAW);
+
+	set_attributes(0, 3, 3, 0);
+	unbind_buffers_and_attribute_pointer();
 }
+
+
 
 void Renderer::generate_and_bind_buffers(unsigned int& uninitialized_VAO, unsigned int& uninitialized_VBO, unsigned int& uninitialized_EBO) {
 	glGenVertexArrays(1, &uninitialized_VAO);
@@ -116,7 +133,6 @@ void Renderer::set_MVP(Shader& shader, Camera& camera) {
 	shader.set_uniform_location("projection", camera.projection);
 }
 
-
 /*
 	When invoking a pointer to functoin memeber:
 	(material.*material.activate_material((*material.info.camera, render)))((*material.info.camera, render))
@@ -127,6 +143,7 @@ void Renderer::set_MVP(Shader& shader, Camera& camera) {
 		5. invoke with proper parameters.
 */
 void Renderer::draw(bool render) {
+
 	material->shader->useProgram();
 	switch (material->material) {
 	case LIGHT:
@@ -135,15 +152,13 @@ void Renderer::draw(bool render) {
 	case COMPLEX:
 		material->apply_shader(dynamic_cast<Complex_Mesh&>(*mesh.get()), render);
 		break;
-	case TEXTURED:
-		material->apply_shader(dynamic_cast<Texture_Mesh&>(*mesh.get()), render);
-		break;
 	case SPOTLIGHT:
 		material->apply_shader(dynamic_cast<Spotlight_Mesh&>(*mesh.get()), render);
 		break;
 	default:
 		return;
 	}
+	
 	set_MVP(*material->shader.get(), camera);
 	glBindVertexArray(mesh->VAO);
 	glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);

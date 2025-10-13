@@ -2,15 +2,23 @@
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 color;
-layout (location = 2) in vec3 normals;
+layout (location = 2) in vec3 texture_coordinate;
+layout (location = 3) in vec3 normal;
 
-uniform vec3 light_position;
+uniform float scalar;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 scale;
+uniform mat4 translation;
+uniform mat4 rotation;
 
+out vec3 normals;
+
+
+//Take note of the order that we perform transformations. 
 void main(){
-	
-	gl_Position = projection * view * model * vec4(position + light_position, 1.0f);
+	normals = normal;
+	gl_Position = projection * view * model * translation * rotation * scale * vec4(position * scalar, 1.0f);
 }

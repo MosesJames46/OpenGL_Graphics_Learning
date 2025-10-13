@@ -9,14 +9,21 @@
 #include "../headers/Material.h"
 #include "../headers/Shader.h"
 #include "../headers/Camera.h"
+#include "../headers/libs.h"
 
 struct Renderer_Data {
     std::string v;
     std::string f;
     std::string mesh_name;
+
     shape_type shape_ind;
     material_type material_ind;
+
+    bool is_textured = false;
+    bool is_model = false;
+
     std::string texture_file;
+
     Camera& camera;
 };
 
@@ -29,6 +36,10 @@ void Gui_Settings::call_new_frame() {
 void Gui_Settings::render_frame() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Gui_Settings::attach_window(GLFWwindow* window) {
+    Gui_Settings::window = window;
 }
 
 void Gui_Settings::gui_test(Camera& camera) {
@@ -76,6 +87,16 @@ void Gui_Settings::gui_test(Camera& camera) {
             ImGui::Checkbox("Apply Texture", &apply_texture);
         }
 
+        static int model = 0;
+        static bool is_model = false;
+        if (shape_index == 1) {
+            use_combo(object_files, "Model", model);
+            is_model = true;
+        }
+        else {
+            is_model = false;
+        }
+
         static std::string texture;
         static int texture_id = 0;
         if (apply_texture) {
@@ -98,11 +119,11 @@ void Gui_Settings::gui_test(Camera& camera) {
         attach_shader(v, f, static_cast<material_type>(material_index));
 
         Renderer_Data render_data{ v, f, mesh_name, static_cast<shape_type>(shape_index),
-        static_cast<material_type>(material_index), texture, camera };
+        static_cast<material_type>(material_index), apply_texture, is_model, texture, camera };
 
         if (ImGui::Button("Create")) {
             
-            std::unique_ptr<Renderer> renderer = std::move(create_renderer(render_data, apply_texture));
+            std::unique_ptr<Renderer> renderer = std::move(create_renderer(render_data));
             renderers.emplace_back(std::move(renderer));
             renderer_names.emplace_back(renderers.back()->mesh->name);
         }
@@ -114,90 +135,15 @@ void Gui_Settings::gui_test(Camera& camera) {
     ImGui::End();
 }
 
-void Gui_Settings::gui_test_type() {
-    static int make = 0;
-
-    ImGui::Begin("Testing");
-    if (ImGui::Button("click")){
-        ++make;
-        windows.push_back(window());
-    }
-
-    for (auto i : windows) {
-        i.rend();
-    }
-    ImGui::End();
-   
-}
-
-std::unique_ptr<Renderer> Gui_Settings::create_renderer(Renderer_Data& render_data, bool is_textured) {
-    switch (render_data.material_ind) {
-    case LIGHT:
-        return create_light(render_data);
-    case COMPLEX:
-        return create_complex(render_data, is_textured);
-    case DIRECTIONAL:
-        return create_directional(render_data, is_textured);
-    case SPOTLIGHT:
-        return create_spotlight(render_data, is_textured);
-    }
-}
-
-std::unique_ptr<Renderer> Gui_Settings::create_light(Renderer_Data& render_data) {
-    std::unique_ptr<Light_Mesh> light_mesh = std::make_unique<Light_Mesh>(render_data.mesh_name, render_data.shape_ind);
+std::unique_ptr<Renderer> Gui_Settings::create_renderer(Renderer_Data& render_data) {
     std::unique_ptr<Shader> shader = std::make_unique<Shader>(render_data.v.c_str(), render_data.f.c_str());
     std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), render_data.material_ind);
-    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(light_mesh), std::move(material), render_data.camera);
-    return renderer;
-}
+    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(create_mesh(render_data)), std::move(material), render_data.camera);
 
-
-/*
-    Anytime there is a c2661 error within a header that states "no overloadded function takes n arguments", it most likely means
-    there is an error with a unique pointer instantiation. 
-*/
-std::unique_ptr<Renderer> Gui_Settings::create_complex(Renderer_Data& render_data, bool is_textured) {
-    std::unique_ptr<Complex_Mesh> complex_mesh = std::make_unique<Complex_Mesh>(render_data.camera, render_data.mesh_name, render_data.shape_ind);;
-    std::unique_ptr<Shader> shader = std::make_unique<Shader>(render_data.v.c_str(), render_data.f.c_str());
-    std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), render_data.material_ind);
-    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(complex_mesh), std::move(material), render_data.camera);
-
-    if (is_textured) {
+    if (render_data.is_textured)
         renderer->add_textures(*renderer->material->shader.get(), { render_data.texture_file.c_str() }, { "material.diffuse" });
-    }
-
-    initialize_renderer(renderer.get());
-
-    return renderer;
-}
-
-//Textured is a complex model that uses textures to improves that look of an object.
-std::unique_ptr<Renderer> Gui_Settings::create_textured(Renderer_Data& render_data, const std::string& file){
-    std::unique_ptr<Mesh> texture_mesh = std::make_unique<Mesh>(render_data.mesh_name, render_data.shape_ind);
-    std::unique_ptr<Shader> shader = std::make_unique<Shader>(render_data.v.c_str(), render_data.f.c_str());
-    std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), render_data.material_ind);
-    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(texture_mesh), std::move(material), render_data.camera);
-    
-    //Apply textures selected in GUI
-    
-    renderer->add_textures(*renderer->material->shader.get() , {file.c_str()}, {"material.diffuse"});
-    initialize_renderer(renderer.get());
-    return renderer;
-}
-
-//Directional is a type of lighting calculation that only uses direction.
-std::unique_ptr<Renderer> Gui_Settings::create_directional(Renderer_Data& render_data, bool is_bool) {
-    return create_complex(render_data, is_bool);
-}
-
-std::unique_ptr<Renderer> Gui_Settings::create_spotlight(Renderer_Data& render_data, bool is_textured) {
-    std::unique_ptr<Spotlight_Mesh> spotlight_mesh = std::make_unique<Spotlight_Mesh>(render_data.camera, render_data.mesh_name, render_data.shape_ind, is_textured);
-    std::unique_ptr<Shader> shader = std::make_unique<Shader>(render_data.v.c_str(), render_data.f.c_str());
-    std::unique_ptr<Material> material = std::make_unique<Material>(std::move(shader), render_data.material_ind);
-    std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(std::move(spotlight_mesh), std::move(material), render_data.camera);
-
-    if (is_textured) {
-        renderer->add_textures(*renderer->material->shader.get(), { render_data.texture_file.c_str() }, { "material.diffuse" });
+    if (renderer->material->material == COMPLEX) {
+        initialize_renderer(renderer.get());
     }
     return renderer;
 }
@@ -224,6 +170,31 @@ void Gui_Settings::attach_shader(std::string& vertex_shader, std::string& fragme
         vertex_shader = vertex[4];
         fragment_shader = fragment[4];
         break;
+    }
+}
+
+void Gui_Settings::stencil_data() {
+    //glStencilOp: What actions to take if stencil test passes or fails and if depth test passes or fails.
+    //glStencilOp: sfail, dpfail, dppass -> stencil fail, stencil pass but depth fails, and both pass.
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    //glStencilFunc sets parameters that determine if the stencil test will pass.
+    //glStencilFunc: enum, ref, mask -> the enum is the requirement necessary to pass a stencil test. See https://learnopengl.com/Advanced-OpenGL/Stencil-testing
+    //-> ref is the value that will be and against the mask. Mask are the values set to the stencil buffer.
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    //The glStencilMask function tells the stencil to start processing request if 0xFF is passed and vice versa if 0x0 is passed.
+    glStencilMask(0xFF);
+}
+
+void Gui_Settings::draw_outline_mesh(Renderer* renderer, bool highlight) {
+    stencil_data();
+    renderer->draw(true);
+    Shader bounds = renderer->material->apply_bounds_shader(renderer->mesh.get());
+    if (highlight) {
+        Shader shader = renderer->material->apply_highlight_shader(renderer->mesh.get());
     }
 }
 
@@ -277,14 +248,48 @@ void Gui_Settings::initialize_renderer(Renderer* renderer) {
     }
 }
 
+
+
+
+/*
+    Simple switch case function to select proper mesh type.
+*/
+std::unique_ptr<Mesh> Gui_Settings::create_mesh(Renderer_Data& render_data) {
+    if (render_data.is_model) {
+        switch (render_data.material_ind) {
+        case LIGHT:
+            return std::make_unique<Light_Mesh>(window, object_files[0], render_data.mesh_name, render_data.shape_ind, render_data.camera);
+        case COMPLEX:
+            return std::make_unique<Complex_Mesh>(window, render_data.camera, object_files[0], render_data.mesh_name, render_data.shape_ind, render_data.is_textured);
+        case SPOTLIGHT:
+            return std::make_unique<Spotlight_Mesh>(window, render_data.camera, object_files[0], render_data.mesh_name, render_data.shape_ind, render_data.is_textured);
+        }
+    }
+    else {
+        switch (render_data.material_ind) {
+        case LIGHT:
+            return std::make_unique<Light_Mesh>(window, render_data.mesh_name, render_data.shape_ind, render_data.camera);
+        case COMPLEX:
+            return std::make_unique<Complex_Mesh>(window, render_data.camera, render_data.mesh_name, render_data.shape_ind, render_data.is_textured);
+        case SPOTLIGHT:
+            return std::make_unique<Spotlight_Mesh>(window, render_data.camera, render_data.mesh_name, render_data.shape_ind, render_data.is_textured);
+        }
+    }
+}
+
 void Gui_Settings::draw_meshes() {
     static std::string selected;
+    static bool highlight = false;
+    ImGui::Checkbox("Highlight Object", &highlight);
+
     if (!renderers.empty()) {
         for (auto& i : renderers) {
             //Every mesh attaches the most recent mesh to the end.
             //i->material.attach_mesh(renderers.back()->mesh);
             if (i->mesh->name == selected) {
-                i->draw(true);
+               
+                draw_outline_mesh(i.get(), highlight);
+                
             }
             else {
                 i->draw(false);
@@ -315,15 +320,16 @@ std::vector<std::string> Gui_Settings::fragment = { "shaders/light_fs.glsl",
     "shaders/spotlight_fs.glsl" };
 std::vector<std::string> Gui_Settings::vertex = { "shaders/light_vs.glsl","shaders/complex_vs.glsl" 
 ,"shaders/textured_vs.glsl", "shaders/direction_light_vs.glsl","shaders/spotlight_vs.glsl" };
-std::vector<std::string> Gui_Settings::shape = { "Sphere"};
+std::vector<std::string> Gui_Settings::shape = { "Sphere", "Model"};
 std::vector<std::string> Gui_Settings::material = { "Light", "Complex", "Textured", "Directional", "Spotlight"};
 std::vector<std::string> Gui_Settings::renderer_names;
 std::vector<std::string> Gui_Settings::texture_file_paths;
+
+std::vector<std::string> Gui_Settings::object_files = { "Sword-Two.obj" };
 
 std::vector<std::unique_ptr<Renderer>> Gui_Settings::renderers;
 std::list<std::unique_ptr<Renderer>> Gui_Settings::renderer_list;
 
 bool Gui_Settings::complex = false;
 
-int window::i = 0;
-std::vector<window> Gui_Settings::windows;
+GLFWwindow* Gui_Settings::window;

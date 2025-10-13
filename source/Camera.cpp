@@ -1,48 +1,66 @@
 #include "../headers/Camera.h"
-#include "../extern/imgui/imgui.h"
-#include "../extern/imgui/backends/imgui_impl_glfw.h"
-#include "../extern/imgui/backends/imgui_impl_opengl3.h"
+#include "../imgui/imgui.h"
+#include "../imgui/backends/imgui_impl_glfw.h"
+#include "../imgui/backends/imgui_impl_opengl3.h"
+
+Camera::Camera(GLFWwindow* window) : window(window) {
+	glfwSetWindowUserPointer(window, this);
+}
 
 void Camera::get_camera_input(GLFWwindow* window) {
 	float current_time = glfwGetTime();
 	float delta_time = current_time - last_frame;
 	last_frame = current_time;
 	float cameraSpeed = delta_time * 2;
-	
-	if (glfwGetKey(window, GLFW_KEY_CAPS_LOCK) == GLFW_PRESS && current_time - last_toggle > 1.0f) {
+
+	ImGuiIO& io = ImGui::GetIO();
+
+	if (ImGui::IsKeyPressed(ImGuiKey_CapsLock) && current_time - last_toggle > .5f) {
 		selector = (selector + 1) % 2;
 		last_edit_mode = is_edit_mode;
 		is_edit_mode = cursor[selector];
 		last_toggle = current_time;
 	}
 
+	/*
+		
+		for glfwSetInputMode: window, input_value, what input_value should be now.
+	*/
 	if (is_edit_mode != last_edit_mode) {
 		glfwSetInputMode(window, GLFW_CURSOR, is_edit_mode);
 		last_edit_mode = is_edit_mode;
 	}
-	
-	if (is_edit_mode == GLFW_CURSOR_NORMAL) {
-		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		ImGui::GetIO().WantCaptureKeyboard = true;
-		ImGui::GetIO().WantCaptureMouse = true;
-		return;
-	}
 
 	if (is_edit_mode == GLFW_CURSOR_DISABLED) {
-		glfwSetCursorPos(window, last_x_position, last_y_position);
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	/*
+		10/6/25: Ensures the mouse position is not reset to the center of the screen after toggle. 
+	*/
+	if (is_edit_mode == GLFW_CURSOR_NORMAL && ImGui::IsKeyPressed(ImGuiKey_CapsLock)) {
+		first_mouse = true;
+	}
+
+	if (is_edit_mode == GLFW_CURSOR_NORMAL) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+
+	if (!io.WantCaptureKeyboard && is_edit_mode == GLFW_CURSOR_DISABLED) {
+		if (ImGui::IsKeyDown(ImGuiKey_W))
 			camera_origin += cameraSpeed * camera_forward;
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		if (ImGui::IsKeyDown(ImGuiKey_S))
 			camera_origin -= cameraSpeed * camera_forward;
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		if (ImGui::IsKeyDown(ImGuiKey_A))
 			camera_origin -= glm::normalize(glm::cross(camera_forward, camera_up)) * cameraSpeed;
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		if (ImGui::IsKeyDown(ImGuiKey_D))
 			camera_origin += glm::normalize(glm::cross(camera_forward, camera_up)) * cameraSpeed;
-		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		if (ImGui::IsKeyDown(ImGuiKey_Space))
 			camera_origin += camera_up * cameraSpeed;
-		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 			camera_origin += -camera_up * cameraSpeed;
 	}
+
+	mouse_callback();
 }
 
 glm::vec3 Camera::get_camera_direction(float yaw, float pitch) { 
@@ -56,28 +74,41 @@ glm::vec3 Camera::get_camera_direction(float yaw, float pitch) {
 	return forward;
 }
 
-void Camera::mouse_callback(GLFWwindow* window, double x_position, double y_position) {
-	Camera* camera = static_cast<Camera*>(glfwGetWindowUserPointer(window));
+void Camera::mouse_callback() {
+	
+	ImGuiIO& io = ImGui::GetIO();
 
-	if (camera->first_mouse) {
-		camera->last_x_position = x_position;
-		camera->last_y_position = y_position;
-		camera->first_mouse = false;
+	if (!io.WantCaptureMouse && is_edit_mode == GLFW_CURSOR_DISABLED) {
+		
+		//Use glfw for delta values.
+		glfwGetCursorPos(window, &x_position, &y_position);
+
+		// First mouse being changed to false can cause issues if the cursor switches to disabled. Since there would be no way to  use the old positions.
+		if (first_mouse) {
+			last_x_position = x_position;
+			last_y_position = y_position;
+			first_mouse = false;
+		}
+
+		/*
+			Increase x/y position based on offset values. 
+			Reset the last position to the current x/y.
+		*/
+		float x_offset = x_position - last_x_position;
+		float y_offset = last_y_position - y_position;
+		last_x_position = x_position;
+		last_y_position = y_position;
+
+		float sensitivity = 0.1f;
+
+		yaw += x_offset * sensitivity;
+		pitch += y_offset * sensitivity;
+
+		//Esnures the pitch does not go out of it's bounds.
+		pitch = glm::clamp(pitch, -89.0f, 89.0f);
+
+		camera_forward = glm::normalize(get_camera_direction(yaw, pitch));
 	}
-
-	float x_offset = x_position - camera->last_x_position;
-	float y_offset = camera->last_y_position - y_position;
-	camera->last_x_position = x_position;
-	camera->last_y_position = y_position;
-
-	float sensitivity = 0.1f;
-
-	camera->yaw += x_offset * sensitivity;
-	camera->pitch += y_offset * sensitivity;
-
-	camera->pitch = glm::clamp(camera->pitch, -89.0f, 89.0f);
-
-	camera->camera_forward = glm::normalize(get_camera_direction(camera->yaw, camera->pitch));
 }
 
 void Camera::view_through_camera() {

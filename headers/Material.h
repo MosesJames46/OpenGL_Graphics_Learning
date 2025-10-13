@@ -2,9 +2,9 @@
 #include <iostream>
 #include "libs.h"
 #include <vector>
-#include "../extern/imgui/imgui.h"
-#include "../extern/imgui/backends/imgui_impl_glfw.h"
-#include "../extern/imgui/backends/imgui_impl_opengl3.h"
+#include "../imgui/imgui.h"
+#include "../imgui/backends/imgui_impl_glfw.h"
+#include "../imgui/backends/imgui_impl_opengl3.h"
 #include <memory>
 
 class Shader;
@@ -88,18 +88,19 @@ public:
 	void apply_shader(Complex_Mesh& complex_mesh, bool render = true) {
 		complex_material(complex_mesh, render);
 	};
-	void apply_shader(Texture_Mesh& texture_mesh, bool render = true) {
-		texture_material(texture_mesh, render);
-	};
 	void apply_shader(Spotlight_Mesh& spotlight_mesh, bool render = true) {
 		spotlight_material(spotlight_mesh, render);
 	};
 
 	material_type material;
 	std::unique_ptr<Shader> shader;
+
 	std::vector<Light_Mesh*> mesh_objects;
 
 	bool is_textured = false;
+
+	Shader apply_highlight_shader(Mesh* mesh);
+	Shader apply_bounds_shader(Mesh* mesh);
 
 private:
 	void light_material(Light_Mesh& light_mesh, bool render = true);
@@ -108,11 +109,10 @@ private:
 	void complex_material(Complex_Mesh& complex_mesh, bool render = true);
 	void complex_material_data(Complex_Mesh& complex_mesh);
 
-	void texture_material(Texture_Mesh& texture_mesh, bool render = true);
-	void texture_material_data(Texture_Mesh& texture_mesh);
-
 	void spotlight_material(Spotlight_Mesh& spotlight, bool render = true);
 	void spotlight_material_data(Spotlight_Mesh& spotlight);
+
+	
 
 	void light_effects();
 	void flashlight(Spotlight_Mesh* spotlight);

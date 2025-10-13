@@ -7,10 +7,11 @@ void Light_Mesh::set_attenuation() {
 }
 
 void Light_Mesh::calculate_light_material() {
-	set_position();
+	object_calculations();
 
 	set_ambient();
-	set_color();
-
 	set_attenuation();
+
+	UI_get_bounding_box();
+	UI_get_cursor_position();
 }

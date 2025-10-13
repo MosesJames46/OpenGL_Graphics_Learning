@@ -19,14 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="extern\imgui\backends\imgui_impl_dx10.h" />
-    <ClInclude Include="extern\imgui\backends\imgui_impl_glfw.h" />
-    <ClInclude Include="extern\imgui\backends\imgui_impl_opengl3.h" />
-    <ClInclude Include="extern\imgui\backends\imgui_impl_win32.h" />
-    <ClInclude Include="extern\imgui\imconfig.h" />
-    <ClInclude Include="extern\imgui\imgui.h" />
-    <ClInclude Include="extern\imgui\imgui_internal.h" />
-    <ClInclude Include="extern\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="glad3.3\include\glad\glad.h" />
     <ClInclude Include="glad3.3\include\KHR\khrplatform.h" />
     <ClInclude Include="headers\Camera.h" />
@@ -45,10 +37,27 @@
     <ClInclude Include="headers\Image.h" />
     <ClInclude Include="headers\Sphere.h" />
     <ClInclude Include="headers\Mesh_Types\Spotlight_Mesh.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="stb_imageloader_header\stb_image.h" />
     <ClInclude Include="headers\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_tables.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="source\Camera.cpp" />
     <ClCompile Include="source\Flashlight.cpp" />
     <ClCompile Include="source\Gui_Settings.cpp" />
@@ -59,17 +68,6 @@
     <ClCompile Include="source\Mesh_Types\Texture_Mesh.cpp" />
     <ClCompile Include="source\Renderer.cpp" />
     <ClCompile Include="source\Sphere.cpp" />
-    <ClCompile Include="extern\imgui\backends\imgui_impl_dx10.cpp" />
-    <ClCompile Include="extern\imgui\backends\imgui_impl_dx11.cpp" />
-    <ClCompile Include="extern\imgui\backends\imgui_impl_glfw.cpp" />
-    <ClCompile Include="extern\imgui\backends\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="extern\imgui\backends\imgui_impl_win32.cpp" />
-    <ClCompile Include="extern\imgui\imgui.cpp" />
-    <ClCompile Include="extern\imgui\imgui_demo.cpp" />
-    <ClCompile Include="extern\imgui\imgui_draw.cpp" />
-    <ClCompile Include="extern\imgui\imgui_tables.cpp" />
-    <ClCompile Include="extern\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="extern\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="glad3.3\src\glad.c" />
     <ClCompile Include="source\Image.cpp" />
     <ClCompile Include="main.cpp" />
@@ -80,9 +78,15 @@
     <ClCompile Include="source\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\basic_fs.glsl" />
+    <None Include="shaders\basic_vs.glsl" />
+    <None Include="shaders\bounding_box_fs.glsl" />
+    <None Include="shaders\bounding_box_vs.glsl" />
     <None Include="shaders\direction_light_fs.glsl" />
     <None Include="shaders\direction_light_vs.glsl" />
     <None Include="shaders\light_fs.glsl" />
+    <None Include="shaders\model_fs.glsl" />
+    <None Include="shaders\model_vs.glsl" />
     <None Include="shaders\spotlight_fs.glsl" />
     <None Include="shaders\spotlight_vs.glsl" />
     <None Include="shaders\textured_fs.glsl" />

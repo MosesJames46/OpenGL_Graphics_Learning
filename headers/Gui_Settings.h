@@ -1,7 +1,7 @@
 #pragma once
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include "../imgui/imgui.h"
+#include "../imgui/backends/imgui_impl_glfw.h"
+#include "../imgui/backends/imgui_impl_opengl3.h"
 #include <vector>
 #include <list>
 #include <memory>
@@ -50,6 +50,8 @@ class Renderer;
 
 class Spotlight;
 
+class GLFWwindow;
+
 enum material_type;
 
 /*
@@ -57,27 +59,21 @@ enum material_type;
 */
 struct Renderer_Data;
 
-class window {
-public:
-	static int i;
-	std::string name = std::to_string(i++);
-	void rend() {
-		ImGui::Begin(name.c_str());
-		ImGui::End();
-	}
-};
-
+/*
+	10/4/25:
+		- Implement functionality to accept the window pointer for callbacks.
+		-change the unique_pointer creation to be a single function call within correspoinding functions. DONE
+		- Removed the textured function and textured shaders. Our glsl shaders now implement textured and non-textured algorithims. DONE
+*/
 
 class Gui_Settings {
 public:
-
 	~Gui_Settings() {}
 	static void call_new_frame();
 	static void render_frame();
 	static void gui_test(Camera& camera);
 	static void gui_test_type();
-
-	
+	static void attach_window(GLFWwindow* window);
 	/*
 		Should create a renderer based on the material type requested.
 
@@ -94,19 +90,17 @@ private:
 		return string == "Textured";
 	}
 
+	static GLFWwindow* window;
 
-	static std::unique_ptr<Renderer> create_renderer(Renderer_Data& render_data, bool is_textured);
-
-	static std::unique_ptr<Renderer> create_light(Renderer_Data& render_data);
-	static std::unique_ptr<Renderer> create_complex(Renderer_Data& render_data, bool is_complex);
-	static std::unique_ptr<Renderer> create_textured(Renderer_Data& render_data, const std::string& file);
-	static std::unique_ptr<Renderer> create_directional(Renderer_Data& render_data, bool is_textured);
-	static std::unique_ptr<Renderer> create_spotlight(Renderer_Data& render_data, bool is_complex);
+	static std::unique_ptr<Renderer> create_renderer(Renderer_Data& render_data);
+	static std::unique_ptr<Mesh> create_mesh(Renderer_Data& render_data);
 
 
 	/*Function utility to make selecting proper shaders easier*/
 	static void attach_shader(std::string& vertex_shader, std::string& fragment_shader, material_type material_index);
 
+	static void stencil_data();
+	static void draw_outline_mesh(Renderer* renderer, bool highlight);
 
 	/*
 		The use combo function generalizes combo boxes to one function for ease.
@@ -141,7 +135,7 @@ private:
 	static std::vector<std::string> material;
 	static std::vector<std::string> renderer_names;
 
+	static std::vector<std::string> object_files;
+
 	static std::vector<std::string> texture_file_paths;
-	
-	static std::vector<window> windows;
 };
