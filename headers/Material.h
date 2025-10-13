@@ -100,6 +100,7 @@ public:
 	bool is_textured = false;
 
 	Shader apply_highlight_shader(Mesh* mesh);
+	Shader apply_bounds_shader(Mesh* mesh);
 
 private:
 	void light_material(Light_Mesh& light_mesh, bool render = true);

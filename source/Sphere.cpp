@@ -108,6 +108,8 @@ void Sphere::generate_mesh(Mesh& mesh, BoundingBox& bounds) {
 			mesh.vertex_data.push_back(y);
 			mesh.vertex_data.push_back(z);
 
+			
+
 			glm::vec3 vertex{ x, y, z };
 			mesh.create_bounding_box(vertex);
 
@@ -130,6 +132,54 @@ void Sphere::generate_mesh(Mesh& mesh, BoundingBox& bounds) {
 			mesh.vertex_data.push_back(ny);
 			mesh.vertex_data.push_back(nz);
 		}
+	}
+
+	//bottom back left
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_x);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_y);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_z);
+
+	//top back left
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_x);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_y);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_z);
+
+	//bottom back right
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_x);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_y);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_z);
+
+	//top back right
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_x);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_y);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_z);
+
+	//bottom front left
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_x);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_y);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_z);
+
+	//top front left
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_x);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_y);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_z);
+
+	//bottom front right
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_x);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().min_y);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_z);
+
+	//top front right
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_x);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_y);
+	mesh.bounding_box_data.push_back(mesh.get_bounds().max_z);
+
+	for (int i = 0, j = 0; i < mesh.bounding_box_data.size(); ++i, ++j) {
+		if (j == 3) {
+			j = 0;
+			std::cout << std::endl;
+		}
+		std::cout << mesh.bounding_box_data[i] << " ";
 	}
 
 	generate_indices(mesh.indices);

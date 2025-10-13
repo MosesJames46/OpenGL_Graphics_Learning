@@ -281,6 +281,7 @@ void Gui_Settings::draw_meshes() {
                
                 stencil_data();
                 i->draw(true);
+                Shader bounds = i->material->apply_bounds_shader(i->mesh.get());
                 if (highlight) {
                     Shader shader = i->material->apply_highlight_shader(i->mesh.get());
                 }

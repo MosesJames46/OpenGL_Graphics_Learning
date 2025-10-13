@@ -211,6 +211,8 @@
     <None Include="shaders\model_fs.glsl" />
     <None Include="shaders\basic_vs.glsl" />
     <None Include="shaders\basic_fs.glsl" />
+    <None Include="shaders\bounding_box_vs.glsl" />
+    <None Include="shaders\bounding_box_fs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="pictures\wall.jpg">

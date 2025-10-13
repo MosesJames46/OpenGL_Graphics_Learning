@@ -22,7 +22,24 @@ void Renderer::initiate_renderer() {
 	set_attributes(2, 2, 11, 6);
 	set_attributes(3, 3, 11, 8);
 	unbind_buffers_and_attribute_pointer();
+	//bound another VAO for the bounding box's shaders.
+
+	glGenVertexArrays(1, &(*mesh.get()).bounds_VAO);
+	glGenBuffers(1, &(*mesh.get()).bounds_VBO);
+	glGenBuffers(1, &(*mesh.get()).bounds_EBO);
+
+	glBindVertexArray((*mesh.get()).bounds_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, (*mesh.get()).bounds_VBO);
+	glBufferData(GL_ARRAY_BUFFER, (*mesh.get()).bounding_box_data.size() * sizeof(float), (*mesh.get()).bounding_box_data.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*mesh.get()).bounds_EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (*mesh.get()).bounding_box_indices.size() * sizeof(unsigned int), (*mesh.get()).bounding_box_indices.data(), GL_STATIC_DRAW);
+
+	set_attributes(0, 3, 3, 0);
+	unbind_buffers_and_attribute_pointer();
 }
+
+
 
 void Renderer::generate_and_bind_buffers(unsigned int& uninitialized_VAO, unsigned int& uninitialized_VBO, unsigned int& uninitialized_EBO) {
 	glGenVertexArrays(1, &uninitialized_VAO);
@@ -145,7 +162,6 @@ void Renderer::draw(bool render) {
 	set_MVP(*material->shader.get(), camera);
 	glBindVertexArray(mesh->VAO);
 	glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
-
 }
 
 void Renderer::redraw() {

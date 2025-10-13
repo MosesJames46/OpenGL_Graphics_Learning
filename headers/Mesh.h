@@ -101,13 +101,13 @@ public:
 	void set_float();
 
 	void create_bounding_box(glm::vec3& vertex) {
-		bounds.min_x = std::min(vertex.x, bounds.min_x);
-		bounds.min_y = std::min(vertex.y, bounds.min_y);
-		bounds.min_z = std::min(vertex.z, bounds.min_z);
-
-		bounds.max_x = std::max(vertex.x, bounds.max_x);
-		bounds.max_y = std::max(vertex.y, bounds.max_y);
-		bounds.max_z = std::max(vertex.z, bounds.max_z);
+		bounds.min_x = std::min(bounds.min_x, vertex.x);
+		bounds.min_y = std::min(bounds.min_y, vertex.y);
+		bounds.min_z = std::min(bounds.min_z, vertex.z);
+		
+		bounds.max_x = std::max(bounds.max_x, vertex.x);
+		bounds.max_y = std::max(bounds.max_y, vertex.y);
+		bounds.max_z = std::max(bounds.max_z, vertex.z);
 	}
 
 	void UI_get_cursor_position();
@@ -154,9 +154,37 @@ public:
 	std::vector<float> normals;
 	std::vector<float> texture_coordinates;
 
+	std::vector<float> bounding_box_data;
+	std::vector<unsigned int> bounding_box_indices{
+		0, 1, 1, 3, 3, 2, 2, 0,
+		
+		4, 5, 5, 7, 7, 6, 6, 4,
+		
+		0, 4, 4, 5, 5, 1, 1, 0, 
+
+		1, 5, 5, 7, 7, 3, 3, 1, 
+
+		2, 6
+		//4, 5, 7,
+		//4, 7, 6,
+		//
+		//0, 4, 6,
+		//0, 6, 2,
+		//
+		//1, 5, 7,
+		//1, 7, 3,
+		//
+		//0, 4, 5,
+		//0, 5, 1,
+		//
+		//2, 6, 7,
+		//2, 7, 3
+	};
+
 	std::string name;
 	
 	unsigned int VAO, VBO, EBO;
+	unsigned int bounds_VAO, bounds_VBO, bounds_EBO;
 private:
 	//Necessary for the mesh to use callback functions for needs like cursor position.
 	GLFWwindow* window;

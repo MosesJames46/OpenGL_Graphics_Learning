@@ -18,5 +18,5 @@ uniform float scalar;
 void main(){
 	normals = normal;
 	//By implementing the translation matrix we removed the bug of our stencil highlighting algorithim not working.
-	gl_Position = projection * view * model * translation * rotation * scale * vec4((position * scalar) * 1.08 , 1.0);
+	gl_Position = projection * view * model * translation * rotation * scale * vec4((position * scalar) * 1.02 , 1.0);
 }

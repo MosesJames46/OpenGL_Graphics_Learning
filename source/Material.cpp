@@ -138,6 +138,27 @@ Shader Material::apply_highlight_shader(Mesh* mesh) {
 	return highlight_shader;
 }
 
+Shader Material::apply_bounds_shader(Mesh* mesh) {
+	Shader bounds_shader("shaders/bounding_box_vs.glsl", "shaders/bounding_box_fs.glsl");
+
+	bounds_shader.useProgram();
+
+	bounds_shader.set_uniform_location("model", mesh->camera.model);
+	bounds_shader.set_uniform_location("view", mesh->camera.view);
+	bounds_shader.set_uniform_location("projection", mesh->camera.projection);
+
+	bounds_shader.set_uniform_location("translate", mesh->translation_matrix);
+	bounds_shader.set_uniform_location("scale", mesh->scale_matrix);
+	bounds_shader.set_uniform_location("rotate", mesh->rotation_matrix);
+
+	bounds_shader.set_uniform_location("scalar", mesh->scale);
+
+	glBindVertexArray(mesh->bounds_VAO);
+	glDrawElements(GL_LINES, mesh->bounding_box_indices.size(), GL_UNSIGNED_INT, 0);
+
+	return bounds_shader;
+}
+
 void Material::spotlight_material_data(Spotlight_Mesh& spotlight) {
 	ImGui::Begin(spotlight.name.c_str());
 	spotlight.show_UI();

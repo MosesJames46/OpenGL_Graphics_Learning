@@ -80,6 +80,8 @@
   <ItemGroup>
     <None Include="shaders\basic_fs.glsl" />
     <None Include="shaders\basic_vs.glsl" />
+    <None Include="shaders\bounding_box_fs.glsl" />
+    <None Include="shaders\bounding_box_vs.glsl" />
     <None Include="shaders\direction_light_fs.glsl" />
     <None Include="shaders\direction_light_vs.glsl" />
     <None Include="shaders\light_fs.glsl" />
