@@ -112,9 +112,11 @@ void Material::spotlight_material(Spotlight_Mesh& spotlight, bool render) {
 Shader Material::apply_highlight_shader(Mesh* mesh) {
 	//After the draw call, use the glStnecilFunc to check if any values are not equal.
 	//Depth testing is disabled to that our newly rendered object is behind our current object.
-	//The stencil mask is set to zero which basically stops the stencil mask from updating.
+	
+	//This tells OpenGL that whenever the stencil value of a fragment is equal (GL_NOTEQUAL) to the reference value 1, 
+	// the fragment passes the test and is drawn, otherwise discarded - LearnOpenGl. 
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilMask(0x00);
+	glStencilMask(0x00); //Bit in the stencil buffer becomes zero (disables writing).
 	glDisable(GL_DEPTH_TEST);
 	Shader highlight_shader("shaders/basic_vs.glsl", "shaders/basic_fs.glsl");
 	highlight_shader.useProgram();
@@ -131,7 +133,7 @@ Shader Material::apply_highlight_shader(Mesh* mesh) {
 	glBindVertexArray(mesh->VAO);
 	glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
 
-	//At this point we want to turn the stencil buffer back on to overwrite the values that are zero.
+	//At this point we want to enable writing to overwrite the values that are zero.
 	glStencilMask(0xFF);
 	glStencilFunc(GL_ALWAYS, 0, 0xFF);
 	glEnable(GL_DEPTH_TEST);

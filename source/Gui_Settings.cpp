@@ -189,6 +189,15 @@ void Gui_Settings::stencil_data() {
     glStencilMask(0xFF);
 }
 
+void Gui_Settings::draw_outline_mesh(Renderer* renderer, bool highlight) {
+    stencil_data();
+    renderer->draw(true);
+    Shader bounds = renderer->material->apply_bounds_shader(renderer->mesh.get());
+    if (highlight) {
+        Shader shader = renderer->material->apply_highlight_shader(renderer->mesh.get());
+    }
+}
+
 /*
     Generalization function for combo boxes. Just input your vector of strings and the function will make a dropdown box.
 */
@@ -279,12 +288,7 @@ void Gui_Settings::draw_meshes() {
             //i->material.attach_mesh(renderers.back()->mesh);
             if (i->mesh->name == selected) {
                
-                stencil_data();
-                i->draw(true);
-                Shader bounds = i->material->apply_bounds_shader(i->mesh.get());
-                if (highlight) {
-                    Shader shader = i->material->apply_highlight_shader(i->mesh.get());
-                }
+                draw_outline_mesh(i.get(), highlight);
                 
             }
             else {

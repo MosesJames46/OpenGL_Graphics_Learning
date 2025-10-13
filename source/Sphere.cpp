@@ -174,13 +174,5 @@ void Sphere::generate_mesh(Mesh& mesh, BoundingBox& bounds) {
 	mesh.bounding_box_data.push_back(mesh.get_bounds().max_y);
 	mesh.bounding_box_data.push_back(mesh.get_bounds().max_z);
 
-	for (int i = 0, j = 0; i < mesh.bounding_box_data.size(); ++i, ++j) {
-		if (j == 3) {
-			j = 0;
-			std::cout << std::endl;
-		}
-		std::cout << mesh.bounding_box_data[i] << " ";
-	}
-
 	generate_indices(mesh.indices);
 }
