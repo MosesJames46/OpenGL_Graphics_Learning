@@ -196,6 +196,7 @@ void Gui_Settings::draw_outline_mesh(Renderer* renderer, bool highlight) {
     if (highlight) {
         Shader shader = renderer->material->apply_highlight_shader(renderer->mesh.get());
     }
+    Shader ray = renderer->material->apply_ray_cast_shader(renderer->mesh.get());
 }
 
 /*

@@ -161,6 +161,46 @@ Shader Material::apply_bounds_shader(Mesh* mesh) {
 	return bounds_shader;
 }
 
+Shader Material::apply_ray_cast_shader(Mesh* mesh) {
+	unsigned int fVAO, fVBO;
+	const float Fvertex_data[6]{
+		mesh->ray_in_worldspace[0], mesh->ray_in_worldspace[1] , mesh->ray_in_worldspace[2],
+		mesh->camera.camera_forward[0] + 2, mesh->camera.camera_forward[1] + 2, mesh->camera.camera_forward[2] + 2
+	};
+
+	//Get OpenGl ready to store buffer information
+	glGenVertexArrays(1, &fVAO);
+	glGenBuffers(1, &fVBO);
+
+	//Now the VAO holds any data being binded thus after until the next call to another VAO
+	glBindVertexArray(fVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, fVBO);
+	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), Fvertex_data, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0));
+	glEnableVertexAttribArray(0);
+
+	Shader ray_shader("shaders/ray_shader_vs.glsl", "shaders/ray_shader_fs.glsl");
+
+	
+
+	ray_shader.useProgram();
+	ray_shader.set_uniform_location("model", mesh->camera.model);
+	ray_shader.set_uniform_location("view", mesh->camera.view);
+	ray_shader.set_uniform_location("projection", mesh->camera.projection);
+
+	glBindVertexArray(fVAO);
+	glLineWidth(5);
+	glDrawArrays(GL_LINES, 0, 2);
+	glLineWidth(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	return ray_shader;
+}
+
 void Material::spotlight_material_data(Spotlight_Mesh& spotlight) {
 	ImGui::Begin(spotlight.name.c_str());
 	spotlight.show_UI();

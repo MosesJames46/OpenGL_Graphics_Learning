@@ -174,49 +174,9 @@ void Mesh::get_NDC() {
 	Convert from clip space to world space by inversing our pipeline.
 */
 void Mesh::clip_to_worldspace() {
-	glm::mat4 inverse_projection_view = glm::inverse(camera.projection) * glm::inverse(camera.view);
-
-	glm::vec3 near = inverse_projection_view * glm::vec4{ x_NDC, y_NDC, -1.f, 1.f };
-	glm::vec3 far = inverse_projection_view * glm::vec4{ x_NDC, y_NDC, 1.f, 1.f };
-
-	ray_direction = glm::normalize(far - near);
-	near.z = camera.camera_origin.z;
-	ray_in_worldspace = near;
-
-	unsigned int fVAO, fVBO;
-	const float Fvertex_data[6]{
-		ray_in_worldspace[0], ray_in_worldspace[1] , ray_in_worldspace[2],
-		camera.camera_forward[0] + 2, camera.camera_forward[1] + 2, camera.camera_forward[2] + 2
-	};
-
-	//Get OpenGl ready to store buffer information
-	glGenVertexArrays(1, &fVAO);
-	glGenBuffers(1, &fVBO);
-
-	//Now the VAO holds any data being binded thus after until the next call to another VAO
-	glBindVertexArray(fVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, fVBO);
-	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), Fvertex_data, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0));
-	glEnableVertexAttribArray(0);
-
-	Shader ray_shader("shaders/ray_shader_vs.glsl", "shaders/ray_shader_fs.glsl");
-
-	
-	//ray_shader.useProgram();
-	//ray_shader.set_uniform_location("model", camera.model);
-	//ray_shader.set_uniform_location("view", camera.view);
-	//ray_shader.set_uniform_location("projection", camera.projection);
-
-	//glBindVertexArray(fVAO);
-	//glLineWidth(5);
-	//glDrawArrays(GL_LINES, 0, 2);
-	//glLineWidth(1);
-	//
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindVertexArray(0);
+	ray_in_eyespace = glm::inverse(camera.view) * ray_in_clipspace;
+	ray_in_worldspace = glm::inverse(camera.projection) * glm::inverse(camera.view) * ray_in_clipspace;
+	ray_direction = camera.camera_forward;
 }
 
 
@@ -323,8 +283,9 @@ void Mesh::UI_get_cursor_position() {
 		
 		ImGui::SeparatorText("Cursor Position");
 		ImGui::Text("Cursor Position (%g, %g)", x_position , y_position);
-		ImGui::Text("Cursor in Worldspace (%g, %g, %g)", ray_in_worldspace.x, ray_in_worldspace.y, ray_in_worldspace.z);
-		ImGui::Text("Cursor Direction (%g, %g, %g)", ray_direction.x, ray_direction.y, ray_direction.z);
+		ImGui::Text("Cursor in Worldspace (%.2f, %.2f, %.2f)", ray_in_worldspace.x, ray_in_worldspace.y, ray_in_worldspace.z);
+		ImGui::Text("Cursor in View Space (%.2f, %.2f, %.2f,)", ray_in_eyespace.x, ray_in_eyespace.y, ray_in_eyespace.z);
+		ImGui::Text("Cursor Direction (%.2f, %.2f, %.2f)", ray_direction.x, ray_direction.y, ray_direction.z);
 		
 	}
 

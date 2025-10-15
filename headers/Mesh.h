@@ -175,6 +175,8 @@ public:
 	
 	unsigned int VAO, VBO, EBO;
 	unsigned int bounds_VAO, bounds_VBO, bounds_EBO;
+
+	glm::vec3 ray_in_worldspace;
 private:
 	//Necessary for the mesh to use callback functions for needs like cursor position.
 	GLFWwindow* window;
@@ -184,7 +186,7 @@ private:
 
 	glm::vec4 ray_in_clipspace;
 	glm::vec4 ray_in_eyespace;
-	glm::vec3 ray_in_worldspace;
+	
 	glm::vec3 ray_direction;
 
 	shape_type shape;
