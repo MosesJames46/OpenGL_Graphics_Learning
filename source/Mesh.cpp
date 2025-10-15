@@ -174,8 +174,12 @@ void Mesh::get_NDC() {
 	Convert from clip space to world space by inversing our pipeline.
 */
 void Mesh::clip_to_worldspace() {
-	ray_in_eyespace = glm::inverse(camera.view) * ray_in_clipspace;
-	ray_in_worldspace = glm::inverse(camera.projection) * glm::inverse(camera.view) * ray_in_clipspace;
+	ray_in_eyespace = glm::inverse(camera.projection) * ray_in_clipspace;
+	ray_in_worldspace = glm::inverse(camera.view) * glm::inverse(camera.projection) * ray_in_clipspace;
+	ray_in_worldspace += camera.camera_origin;
+	
+	//glm::vec3 scale_camera_forward = camera.camera_forward * 6.f;
+
 	ray_direction = camera.camera_forward;
 }
 
@@ -194,7 +198,7 @@ void Mesh::sphere_intersection_test() {
 
 bool Mesh::bounding_box_intersection_test() {
 	glm::vec3 ray_origin = camera.camera_origin;
-	glm::vec3 ray_direction = camera.camera_forward;
+	ray_direction = camera.camera_forward;
 	glm::vec3 inverse_ray_direction{ 1 / ray_direction.x, 1 / ray_direction.y, 1 / ray_direction.z };
 
 	float minimums[3]{ bounds.min_x, bounds.min_y, bounds.min_z };
@@ -202,33 +206,57 @@ bool Mesh::bounding_box_intersection_test() {
 
 
 	//Perform line equation to determine the value needed to scale t. If t_min is < t_max then we are facing negative.
-	float t_min; float t_max;
+	float t_min, t_max, tx_min, tx_max, ty_min, ty_max, tz_min, tz_max;
 
-	t_min = (minimums[0] - ray_origin[0]) * ray_direction[0];
-	t_max = (maximums[0] - ray_origin[0]) * ray_direction[0];
+	//If the x component has positive influence, then our min and max values are left to right and right to left if x component has negatice influence.
+	if (inverse_ray_direction.x >= 0) {
+		tx_min = (minimums[0] - ray_origin[0]) * inverse_ray_direction.x;
+		tx_max = (maximums[0] - ray_origin[0]) * inverse_ray_direction.x;
+	}else {
+		tx_max = (minimums[0] - ray_origin[0]) * inverse_ray_direction.x;
+		tx_min = (maximums[0] - ray_origin[0]) * inverse_ray_direction.x;
+	}
 
-	if (t_min > t_max) std::swap(t_min, t_max);
+	t_min = tx_min;
+	t_max = tx_max;
 
-	float ty_min = (minimums[1] - ray_origin[1]) * ray_direction[1];
-	float ty_max = (maximums[1] - ray_origin[1]) * ray_direction[1];
+	if (inverse_ray_direction.y >= 0) {
+		ty_min = (minimums[1] - ray_origin[1]) * inverse_ray_direction.y;
+		ty_max = (maximums[1] - ray_origin[1]) * inverse_ray_direction.y;
+	}else {
+		ty_max = (minimums[1] - ray_origin[1]) * inverse_ray_direction.y;
+		ty_min = (maximums[1] - ray_origin[1]) * inverse_ray_direction.y;
+	}
 
-	if (ty_min > ty_max) std::swap(ty_min, ty_max);
 
-	//If the tx_0 > ty_1 || tx_1 < ty_0 return false;
+	//To understand this piece of code, we must remember our context is intersection with the axis of a box.
+	//If we so happen to first hit the y axis max, then ty_max will be assigned to first and our tx_min will be greater than ty_max.
+	//This is illustrated in https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection.html where misses
+	//are located.
+	//A check like this should be down for every t value on our axis aligned box.
+	//Checking t_min against the y and z hit points are sufficient since if t_min and ty_max fail then we should fail the program.
 	if ((t_min > ty_max) || (t_max < ty_min)) return false;
 
+	//The points that matter are the points that are closest to each other. 
+	//i.e. The largest minimum values and the smallest maximum values. 
 	if (ty_min > t_min) t_min = ty_min;
 	if (ty_max < t_max) t_max = ty_max;
 
-	float tz_min = (minimums[2] - ray_origin[2]) * inverse_ray_direction[2];
-	float tz_max = (maximums[2] - ray_origin[2]) * inverse_ray_direction[2];
-
-	if (tz_min > tz_max) std::swap(tz_min, tz_max);
+	if (inverse_ray_direction.z >= 0) {
+		tz_min = (minimums[2] - ray_origin[2]) * inverse_ray_direction.z;
+		tz_max = (maximums[2] - ray_origin[2]) * inverse_ray_direction.z;
+	}else {
+		tz_max = (minimums[2] - ray_origin[2]) * inverse_ray_direction.z;
+		tz_min = (maximums[2] - ray_origin[2]) * inverse_ray_direction.z;
+	}
 
 	if ((t_min > tz_max) || (t_max < tz_min)) return false;
 
 	if (tz_min > t_min) t_min = tz_min;
 	if (tz_max < t_max) t_max = tz_max;
+	
+	//Intersection fails if any of our t values are negative. They still intersect logically, but we want our intersection to happen only if we're facing the mesh.
+	if (t_min < 0 || t_max < 0) return false;
 
 	return true;
 }
@@ -278,8 +306,6 @@ void Mesh::UI_get_cursor_position() {
 	clip_to_worldspace();
 
 	if (show_cursor & 1) {
-		//double x_position, y_position;
-		//Use glfw for delta values.
 		
 		ImGui::SeparatorText("Cursor Position");
 		ImGui::Text("Cursor Position (%g, %g)", x_position , y_position);

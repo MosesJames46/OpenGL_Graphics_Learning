@@ -66,7 +66,15 @@ public:
 		translation_matrix[3][1] = position[1];
 		translation_matrix[3][2] = position[2];
 
+		//Use data from the scale matrix and the scale value to calculate where the position of our bounding box values.
+		bounds.min_x = scale_matrix[0][0] * -1 * scale + position.x;
+		bounds.max_x = scale_matrix[0][0] * 1 * scale + position.x;
 
+		bounds.min_y = scale_matrix[1][1] * -1 * scale + position.y;
+		bounds.max_y = scale_matrix[1][1] * 1 * scale + position.y;
+
+		bounds.min_z = scale_matrix[2][2] * -1 * scale + position.z;
+		bounds.max_z = scale_matrix[2][2] * 1 * scale + position.z;
 	}
 	
 	//The rotation must update from the model matrix every frame. Else it will be continous or only update the last matrix.
@@ -177,6 +185,7 @@ public:
 	unsigned int bounds_VAO, bounds_VBO, bounds_EBO;
 
 	glm::vec3 ray_in_worldspace;
+	glm::vec3 ray_direction;
 private:
 	//Necessary for the mesh to use callback functions for needs like cursor position.
 	GLFWwindow* window;
@@ -187,20 +196,13 @@ private:
 	glm::vec4 ray_in_clipspace;
 	glm::vec4 ray_in_eyespace;
 	
-	glm::vec3 ray_direction;
+	
 
 	shape_type shape;
 
 	BoundingBox bounds;
 
-	glm::vec3 min_x;
-	glm::vec3 max_x;
-
-	glm::vec3 min_y;
-	glm::vec3 max_y;
-
-	glm::vec3 min_z;
-	glm::vec3 max_z;
+	glm::vec3 ray_hit;
 
 	void sphere_intersection_test();
 	bool bounding_box_intersection_test();

@@ -162,10 +162,12 @@ Shader Material::apply_bounds_shader(Mesh* mesh) {
 }
 
 Shader Material::apply_ray_cast_shader(Mesh* mesh) {
+	float ray_multiplier = 6;
+	glm::vec3 ray_direction_vector = mesh->ray_direction;
 	unsigned int fVAO, fVBO;
 	const float Fvertex_data[6]{
-		mesh->ray_in_worldspace[0], mesh->ray_in_worldspace[1] , mesh->ray_in_worldspace[2],
-		mesh->camera.camera_forward[0] + 2, mesh->camera.camera_forward[1] + 2, mesh->camera.camera_forward[2] + 2
+		mesh->camera.camera_origin[0], mesh->camera.camera_origin[1], mesh->camera.camera_origin[2],
+		mesh->position.x, mesh->position.y, mesh->position.z
 	};
 
 	//Get OpenGl ready to store buffer information
@@ -191,7 +193,7 @@ Shader Material::apply_ray_cast_shader(Mesh* mesh) {
 	ray_shader.set_uniform_location("projection", mesh->camera.projection);
 
 	glBindVertexArray(fVAO);
-	glLineWidth(5);
+	glLineWidth(9);
 	glDrawArrays(GL_LINES, 0, 2);
 	glLineWidth(1);
 
