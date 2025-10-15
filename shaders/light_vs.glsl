@@ -19,6 +19,6 @@ out vec3 normals;
 
 //Take note of the order that we perform transformations. 
 void main(){
-	normals = normal;
+	normals = vec3(rotation * vec4(normal, 0.0f));
 	gl_Position = projection * view * model * translation * rotation * scale * vec4(position * scalar, 1.0f);
 }

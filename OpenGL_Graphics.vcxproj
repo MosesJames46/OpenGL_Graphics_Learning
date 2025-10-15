@@ -87,6 +87,8 @@
     <None Include="shaders\light_fs.glsl" />
     <None Include="shaders\model_fs.glsl" />
     <None Include="shaders\model_vs.glsl" />
+    <None Include="shaders\ray_shader_vs.glsl" />
+    <None Include="shaders\ray_shader_fs.glsl" />
     <None Include="shaders\spotlight_fs.glsl" />
     <None Include="shaders\spotlight_vs.glsl" />
     <None Include="shaders\textured_fs.glsl" />

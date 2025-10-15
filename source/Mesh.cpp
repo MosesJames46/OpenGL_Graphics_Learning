@@ -2,6 +2,7 @@
 #include "../headers/Sphere.h"
 #include "../headers/libs.h"
 #include "../headers/Camera.h"
+#include "../headers/Shader.h"
 
 Mesh::Mesh(const std::string& name, shape_type shape, Camera& camera) : name(name), camera(camera), shape(shape) {
 	id = mesh_number();
@@ -165,7 +166,7 @@ void Mesh::get_NDC() {
 	x_NDC = ((2.f * x_position) / m_viewport[2]) - 1.f;
 	y_NDC = 1.f - ((2.f * y_position) / m_viewport[3]);
 	z_NDC = 1.f;
-	ray_in_clipspace = glm::vec4{ x_NDC, y_NDC, -1.f, 1.f };
+	ray_in_clipspace = glm::vec4{ x_NDC, y_NDC, 1.f, 1.f };
 }
 
 /*
@@ -179,7 +180,43 @@ void Mesh::clip_to_worldspace() {
 	glm::vec3 far = inverse_projection_view * glm::vec4{ x_NDC, y_NDC, 1.f, 1.f };
 
 	ray_direction = glm::normalize(far - near);
+	near.z = camera.camera_origin.z;
 	ray_in_worldspace = near;
+
+	unsigned int fVAO, fVBO;
+	const float Fvertex_data[6]{
+		ray_in_worldspace[0], ray_in_worldspace[1] , ray_in_worldspace[2],
+		camera.camera_forward[0] + 2, camera.camera_forward[1] + 2, camera.camera_forward[2] + 2
+	};
+
+	//Get OpenGl ready to store buffer information
+	glGenVertexArrays(1, &fVAO);
+	glGenBuffers(1, &fVBO);
+
+	//Now the VAO holds any data being binded thus after until the next call to another VAO
+	glBindVertexArray(fVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, fVBO);
+	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), Fvertex_data, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0));
+	glEnableVertexAttribArray(0);
+
+	Shader ray_shader("shaders/ray_shader_vs.glsl", "shaders/ray_shader_fs.glsl");
+
+	
+	//ray_shader.useProgram();
+	//ray_shader.set_uniform_location("model", camera.model);
+	//ray_shader.set_uniform_location("view", camera.view);
+	//ray_shader.set_uniform_location("projection", camera.projection);
+
+	//glBindVertexArray(fVAO);
+	//glLineWidth(5);
+	//glDrawArrays(GL_LINES, 0, 2);
+	//glLineWidth(1);
+	//
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
 }
 
 
@@ -197,23 +234,43 @@ void Mesh::sphere_intersection_test() {
 
 bool Mesh::bounding_box_intersection_test() {
 	glm::vec3 ray_origin = camera.camera_origin;
-	glm::vec3 ray_direction = glm::normalize((ray_in_worldspace + camera.camera_forward) - ray_origin);
+	glm::vec3 ray_direction = camera.camera_forward;
 	glm::vec3 inverse_ray_direction{ 1 / ray_direction.x, 1 / ray_direction.y, 1 / ray_direction.z };
 
 	float minimums[3]{ bounds.min_x, bounds.min_y, bounds.min_z };
 	float maximums[3]{ bounds.max_x, bounds.max_y, bounds.max_z };
 
-	float t_min = 0.0f; float t_max = INFINITY;
 
-	for (int i = 0; i < 3; ++i) {
-		float t1 = (minimums[i] - ray_origin[i]) * inverse_ray_direction[i];
-		float t2 = (maximums[i] - ray_origin[i]) * inverse_ray_direction[i];
+	//Perform line equation to determine the value needed to scale t. If t_min is < t_max then we are facing negative.
+	float t_min; float t_max;
 
-		t_min = std::max(t_min, std::min(t1, t2));
-		t_max = std::min(t_max, std::max(t1, t2));
-	}
+	t_min = (minimums[0] - ray_origin[0]) * ray_direction[0];
+	t_max = (maximums[0] - ray_origin[0]) * ray_direction[0];
 
-	return t_min < t_max;
+	if (t_min > t_max) std::swap(t_min, t_max);
+
+	float ty_min = (minimums[1] - ray_origin[1]) * ray_direction[1];
+	float ty_max = (maximums[1] - ray_origin[1]) * ray_direction[1];
+
+	if (ty_min > ty_max) std::swap(ty_min, ty_max);
+
+	//If the tx_0 > ty_1 || tx_1 < ty_0 return false;
+	if ((t_min > ty_max) || (t_max < ty_min)) return false;
+
+	if (ty_min > t_min) t_min = ty_min;
+	if (ty_max < t_max) t_max = ty_max;
+
+	float tz_min = (minimums[2] - ray_origin[2]) * inverse_ray_direction[2];
+	float tz_max = (maximums[2] - ray_origin[2]) * inverse_ray_direction[2];
+
+	if (tz_min > tz_max) std::swap(tz_min, tz_max);
+
+	if ((t_min > tz_max) || (t_max < tz_min)) return false;
+
+	if (tz_min > t_min) t_min = tz_min;
+	if (tz_max < t_max) t_max = tz_max;
+
+	return true;
 }
 
 void Mesh::UI_get_bounding_box() {

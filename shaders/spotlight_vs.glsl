@@ -24,7 +24,7 @@ void main(){
 
 	fragment_position = vec3( world_space_position);
 	
-	fragment_normal = mat3(transpose(inverse(model))) * normal;
+	fragment_normal = mat3(transpose(inverse(model)))* mat3(rotation) * normal;
 
 	texture_coordinates = texture_coordinate;
 	

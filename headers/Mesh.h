@@ -65,6 +65,8 @@ public:
 		translation_matrix[3][0] = position[0];
 		translation_matrix[3][1] = position[1];
 		translation_matrix[3][2] = position[2];
+
+
 	}
 	
 	//The rotation must update from the model matrix every frame. Else it will be continous or only update the last matrix.
@@ -75,6 +77,8 @@ public:
 		rotation_matrix = glm::rotate(model, glm::radians(rotation_matrix_values[0]), glm::vec3{1.0f, 0.0f, 0.0f});
 		rotation_matrix = glm::rotate(rotation_matrix, glm::radians(rotation_matrix_values[1]), glm::vec3{ 0.0f, 1.0f, 0.0f });
 		rotation_matrix = glm::rotate(rotation_matrix, glm::radians(rotation_matrix_values[2]), glm::vec3{ 0.0f, 0.0f,1.0f });
+
+
 	}
 
 	void object_calculations() {

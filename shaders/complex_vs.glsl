@@ -21,6 +21,6 @@ uniform float scalar;
 void main(){
 	vec4 world_space_position =  model * translate * rotation * scale * vec4(position * scalar, 1.0f);
 	gl_Position = projection * view * world_space_position;
-	normal_output = mat3(transpose(inverse(model))) * normal;
+	normal_output = mat3(transpose(inverse(model)))* mat3(rotation) * normal;;
 	fragment_positions = vec3(world_space_position);
 }
