@@ -22,8 +22,8 @@ void Renderer::initiate_renderer() {
 	set_attributes(2, 2, 11, 6);
 	set_attributes(3, 3, 11, 8);
 	unbind_buffers_and_attribute_pointer();
-	//bound another VAO for the bounding box's shaders.
 
+	//bound another VAO for the bounding box's shaders.
 	glGenVertexArrays(1, &(*mesh.get()).bounds_VAO);
 	glGenBuffers(1, &(*mesh.get()).bounds_VBO);
 	glGenBuffers(1, &(*mesh.get()).bounds_EBO);

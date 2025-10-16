@@ -1,14 +1,17 @@
 #include "../headers/Material.h"
-#include "../headers/Shader.h"
 #include "../headers/Mesh.h"
 #include "../headers/Camera.h"
 #include "../headers/Mesh_Types/Spotlight_Mesh.h"
 #include "../headers/Mesh_Types/Light_Mesh.h"
 #include "../headers/Mesh_Types/Complex_Mesh.h"
 #include "../headers/Mesh_Types/Texture_Mesh.h"
+#include "../headers/Sphere.h"
+#include "../imgui/imgui.h"
+#include "../imgui/backends/imgui_impl_glfw.h"
+#include "../imgui/backends/imgui_impl_opengl3.h"
 
 Material::Material(std::unique_ptr<Shader> shader, material_type material) :
-	shader(std::move(shader)), material(material), is_textured(is_textured) {}
+	shader(std::move(shader)), material(material), is_textured(is_textured){}
 
 
 void Material::light_material(Light_Mesh& light_mesh, bool render) {
@@ -109,7 +112,7 @@ void Material::spotlight_material(Spotlight_Mesh& spotlight, bool render) {
 	flashlight(&spotlight);
 }
 
-Shader Material::apply_highlight_shader(Mesh* mesh) {
+void Material::apply_highlight_shader(Mesh* mesh) {
 	//After the draw call, use the glStnecilFunc to check if any values are not equal.
 	//Depth testing is disabled to that our newly rendered object is behind our current object.
 	
@@ -118,16 +121,16 @@ Shader Material::apply_highlight_shader(Mesh* mesh) {
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilMask(0x00); //Bit in the stencil buffer becomes zero (disables writing).
 	glDisable(GL_DEPTH_TEST);
-	Shader highlight_shader("shaders/basic_vs.glsl", "shaders/basic_fs.glsl");
-	highlight_shader.useProgram();
-	highlight_shader.set_uniform_location("model", mesh->camera.model);
-	highlight_shader.set_uniform_location("view", mesh->camera.view);
-	highlight_shader.set_uniform_location("projection", mesh->camera.projection);
-	highlight_shader.set_uniform_location("translation", mesh->translation_matrix);
-	highlight_shader.set_uniform_location("rotation", mesh->rotation_matrix);
-	highlight_shader.set_uniform_location("scale", mesh->scale_matrix);
-	highlight_shader.set_uniform_location("object_position", mesh->position);
-	highlight_shader.set_uniform_location("scalar", mesh->scale);
+
+	stencil_shader.useProgram();
+	stencil_shader.set_uniform_location("model", mesh->camera.model);
+	stencil_shader.set_uniform_location("view", mesh->camera.view);
+	stencil_shader.set_uniform_location("projection", mesh->camera.projection);
+	stencil_shader.set_uniform_location("translation", mesh->translation_matrix);
+	stencil_shader.set_uniform_location("rotation", mesh->rotation_matrix);
+	stencil_shader.set_uniform_location("scale", mesh->scale_matrix);
+	stencil_shader.set_uniform_location("object_position", mesh->position);
+	stencil_shader.set_uniform_location("scalar", mesh->scale);
 
 	//Render the triangle but with the newly attached shader. 
 	glBindVertexArray(mesh->VAO);
@@ -137,70 +140,55 @@ Shader Material::apply_highlight_shader(Mesh* mesh) {
 	glStencilMask(0xFF);
 	glStencilFunc(GL_ALWAYS, 0, 0xFF);
 	glEnable(GL_DEPTH_TEST);
-	return highlight_shader;
 }
 
-Shader Material::apply_bounds_shader(Mesh* mesh) {
-	Shader bounds_shader("shaders/bounding_box_vs.glsl", "shaders/bounding_box_fs.glsl");
-
-	bounds_shader.useProgram();
-
-	bounds_shader.set_uniform_location("model", mesh->camera.model);
-	bounds_shader.set_uniform_location("view", mesh->camera.view);
-	bounds_shader.set_uniform_location("projection", mesh->camera.projection);
-
-	bounds_shader.set_uniform_location("translate", mesh->translation_matrix);
-	bounds_shader.set_uniform_location("scale", mesh->scale_matrix);
-	bounds_shader.set_uniform_location("rotate", mesh->rotation_matrix);
-
-	bounds_shader.set_uniform_location("scalar", mesh->scale);
+void Material::apply_bounds_shader(Mesh* mesh) {
+	bounding_box_shader.useProgram();
+		 
+	bounding_box_shader.set_uniform_location("model", mesh->camera.model);
+	bounding_box_shader.set_uniform_location("view", mesh->camera.view);
+	bounding_box_shader.set_uniform_location("projection", mesh->camera.projection);
+		 
+	bounding_box_shader.set_uniform_location("translate", mesh->translation_matrix);
+	bounding_box_shader.set_uniform_location("scale", mesh->scale_matrix);
+	bounding_box_shader.set_uniform_location("rotate", mesh->rotation_matrix);
+		 
+	bounding_box_shader.set_uniform_location("scalar", mesh->scale);
 
 	glBindVertexArray(mesh->bounds_VAO);
 	glDrawElements(GL_LINES, mesh->bounding_box_indices.size(), GL_UNSIGNED_INT, 0);
-
-	return bounds_shader;
 }
 
-Shader Material::apply_ray_cast_shader(Mesh* mesh) {
-	float ray_multiplier = 6;
-	glm::vec3 ray_direction_vector = mesh->ray_direction;
-	unsigned int fVAO, fVBO;
-	const float Fvertex_data[6]{
-		mesh->camera.camera_origin[0], mesh->camera.camera_origin[1], mesh->camera.camera_origin[2],
-		mesh->position.x, mesh->position.y, mesh->position.z
-	};
-
-	//Get OpenGl ready to store buffer information
-	glGenVertexArrays(1, &fVAO);
-	glGenBuffers(1, &fVBO);
-
-	//Now the VAO holds any data being binded thus after until the next call to another VAO
-	glBindVertexArray(fVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, fVBO);
-	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), Fvertex_data, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0));
-	glEnableVertexAttribArray(0);
-
-	Shader ray_shader("shaders/ray_shader_vs.glsl", "shaders/ray_shader_fs.glsl");
-
+void Material::apply_ray_cast_shader(Mesh* mesh) {
 	
+	if (mesh->bounding_box_intersection_test()) {
+		glm::vec3 ray_hit = mesh->get_ray_hit();
 
-	ray_shader.useProgram();
-	ray_shader.set_uniform_location("model", mesh->camera.model);
-	ray_shader.set_uniform_location("view", mesh->camera.view);
-	ray_shader.set_uniform_location("projection", mesh->camera.projection);
+		//Store pevious translation matirx values
+		float x = mesh->translation_matrix[3][0];
+		float y = mesh->translation_matrix[3][1];
+		float z = mesh->translation_matrix[3][2];
 
-	glBindVertexArray(fVAO);
-	glLineWidth(9);
-	glDrawArrays(GL_LINES, 0, 2);
-	glLineWidth(1);
+		//Use ray hit values to move a model of the current sphere object.
+		mesh->translation_matrix[3][0] = ray_hit[0];
+		mesh->translation_matrix[3][1] = ray_hit[1];
+		mesh->translation_matrix[3][2] = ray_hit[2];
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+		ray_cast_shader.useProgram();
+		ray_cast_shader.set_uniform_location("model", mesh->camera.model);
+		ray_cast_shader.set_uniform_location("view", mesh->camera.view);
+		ray_cast_shader.set_uniform_location("projection", mesh->camera.projection);
+		ray_cast_shader.set_uniform_location("translate", mesh->translation_matrix);
+		ray_cast_shader.set_uniform_location("scalar", .1f);
 
-	return ray_shader;
+		//Place the old values back for later drawings.
+		mesh->translation_matrix[3][0] = x;
+		mesh->translation_matrix[3][1] = y;
+		mesh->translation_matrix[3][2] = z;
+
+		glBindVertexArray(mesh->VAO);
+		glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+	}
 }
 
 void Material::spotlight_material_data(Spotlight_Mesh& spotlight) {

@@ -124,11 +124,16 @@ public:
 
 	void UI_get_cursor_position();
 
+	glm::vec3 get_ray_hit() {
+		return ray_hit;
+	}
+
 	static unsigned int mesh_number() {
 		static unsigned int mesh_id = 0;
 		return ++mesh_id;
 	}
 
+	//MESH DATA
 	glm::vec3 ambient{ 0.01f, 0.01f, 0.01f };
 	glm::vec3 color{ 1.0f, 0.55f, 1.0f };
 	glm::vec3 position{ 0.0f, 0.0f, 0.0f };
@@ -136,6 +141,8 @@ public:
 	glm::vec3 rotation{ 0.0f, 0.0f, 0.0f };
 	glm::vec3 scale_mat_values{ 1.0f, 1.0f, 1.0f };
 
+
+	//MATRIX VALUES
 	glm::mat4 scale_matrix = glm::mat4(1.0f);
 	float scale_matrix_values[3] = {scale_matrix[0][0], scale_matrix[1][1], scale_matrix[2][2]};
 
@@ -145,6 +152,8 @@ public:
 	glm::mat4 rotation_matrix = glm::mat4(1.0f);
 	float rotation_matrix_values[3] = { 0.0f, 0.0f, 0.0f };
 
+	//BOUNDING BOX
+	bool bounding_box_intersection_test();
 	inline BoundingBox& get_bounds() {
 		return bounds;
 	}
@@ -205,5 +214,5 @@ private:
 	glm::vec3 ray_hit;
 
 	void sphere_intersection_test();
-	bool bounding_box_intersection_test();
+	
 };

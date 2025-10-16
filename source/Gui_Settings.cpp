@@ -192,11 +192,11 @@ void Gui_Settings::stencil_data() {
 void Gui_Settings::draw_outline_mesh(Renderer* renderer, bool highlight) {
     stencil_data();
     renderer->draw(true);
-    Shader bounds = renderer->material->apply_bounds_shader(renderer->mesh.get());
+    renderer->material->apply_bounds_shader(renderer->mesh.get());
     if (highlight) {
-        Shader shader = renderer->material->apply_highlight_shader(renderer->mesh.get());
+        renderer->material->apply_highlight_shader(renderer->mesh.get());
     }
-    Shader ray = renderer->material->apply_ray_cast_shader(renderer->mesh.get());
+    renderer->material->apply_ray_cast_shader(renderer->mesh.get());
 }
 
 /*
@@ -289,8 +289,13 @@ void Gui_Settings::draw_meshes() {
             //i->material.attach_mesh(renderers.back()->mesh);
             if (i->mesh->name == selected) {
                
-                draw_outline_mesh(i.get(), highlight);
-                
+                stencil_data();
+                i->draw(true);
+                i->material->apply_bounds_shader(i->mesh.get());
+                if (highlight) {
+                    i->material->apply_highlight_shader(i->mesh.get());
+                }
+                i->material->apply_ray_cast_shader(i->mesh.get());
             }
             else {
                 i->draw(false);
@@ -334,3 +339,5 @@ std::list<std::unique_ptr<Renderer>> Gui_Settings::renderer_list;
 bool Gui_Settings::complex = false;
 
 GLFWwindow* Gui_Settings::window;
+
+

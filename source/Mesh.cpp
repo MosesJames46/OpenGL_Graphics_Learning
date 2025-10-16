@@ -258,6 +258,8 @@ bool Mesh::bounding_box_intersection_test() {
 	//Intersection fails if any of our t values are negative. They still intersect logically, but we want our intersection to happen only if we're facing the mesh.
 	if (t_min < 0 || t_max < 0) return false;
 
+	ray_hit = camera.camera_origin + ray_direction * t_min;
+
 	return true;
 }
 

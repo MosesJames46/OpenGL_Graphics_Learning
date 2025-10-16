@@ -2,12 +2,9 @@
 #include <iostream>
 #include "libs.h"
 #include <vector>
-#include "../imgui/imgui.h"
-#include "../imgui/backends/imgui_impl_glfw.h"
-#include "../imgui/backends/imgui_impl_opengl3.h"
+#include "Shader.h"
 #include <memory>
 
-class Shader;
 class Mesh;
 
 /*
@@ -95,13 +92,17 @@ public:
 	material_type material;
 	std::unique_ptr<Shader> shader;
 
+	Shader stencil_shader{ "shaders/stencil_vs.glsl", "shaders/stencil_fs.glsl" };
+	Shader bounding_box_shader{ "shaders/bounding_box_vs.glsl", "shaders/bounding_box_fs.glsl" };
+	Shader ray_cast_shader{ "shaders/ray_shader_vs.glsl", "shaders/ray_shader_fs.glsl" };
+
 	std::vector<Light_Mesh*> mesh_objects;
 
 	bool is_textured = false;
 
-	Shader apply_highlight_shader(Mesh* mesh);
-	Shader apply_bounds_shader(Mesh* mesh);
-	Shader apply_ray_cast_shader(Mesh* mesh);
+	void apply_highlight_shader(Mesh* mesh);
+	void apply_bounds_shader(Mesh* mesh);
+	void apply_ray_cast_shader(Mesh* mesh);
 
 private:
 	void light_material(Light_Mesh& light_mesh, bool render = true);

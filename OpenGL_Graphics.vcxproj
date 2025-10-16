@@ -78,8 +78,8 @@
     <ClCompile Include="source\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\basic_fs.glsl" />
-    <None Include="shaders\basic_vs.glsl" />
+    <None Include="shaders\stencil_fs.glsl" />
+    <None Include="shaders\stencil_vs.glsl" />
     <None Include="shaders\bounding_box_fs.glsl" />
     <None Include="shaders\bounding_box_vs.glsl" />
     <None Include="shaders\direction_light_fs.glsl" />

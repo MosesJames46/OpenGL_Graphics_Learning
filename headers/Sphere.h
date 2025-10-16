@@ -9,8 +9,8 @@ struct BoundingBox;
 class Sphere : public Shape {
 public:
 	
-	Sphere(const std::string& name, int stacks, int slices, int scale) : sphere_name(name)
-	, stacks(stacks), slices(slices), radius(radius){
+	Sphere(const std::string& name, int stacks, int slices, float scale) : sphere_name(name)
+	, stacks(stacks), slices(slices), radius(scale){
 		//Good tip for transforming the this pointer into a string. Static case to a const void*.
 		const void* a = static_cast<const void*>(this);
 		std::stringstream ss;

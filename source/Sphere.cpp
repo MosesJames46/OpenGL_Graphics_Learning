@@ -92,8 +92,8 @@ void Sphere::generate_mesh(Mesh& mesh, BoundingBox& bounds) {
 	for (int i = 0; i <= stacks; ++i)
 	{
 		stackAngle = (pi / 2.f) - i * stackStep;        // starting from pi/2 to -pi/2
-		xy = cosf(stackAngle);							// r * cos(u)
-		z =  sinf(stackAngle);							// r * sin(u)
+		xy = cosf(stackAngle) * radius;							// r * cos(u)
+		z =  sinf(stackAngle) * radius;							// r * sin(u)
 
 		// add (sectorCount+1) vertices per stack
 		// first and last vertices have same position and normal, but different tex coords
@@ -102,8 +102,8 @@ void Sphere::generate_mesh(Mesh& mesh, BoundingBox& bounds) {
 			sectorAngle = j * sectorStep;           // starting from 0 to 2pi
 
 			// vertex position (x, y, z)
-			x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
-			y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
+			x = xy * cosf(sectorAngle) ;             // r * cos(u) * cos(v)
+			y = xy * sinf(sectorAngle) ;             // r * cos(u) * sin(v)
 			mesh.vertex_data.push_back(x);
 			mesh.vertex_data.push_back(y);
 			mesh.vertex_data.push_back(z);

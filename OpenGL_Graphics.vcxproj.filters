@@ -209,10 +209,12 @@
     <None Include="shaders\spotlight_vs.glsl" />
     <None Include="shaders\model_vs.glsl" />
     <None Include="shaders\model_fs.glsl" />
-    <None Include="shaders\basic_vs.glsl" />
-    <None Include="shaders\basic_fs.glsl" />
+    <None Include="shaders\stencil_vs.glsl" />
+    <None Include="shaders\stencil_fs.glsl" />
     <None Include="shaders\bounding_box_vs.glsl" />
     <None Include="shaders\bounding_box_fs.glsl" />
+    <None Include="shaders\ray_shader_vs.glsl" />
+    <None Include="shaders\ray_shader_fs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="pictures\wall.jpg">

@@ -25,6 +25,7 @@ Shader::Shader(const char* vertex_file_path, const char* fragment_file_path) {
 	if (!success) {
 		glGetProgramInfoLog(programShaderID, 512, NULL, infoLog);
 		std::cout << "FAILED::SHADER::PROGRAM::LINK\n" << infoLog << std::endl;
+		std::cout << "could not find " << vertex_file_path << " or " << fragment_file_path << std::endl;
 	}
 	//Finsihed with Shaders so delete
 	delete_shader(compiled_shaders[0]);
