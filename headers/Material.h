@@ -6,6 +6,8 @@
 #include <memory>
 
 class Mesh;
+class Renderer;
+class Camera;
 
 /*
 	Spotlight is a combo type that has all elements of a camera with the inclusion of a cutoff.
@@ -58,6 +60,7 @@ public:
 	using spotlight = void (Material::*)(Spotlight_Mesh& spotlight, bool renderer);
 
 	Material(std::unique_ptr<Shader> shader, material_type material);
+	Material(Shader* shader) : ray_shader(shader) {};
 
 	~Material() {}
 		
@@ -104,6 +107,8 @@ public:
 	void apply_bounds_shader(Mesh* mesh);
 	void apply_ray_cast_shader(Mesh* mesh);
 
+	
+
 private:
 	void light_material(Light_Mesh& light_mesh, bool render = true);
 	void light_material_data(Light_Mesh& light_mesh);
@@ -114,8 +119,10 @@ private:
 	void spotlight_material(Spotlight_Mesh& spotlight, bool render = true);
 	void spotlight_material_data(Spotlight_Mesh& spotlight);
 
-	
-
 	void light_effects();
 	void flashlight(Spotlight_Mesh* spotlight);
+
+	Camera* camera_for_ray_cast;
+	std::unique_ptr<Mesh> ray_mesh;
+	Shader* ray_shader;
 };

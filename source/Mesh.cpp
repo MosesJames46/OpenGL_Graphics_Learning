@@ -22,6 +22,8 @@ Mesh::Mesh(const std::string& name, shape_type shape, Camera& camera) : name(nam
 	}
 }
 
+
+
 Mesh::Mesh(GLFWwindow* window, std::string file, const std::string& name, shape_type shape, Camera& camera): Mesh(window, name, shape, camera) {
 	std::ifstream file_stream(file);
 	if (!file_stream.is_open()) {

@@ -9,9 +9,38 @@
 #include "../imgui/imgui.h"
 #include "../imgui/backends/imgui_impl_glfw.h"
 #include "../imgui/backends/imgui_impl_opengl3.h"
+#include "../headers/Renderer.h"
 
 Material::Material(std::unique_ptr<Shader> shader, material_type material) :
-	shader(std::move(shader)), material(material), is_textured(is_textured){}
+	shader(std::move(shader)), material(material), is_textured(is_textured){
+	Camera cam(nullptr);
+	camera_for_ray_cast = &cam;
+	ray_mesh = std::make_unique<Mesh>("Ray", SPHERE, *camera_for_ray_cast);
+
+	glGenVertexArrays(1, &ray_mesh->VAO);
+	glGenBuffers(1, &ray_mesh->VBO);
+	glGenBuffers(1, &ray_mesh->EBO);
+
+	glBindVertexArray(ray_mesh->VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, ray_mesh->VBO);
+	glBufferData(GL_ARRAY_BUFFER, ray_mesh->vertex_data.size() * sizeof(float) , ray_mesh->vertex_data.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ray_mesh->EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ray_mesh->indices.size() * sizeof(unsigned int), ray_mesh->indices.data(), GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(0));
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(3);
+}
 
 
 void Material::light_material(Light_Mesh& light_mesh, bool render) {
@@ -164,30 +193,19 @@ void Material::apply_ray_cast_shader(Mesh* mesh) {
 	if (mesh->bounding_box_intersection_test()) {
 		glm::vec3 ray_hit = mesh->get_ray_hit();
 
-		//Store pevious translation matirx values
-		float x = mesh->translation_matrix[3][0];
-		float y = mesh->translation_matrix[3][1];
-		float z = mesh->translation_matrix[3][2];
-
-		//Use ray hit values to move a model of the current sphere object.
-		mesh->translation_matrix[3][0] = ray_hit[0];
-		mesh->translation_matrix[3][1] = ray_hit[1];
-		mesh->translation_matrix[3][2] = ray_hit[2];
+		ray_mesh->translation_matrix[3][0] = ray_hit[0];
+		ray_mesh->translation_matrix[3][1] = ray_hit[1];
+		ray_mesh->translation_matrix[3][2] = ray_hit[2];
 
 		ray_cast_shader.useProgram();
 		ray_cast_shader.set_uniform_location("model", mesh->camera.model);
 		ray_cast_shader.set_uniform_location("view", mesh->camera.view);
 		ray_cast_shader.set_uniform_location("projection", mesh->camera.projection);
-		ray_cast_shader.set_uniform_location("translate", mesh->translation_matrix);
+		ray_cast_shader.set_uniform_location("translate", ray_mesh->translation_matrix);
 		ray_cast_shader.set_uniform_location("scalar", .1f);
 
-		//Place the old values back for later drawings.
-		mesh->translation_matrix[3][0] = x;
-		mesh->translation_matrix[3][1] = y;
-		mesh->translation_matrix[3][2] = z;
-
-		glBindVertexArray(mesh->VAO);
-		glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(ray_mesh->VAO);
+		glDrawElements(GL_TRIANGLES, ray_mesh->indices.size(), GL_UNSIGNED_INT, 0);
 	}
 }
 

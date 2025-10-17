@@ -40,7 +40,7 @@ public:
 	Mesh(const std::string& name, shape_type shape, Camera& camera);
 	Mesh(GLFWwindow* window, std::string file, const std::string& name, shape_type shape, Camera& camera);
 	Mesh(GLFWwindow* window, const std::string& name, shape_type shape, Camera& camera);
-	Mesh(shape_type shape);
+	Mesh(const std::string& name, shape_type shape);
 
 	~Mesh() {};
 	
@@ -214,5 +214,4 @@ private:
 	glm::vec3 ray_hit;
 
 	void sphere_intersection_test();
-	
 };

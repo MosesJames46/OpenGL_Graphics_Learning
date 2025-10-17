@@ -4,7 +4,8 @@
 #include "../imgui/backends/imgui_impl_opengl3.h"
 
 Camera::Camera(GLFWwindow* window) : window(window) {
-	glfwSetWindowUserPointer(window, this);
+	if(window)
+		glfwSetWindowUserPointer(window, this);
 }
 
 void Camera::get_camera_input(GLFWwindow* window) {
