@@ -121,12 +121,15 @@ public:
 	
 	std::vector<Texture> textures;
 private:
+
+	//The stencil highlighting technique is to write during the first draw call of your object and always pass the stencil test. Next turn off writing and fail values not
+	//equal to the stencil buffer. This should highlight values of that model that are not exactly where the bits are placed within the stencil buffer.
 	void stencil_data_for_highlighting() {
 		//glStencilOp: What actions to take if stencil test passes or fails and if depth test passes or fails.
 		//glStencilOp: sfail, dpfail, dppass -> stencil fail, stencil pass but depth fails, and both pass.
 		glEnable(GL_STENCIL_TEST);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glClear(GL_STENCIL_BUFFER_BIT);
 		//glStencilFunc sets parameters that determine if the stencil test will pass.
 		//glStencilFunc: enum, ref, mask -> the enum is the requirement necessary to pass a stencil test. See https://learnopengl.com/Advanced-OpenGL/Stencil-testing
 		//-> ref is the value that will be and against the mask. Mask are the values set to the stencil buffer.
