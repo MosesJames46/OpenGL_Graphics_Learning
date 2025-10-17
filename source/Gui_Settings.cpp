@@ -173,24 +173,7 @@ void Gui_Settings::attach_shader(std::string& vertex_shader, std::string& fragme
     }
 }
 
-void Gui_Settings::stencil_data() {
-    //glStencilOp: What actions to take if stencil test passes or fails and if depth test passes or fails.
-    //glStencilOp: sfail, dpfail, dppass -> stencil fail, stencil pass but depth fails, and both pass.
-    glEnable(GL_STENCIL_TEST);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    //glStencilFunc sets parameters that determine if the stencil test will pass.
-    //glStencilFunc: enum, ref, mask -> the enum is the requirement necessary to pass a stencil test. See https://learnopengl.com/Advanced-OpenGL/Stencil-testing
-    //-> ref is the value that will be and against the mask. Mask are the values set to the stencil buffer.
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    //The glStencilMask function tells the stencil to start processing request if 0xFF is passed and vice versa if 0x0 is passed.
-    glStencilMask(0xFF);
-}
-
 void Gui_Settings::draw_outline_mesh(Renderer* renderer, bool highlight) {
-    stencil_data();
     renderer->draw(true);
     renderer->material->apply_bounds_shader(renderer->mesh.get());
     if (highlight) {
@@ -288,14 +271,15 @@ void Gui_Settings::draw_meshes() {
             //Every mesh attaches the most recent mesh to the end.
             //i->material.attach_mesh(renderers.back()->mesh);
             if (i->mesh->name == selected) {
-               
-                stencil_data();
-                i->draw(true);
+                
                 i->material->apply_bounds_shader(i->mesh.get());
-                if (highlight) {
-                    i->material->apply_highlight_shader(i->mesh.get());
-                }
                 i->material->apply_ray_cast_shader(i->mesh.get());
+                if (highlight) {
+                    i->draw_highlights(true);
+                }else {
+                    i->draw(true);
+                }
+               
             }
             else {
                 i->draw(false);

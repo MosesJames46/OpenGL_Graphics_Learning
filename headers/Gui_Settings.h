@@ -98,8 +98,6 @@ private:
 
 	/*Function utility to make selecting proper shaders easier*/
 	static void attach_shader(std::string& vertex_shader, std::string& fragment_shader, material_type material_index);
-
-	static void stencil_data();
 	static void draw_outline_mesh(Renderer* renderer, bool highlight);
 
 	/*

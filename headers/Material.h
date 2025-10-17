@@ -92,6 +92,8 @@ public:
 		spotlight_material(spotlight_mesh, render);
 	};
 
+
+
 	material_type material;
 	std::unique_ptr<Shader> shader;
 

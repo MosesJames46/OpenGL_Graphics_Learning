@@ -111,10 +111,48 @@ public:
 	*/
 
 	void draw(bool renderer_gui = false);
+	void draw_highlights(bool renderer_gui = false);
+
+	void apply_shaders(Material& material, bool render);
 
 	void redraw();
 
 	const char* get_shader_type(fragment_shader_type);
 	
 	std::vector<Texture> textures;
+private:
+	void stencil_data_for_highlighting() {
+		//glStencilOp: What actions to take if stencil test passes or fails and if depth test passes or fails.
+		//glStencilOp: sfail, dpfail, dppass -> stencil fail, stencil pass but depth fails, and both pass.
+		glEnable(GL_STENCIL_TEST);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		//glStencilFunc sets parameters that determine if the stencil test will pass.
+		//glStencilFunc: enum, ref, mask -> the enum is the requirement necessary to pass a stencil test. See https://learnopengl.com/Advanced-OpenGL/Stencil-testing
+		//-> ref is the value that will be and against the mask. Mask are the values set to the stencil buffer.
+		//The glStencilMask function tells the stencil to start processing request if 0xFF is passed and vice versa if 0x0 is passed.
+
+		//Draw after enabling writing to stencil buffer.
+	}
+
+	void disable_stencil_write() {
+		//Before we draw the object again, we need to disable the stencil buffer.
+
+		//After the draw call, use the glStnecilFunc to check if any values are not equal.
+		//Depth testing is disabled to that our newly rendered object is behind our current object.
+
+		//This tells OpenGL that whenever the stencil value of a fragment is equal (GL_NOTEQUAL) to the reference value 1, 
+		// the fragment passes the test and is drawn, otherwise discarded - LearnOpenGl. 
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00); //Bit in the stencil buffer becomes zero (disables writing).
+		glDisable(GL_DEPTH_TEST);
+	}
+
+	void enable_stencil_write_and_depth() {
+		//At this point we want to enable writing to overwrite the values that are zero.
+		glStencilMask(0xFF);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glEnable(GL_DEPTH_TEST);
+
+	}
 };

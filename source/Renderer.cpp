@@ -144,24 +144,37 @@ void Renderer::set_MVP(Shader& shader, Camera& camera) {
 */
 void Renderer::draw(bool render) {
 
-	material->shader->useProgram();
-	switch (material->material) {
+	
+	apply_shaders((*material.get()), true);
+	set_MVP(*material->shader.get(), camera);
+	glBindVertexArray(mesh->VAO);
+	glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+}
+
+void Renderer::apply_shaders(Material& material, bool render) {
+	material.shader->useProgram();
+	switch (material.material) {
 	case LIGHT:
-		material->apply_shader(dynamic_cast<Light_Mesh&>(*mesh.get()), render);
+		material.apply_shader(dynamic_cast<Light_Mesh&>(*mesh.get()), render);
 		break;
 	case COMPLEX:
-		material->apply_shader(dynamic_cast<Complex_Mesh&>(*mesh.get()), render);
+		material.apply_shader(dynamic_cast<Complex_Mesh&>(*mesh.get()), render);
 		break;
 	case SPOTLIGHT:
-		material->apply_shader(dynamic_cast<Spotlight_Mesh&>(*mesh.get()), render);
+		material.apply_shader(dynamic_cast<Spotlight_Mesh&>(*mesh.get()), render);
 		break;
 	default:
 		return;
 	}
-	
-	set_MVP(*material->shader.get(), camera);
-	glBindVertexArray(mesh->VAO);
-	glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+}
+
+void Renderer::draw_highlights(bool renderer_gui) {
+	stencil_data_for_highlighting();
+	draw(renderer_gui);
+	disable_stencil_write();
+	material->apply_highlight_shader(mesh.get());
+	//draw(false);
+	enable_stencil_write_and_depth();
 }
 
 void Renderer::redraw() {
