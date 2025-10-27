@@ -19,6 +19,6 @@ void main(){
 	"discard" is bad for every mainstream graphics acceleration technique - IMR, TBR, TBDR. This is because visibility of a fragment (and hence depth) 
 	is only determinable after fragment processing and not during Early-Z 
 	*/
-	if (texture_value.a < .1f) discard;
+	//if (texture_value.a < .1f) discard;
 	fragment_color =  texture_value;
 }
