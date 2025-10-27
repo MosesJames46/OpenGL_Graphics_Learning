@@ -168,13 +168,50 @@ void Renderer::apply_shaders(Material& material, bool render) {
 	}
 }
 
+/*
+	The highlight any object within a scene:
+	1. Esnure the stencil buffer has writing enable and set to always keep for whenever the stencil fails, depth pass. But Replace if both the stencil pass and depth pass.
+	2. Draw the object the first time.
+	3. Disable writing to the stencil buffer.
+	4. draw the same object but this time scaled up.
+	5. Tell the stencil buffer to pass values if objects that are written do not equal to the values of the original stencil.
+		- i.e. Since the object is scale from is original position,  we know anything outside of the original object's stencil value will be not equal to 1.
+	6. disable the depth buffer to ensure the object draw after is rendered behind the original object. 
+	7. enable writing to the stencil buffer.
+*/
+
 void Renderer::draw_highlights(bool renderer_gui) {
-	stencil_data_for_highlighting();
+	glEnable(GL_STENCIL_TEST); //Do not assume that stencil testing is on.
+
+	//This ensures that the stencil is always enable before proceeding with the operation.
+	//glStencilMask(0xFF);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glEnable(GL_DEPTH_TEST);	//Do not assume Depth testing is enabled.
+	//glStencilOp: What actions to take if stencil test passes or fails and if depth test passes or fails.
+	//glStencilOp: sfail, dpfail, dppass -> stencil fail, stencil pass but depth fails, and both pass.
+	
+	//By ensuring that our values get replaced when both the stencil and depth buffer pass, we write 1 where our original object would be.
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	//glClear(GL_STENCIL_BUFFER_BIT);
+	//glStencilFunc sets parameters that determine if the stencil test will pass.
+	//glStencilFunc: enum, ref, mask -> the enum is the requirement necessary to pass a stencil test. See https://learnopengl.com/Advanced-OpenGL/Stencil-testing
+	//-> ref is the value that will be and against the mask. Mask are the values set to the stencil buffer.
+	//The glStencilMask function tells the stencil to start processing request if 0xFF is passed and vice versa if 0x0 is passed.
 	draw(renderer_gui);
-	disable_stencil_write();
+	//Before we draw the object again, we need to disable the stencil buffer.
+
+	//After the draw call, use the glStnecilFunc to check if any values are not equal.
+	//Depth testing is disabled to that our newly rendered object is behind our current object.
+
+	//This tells OpenGL that whenever the stencil value of a fragment is equal (GL_NOTEQUAL) to the reference value 1,
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	//glStencilMask(0x00); //Bit in the stencil buffer becomes zero (disables writing).
+	glDisable(GL_DEPTH_TEST);
 	material->apply_highlight_shader(mesh.get());
-	//draw(false);
-	enable_stencil_write_and_depth();
+	//glStencilMask(0xFF);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_STENCIL_TEST); //Makes sense to disable after using since we can not assume that it will be used again.
 }
 
 void Renderer::redraw() {

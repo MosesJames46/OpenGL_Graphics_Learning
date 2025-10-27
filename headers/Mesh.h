@@ -205,7 +205,10 @@ private:
 	glm::vec4 ray_in_clipspace;
 	glm::vec4 ray_in_eyespace;
 	
-	
+	float last_x;
+	float last_y;
+
+	bool first_mouse = true;
 
 	shape_type shape;
 

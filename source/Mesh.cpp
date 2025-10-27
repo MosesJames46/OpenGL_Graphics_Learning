@@ -168,7 +168,14 @@ void Mesh::get_NDC() {
 	x_NDC = ((2.f * x_position) / m_viewport[2]) - 1.f;
 	y_NDC = 1.f - ((2.f * y_position) / m_viewport[3]);
 	z_NDC = 1.f;
-	ray_in_clipspace = glm::vec4{ x_NDC, y_NDC, 1.f, 1.f };
+
+	if (x_NDC < -1) x_NDC = -1;
+	if (x_NDC > 1) x_NDC = 1;
+
+	if (y_NDC < -1) y_NDC = -1;
+	if (y_NDC > 1) y_NDC = 1;
+
+	ray_in_clipspace = glm::vec4{ x_NDC, y_NDC, 0.0F, 1 };
 }
 
 /*
@@ -176,12 +183,8 @@ void Mesh::get_NDC() {
 	Convert from clip space to world space by inversing our pipeline.
 */
 void Mesh::clip_to_worldspace() {
-	ray_in_eyespace = glm::inverse(camera.projection) * ray_in_clipspace;
 	ray_in_worldspace = glm::inverse(camera.view) * glm::inverse(camera.projection) * ray_in_clipspace;
-	ray_in_worldspace += camera.camera_origin;
-	
-	//glm::vec3 scale_camera_forward = camera.camera_forward * 6.f;
-
+	ray_in_worldspace.z = camera.camera_origin.z;
 	ray_direction = camera.camera_forward;
 }
 
@@ -200,7 +203,11 @@ void Mesh::sphere_intersection_test() {
 
 bool Mesh::bounding_box_intersection_test() {
 	glm::vec3 ray_origin = camera.camera_origin;
-	ray_direction = camera.camera_forward;
+	if (camera.is_edit_mode == GLFW_CURSOR_NORMAL) {
+		ray_origin = ray_in_worldspace + camera.camera_origin;
+		ray_direction = glm::normalize((ray_origin + camera.camera_forward * 2.f) - camera.camera_origin);
+	}
+
 	glm::vec3 inverse_ray_direction{ 1 / ray_direction.x, 1 / ray_direction.y, 1 / ray_direction.z };
 
 	float minimums[3]{ bounds.min_x, bounds.min_y, bounds.min_z };
@@ -314,7 +321,8 @@ void Mesh::UI_get_cursor_position() {
 		ImGui::SeparatorText("Cursor Position");
 		ImGui::Text("Cursor Position (%g, %g)", x_position , y_position);
 		ImGui::Text("Cursor in Worldspace (%.2f, %.2f, %.2f)", ray_in_worldspace.x, ray_in_worldspace.y, ray_in_worldspace.z);
-		ImGui::Text("Cursor in View Space (%.2f, %.2f, %.2f,)", ray_in_eyespace.x, ray_in_eyespace.y, ray_in_eyespace.z);
+		//ImGui::Text("Cursor in View Space (%.2f, %.2f, %.2f,)", ray_in_eyespace.x, ray_in_eyespace.y, ray_in_eyespace.z);
+		ImGui::Text("Cursor in Clip Space (%.2f, %.2f, %.2f,)", ray_in_clipspace.x, ray_in_clipspace.y, ray_in_clipspace.z);
 		ImGui::Text("Cursor Direction (%.2f, %.2f, %.2f)", ray_direction.x, ray_direction.y, ray_direction.z);
 		
 	}

@@ -21,6 +21,7 @@ void Texture::apply_texture(const char* image_path) {
 	Image image(image_path);
 	image.load_data_through_stbi(image_path);
 	if (image.image_data) {
+		//std::cout << image.color_channels << std::endl;
 		glTexImage2D(GL_TEXTURE_2D, 0, get_color_channel(image), image.width, image.height, 0, get_color_channel(image), GL_UNSIGNED_BYTE, image.image_data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}

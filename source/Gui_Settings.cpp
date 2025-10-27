@@ -269,21 +269,17 @@ void Gui_Settings::draw_meshes() {
     if (!renderers.empty()) {
         for (auto& i : renderers) {
             //Every mesh attaches the most recent mesh to the end.
-            //i->material.attach_mesh(renderers.back()->mesh);
-            if (i->mesh->name == selected) {
-                
+            //i->material.attach_mesh(renderers.back()->mesh); 
+            if (i->mesh->bounding_box_intersection_test() || highlight) {
+                i->draw_highlights(true);
                 i->material->apply_bounds_shader(i->mesh.get());
                 i->material->apply_ray_cast_shader(i->mesh.get());
-                if (highlight) {
-                    i->draw_highlights(true);
-                }else {
-                    i->draw(true);
-                }
-               
+            }else {
+                i->draw(true);
             }
-            else {
-                i->draw(false);
-            }
+            //else {
+            //    i->draw(false);
+            //}
         }
 
         static int obj = 0;

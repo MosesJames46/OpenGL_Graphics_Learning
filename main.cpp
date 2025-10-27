@@ -15,6 +15,7 @@
 #include "../headers/Mesh_Types/Complex_Mesh.h"
 #include "../headers/Mesh_Types/Texture_Mesh.h"
 #include "../headers/Mesh_Types/Spotlight_Mesh.h"
+#include "../headers/Grass.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_button_callback(GLFWwindow* window, double x_position, double y_position);
@@ -74,9 +75,25 @@ int main() {
 	
 	Gui_Settings::attach_window(window);
 	Camera camera(window);
+	Grass grass;
+
+	float current_time = glfwGetTime();
+	float previous_time = 0.0f;
+	float elapsed_time = 0.0f;
+
+	unsigned int count = 0;
+
+	bool show_fps = false;
+	int fps_int = 0;
 
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
+		current_time = glfwGetTime();
+
+		elapsed_time = current_time - previous_time;
+		
+		//Obtain current time before drawing.
+		float time_before_draw = glfwGetTime();
 		
 		glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
@@ -94,12 +111,27 @@ int main() {
 
 		//r.draw(false);
 		//r_shiny.draw(false);
-
+		grass.draw_plane(camera);
+		if (ImGui::IsKeyPressed(ImGuiKey_F2)) ++fps_int;
+		
+		if (fps_int & 1) {
+			//Time After all draws have been done.
+			float time_after_frame = glfwGetTime();
+			ImGui::Begin("FPS BOX");
+			//We want to check frames every 1 second, elapsed_time variable esnures our code does just that.
+			if (elapsed_time >= 1 / 100.0f) { // https://gamedev.stackexchange.com/questions/133173/how-to-calculate-fps-in-glfw // obtaining fps
+				previous_time = current_time;
+				current_time = glfwGetTime();
+				ImGui::Text("FPS: %.3f", 1.0f / (time_after_frame - time_before_draw));
+			}
+			ImGui::End();
+		}
+			 
 		ImGui::ShowDemoWindow();
 
 		ImGui::EndFrame();
 		Gui_Settings::render_frame();
-				
+
 		glfwSwapBuffers(window);
 	}
 
