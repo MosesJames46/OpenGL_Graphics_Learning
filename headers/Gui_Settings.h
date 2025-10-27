@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 #include <filesystem>
-
+#include "Grass.h"
 
 
 /*
@@ -125,6 +125,10 @@ private:
 	static std::vector<std::unique_ptr<Renderer>> renderers;
 	static std::list<std::unique_ptr<Renderer>> renderer_list;
 	
+	static std::vector<std::string> grass_names;
+
+	static std::vector<std::unique_ptr<Grass>> grass_textures;
+
 	static bool complex;
 
 	static std::vector<std::string> fragment;

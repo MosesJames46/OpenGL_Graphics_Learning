@@ -49,14 +49,14 @@ void Gui_Settings::gui_test(Camera& camera) {
         For all char arrays, they must be static in order to be modified as a single entity,
         over the time of the program.
     */
-    
-    
+
+
     // List of shaders that can be used. Sucks I must do every frame.
-  
+
     /*
         Objects that must persist throughout the lifetime of the render must be made static.
     */
-   
+
 
     /*
         Determine Shader Types
@@ -66,6 +66,30 @@ void Gui_Settings::gui_test(Camera& camera) {
     static int button_clicked = 0;
     if (ImGui::Button("Add Window")) {
         ++button_clicked;
+    }
+
+    //Use the "add texture" button to add a 2D texture in the world. If the button is clicked increase click count, bit & with 1 and continue with further process.
+    static int texture_button = 0;
+    if (ImGui::Button("Add Texture")) {
+        std::unique_ptr<Grass> grass = std::make_unique<Grass>();
+        grass_textures.push_back(std::move(grass));
+        grass_names.push_back(grass_textures.back()->name);
+    };
+
+    static int grass_index = 0;
+
+    std::string grass_preview_string;
+    if (!grass_names.empty()) grass_preview_string = grass_names[grass_index];//Obtain the default grass name only if it's not empty. 
+
+    if (ImGui::BeginCombo("Grass Textures", grass_preview_string.c_str(), 0)) {
+        for (int i = 0; i < grass_names.size(); ++i) {
+            bool selected = (grass_index == i);//The selected bool is true only if the grass_index matches the current iteration index.
+            if (ImGui::Selectable(grass_names[i].c_str(), &selected)) {//Sets selectable to hovered if selected is true.
+                grass_index = i;
+            }
+            if (selected) ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
     }
 
     static bool create = false;
@@ -128,9 +152,15 @@ void Gui_Settings::gui_test(Camera& camera) {
             renderer_names.emplace_back(renderers.back()->mesh->name);
         }
     }
-    
+
     draw_meshes();
     get_world_position(camera);
+    if (!grass_textures.empty()) {
+        for (int i = 0; i < grass_textures.size(); ++i) {
+            grass_textures[i]->edit_object = (grass_names[i] == grass_preview_string);
+            grass_textures[i]->draw_plane(camera);
+        }
+    };
 
     ImGui::End();
 }
@@ -315,6 +345,10 @@ std::vector<std::string> Gui_Settings::object_files = { "Sword-Two.obj" };
 
 std::vector<std::unique_ptr<Renderer>> Gui_Settings::renderers;
 std::list<std::unique_ptr<Renderer>> Gui_Settings::renderer_list;
+
+std::vector<std::string> Gui_Settings::grass_names;
+
+std::vector<std::unique_ptr<Grass>> Gui_Settings::grass_textures;
 
 bool Gui_Settings::complex = false;
 

@@ -108,10 +108,6 @@ int main() {
 		Gui_Settings::call_new_frame();
 		Gui_Settings::gui_test(camera);
 		//Gui_Settings::gui_test_type();
-
-		//r.draw(false);
-		//r_shiny.draw(false);
-		grass.draw_plane(camera);
 		if (ImGui::IsKeyPressed(ImGuiKey_F2)) ++fps_int;
 		
 		if (fps_int & 1) {

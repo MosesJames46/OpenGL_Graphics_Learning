@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 #include "../headers/libs.h"
+#include <sstream>
+#include <string.>
 
 class Camera;
 class Shader;
@@ -26,6 +28,9 @@ public:
 
 	void draw_plane(Camera& camera);
 
+	std::string name;
+
+	bool edit_object = false;
 private:
 	glm::mat4 scale = glm::mat4(1.0f);
 	float scale_array[3] = { 1.0f, 1.0f, 1.0f };
