@@ -10,6 +10,8 @@
 #include "../headers/Shader.h"
 #include "../headers/Camera.h"
 #include "../headers/libs.h"
+#include "../headers/Grass.h"
+#include "../headers/Transparent_Window.h"
 
 struct Renderer_Data {
     std::string v;
@@ -70,23 +72,43 @@ void Gui_Settings::gui_test(Camera& camera) {
 
     //Use the "add texture" button to add a 2D texture in the world. If the button is clicked increase click count, bit & with 1 and continue with further process.
     static int texture_button = 0;
-    if (ImGui::Button("Add Texture")) {
+    if (ImGui::Button("Add Grass Texture")) {
         std::unique_ptr<Grass> grass = std::make_unique<Grass>();
         grass_textures.push_back(std::move(grass));
         grass_names.push_back(grass_textures.back()->name);
     };
 
+    //Logic to create Grass Textures
     static int grass_index = 0;
-
     std::string grass_preview_string;
     if (!grass_names.empty()) grass_preview_string = grass_names[grass_index];//Obtain the default grass name only if it's not empty. 
 
     if (ImGui::BeginCombo("Grass Textures", grass_preview_string.c_str(), 0)) {
         for (int i = 0; i < grass_names.size(); ++i) {
             bool selected = (grass_index == i);//The selected bool is true only if the grass_index matches the current iteration index.
-            if (ImGui::Selectable(grass_names[i].c_str(), &selected)) {//Sets selectable to hovered if selected is true.
+            if (ImGui::Selectable(grass_names[i].c_str(), &selected)) {//Takes grass_names at index i and selected boolean and updates grass index.
                 grass_index = i;
             }
+            if (selected) ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    //Logic to create Window Textures
+    if (ImGui::Button("Create Window Textures")) {
+        std::unique_ptr<Transparent_Window> tw = std::make_unique<Transparent_Window>();
+        window_textures.push_back(std::move(tw));
+        window_texture_names.push_back(window_textures.back()->name);
+    }
+
+    std::string window_texture_preview_name;
+    static int window_texture_index = 0;
+    if (!window_textures.empty()) window_texture_preview_name = window_texture_names[window_texture_index];
+
+    if (ImGui::BeginCombo("Window Textures", window_texture_preview_name.c_str())) {
+        for (int i = 0; i < window_textures.size(); ++i) {
+            bool selected = (window_texture_index == i);
+            if (ImGui::Selectable(window_texture_names[i].c_str(), &selected)) window_texture_index = i;
             if (selected) ImGui::SetItemDefaultFocus();
         }
         ImGui::EndCombo();
@@ -161,6 +183,13 @@ void Gui_Settings::gui_test(Camera& camera) {
             grass_textures[i]->draw_plane(camera);
         }
     };
+
+    if (!window_textures.empty()) {
+        for (int i = 0; i < window_textures.size(); ++i) {;
+            window_textures[i]->edit_object = (window_texture_index == i);
+            window_textures[i]->draw_transparent_window(camera);
+        }
+    }
 
     ImGui::End();
 }
@@ -347,8 +376,10 @@ std::vector<std::unique_ptr<Renderer>> Gui_Settings::renderers;
 std::list<std::unique_ptr<Renderer>> Gui_Settings::renderer_list;
 
 std::vector<std::string> Gui_Settings::grass_names;
-
 std::vector<std::unique_ptr<Grass>> Gui_Settings::grass_textures;
+
+std::vector<std::unique_ptr<Transparent_Window>> Gui_Settings::window_textures;
+std::vector<std::string> Gui_Settings::window_texture_names;
 
 bool Gui_Settings::complex = false;
 

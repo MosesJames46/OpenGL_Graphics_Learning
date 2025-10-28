@@ -38,6 +38,7 @@
     <ClInclude Include="headers\Image.h" />
     <ClInclude Include="headers\Sphere.h" />
     <ClInclude Include="headers\Mesh_Types\Spotlight_Mesh.h" />
+    <ClInclude Include="headers\Transparent_Window.h" />
     <ClInclude Include="imgui\backends\imgui_impl_glfw.h" />
     <ClInclude Include="imgui\backends\imgui_impl_opengl3.h" />
     <ClInclude Include="imgui\backends\imgui_impl_win32.h" />
@@ -78,6 +79,7 @@
     <ClCompile Include="source\Mesh_Types\Spotlight_Mesh.cpp" />
     <ClCompile Include="source\stb_image.cpp" />
     <ClCompile Include="source\Texture.cpp" />
+    <ClCompile Include="source\Transparent_Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\grass_fs.glsl" />

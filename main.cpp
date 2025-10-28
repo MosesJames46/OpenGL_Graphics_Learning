@@ -16,6 +16,7 @@
 #include "../headers/Mesh_Types/Texture_Mesh.h"
 #include "../headers/Mesh_Types/Spotlight_Mesh.h"
 #include "../headers/Grass.h"
+#include "../headers/Transparent_Window.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_button_callback(GLFWwindow* window, double x_position, double y_position);
@@ -85,6 +86,8 @@ int main() {
 
 	bool show_fps = false;
 	int fps_int = 0;
+
+	Transparent_Window transparent_window;
 
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);

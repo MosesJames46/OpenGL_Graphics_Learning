@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 #include <filesystem>
-#include "Grass.h"
 
 
 /*
@@ -49,6 +48,9 @@ class Material;
 class Renderer;
 
 class Spotlight;
+
+class Grass;
+class Transparent_Window;
 
 class GLFWwindow;
 
@@ -126,8 +128,10 @@ private:
 	static std::list<std::unique_ptr<Renderer>> renderer_list;
 	
 	static std::vector<std::string> grass_names;
-
 	static std::vector<std::unique_ptr<Grass>> grass_textures;
+
+	static std::vector<std::unique_ptr<Transparent_Window>> window_textures;
+	static std::vector<std::string> window_texture_names;
 
 	static bool complex;
 

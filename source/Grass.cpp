@@ -141,4 +141,6 @@ void Grass::draw_plane(Camera& camera) {
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, index_data.size(), GL_UNSIGNED_INT, 0);
+
+	glDisable(GL_BLEND);
 }
