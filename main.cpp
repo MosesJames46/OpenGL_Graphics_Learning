@@ -15,8 +15,10 @@
 #include "../headers/Mesh_Types/Complex_Mesh.h"
 #include "../headers/Mesh_Types/Texture_Mesh.h"
 #include "../headers/Mesh_Types/Spotlight_Mesh.h"
-#include "../headers/Grass.h"
-#include "../headers/Transparent_Window.h"
+#include "../headers/Cube.h"
+#include "../headers/Cube_Highlight.h"
+#include "../headers/Cube_Cull.h"
+#include "../headers/Cubemap.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_button_callback(GLFWwindow* window, double x_position, double y_position);
@@ -76,7 +78,6 @@ int main() {
 	
 	Gui_Settings::attach_window(window);
 	Camera camera(window);
-	Grass grass;
 
 	float current_time = glfwGetTime();
 	float previous_time = 0.0f;
@@ -87,7 +88,10 @@ int main() {
 	bool show_fps = false;
 	int fps_int = 0;
 
-	Transparent_Window transparent_window;
+	Cube cube;
+	Cube_Highlight cube_highlight;
+	Cube_Cull cube_cull;
+	Cubemap cubemap;
 
 	while (!glfwWindowShouldClose(window)) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -121,13 +125,17 @@ int main() {
 			if (elapsed_time >= 1 / 100.0f) { // https://gamedev.stackexchange.com/questions/133173/how-to-calculate-fps-in-glfw // obtaining fps
 				previous_time = current_time;
 				current_time = glfwGetTime();
-				ImGui::Text("FPS: %.3f", 1.0f / (time_after_frame - time_before_draw));
+				ImGui::Text("FPS: %.2f", 1.0f / (time_after_frame - time_before_draw));
 			}
 			ImGui::End();
 		}
 			 
 		ImGui::ShowDemoWindow();
-
+		//cube.draw_cube(camera);
+		//cube_highlight.draw_cube(camera);
+		
+		cubemap.draw_skybox(camera);
+		cube_cull.draw_cube(camera);
 		ImGui::EndFrame();
 		Gui_Settings::render_frame();
 

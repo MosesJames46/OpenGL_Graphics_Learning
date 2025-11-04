@@ -9,6 +9,19 @@
 class Camera;
 class Shader;
 
+/*
+	The Blend Operation for translucent textures is as follows:
+	1. Create texture.
+	2. Enable blending 
+	3. Choose proper blend function. 
+	4. Choose desired glBlendEquation
+	5. Render
+
+	This lesson needs further fixing since textures need to first be sorted or weighted using the OIT algorithims.
+	
+	Generally we draw all opaque objects first. Proceed to sorting the transparent objects based on distance. Then draw transparent objects.
+*/
+
 class Transparent_Window {
 public:
 	Transparent_Window();

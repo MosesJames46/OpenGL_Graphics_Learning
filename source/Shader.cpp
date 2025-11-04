@@ -100,22 +100,42 @@ void Shader::useProgram() {
 }
 
 void Shader::set_uniform_location(const char* uniform_location_name, int value) {
+	int uniform_value = glGetUniformLocation(programShaderID, uniform_location_name);
+	if (uniform_value < 0) {
+		std::cout << uniform_location_name << " was not initialized properly\n";
+	}
 	glUniform1i(glGetUniformLocation(programShaderID, uniform_location_name), value);
 }
 
 void Shader::set_uniform_location(const char* uniform_location_name, float value) {
+	int uniform_value = glGetUniformLocation(programShaderID, uniform_location_name);
+	if (uniform_value < 0) {
+		std::cout << uniform_location_name << " was not initialized properly\n";
+	}
 	glUniform1f(glGetUniformLocation(programShaderID, uniform_location_name), value);
 }
 
 void Shader::set_uniform_location(const char* uniform_location_name, bool value) {
+	int uniform_value = glGetUniformLocation(programShaderID, uniform_location_name);
+	if (uniform_value < 0) {
+		std::cout << uniform_location_name << " was not initialized properly\n";
+	}
 	glUniform1i(glGetUniformLocation(programShaderID, uniform_location_name), (int)value);
 }
 
 void Shader::set_uniform_location(const char* uniform_location_name, glm::mat4& matrix) {
+	int uniform_value = glGetUniformLocation(programShaderID, uniform_location_name);
+	if (uniform_value < 0) {
+		std::cout << uniform_location_name << " was not initialized properly\n";
+	}
 	glUniformMatrix4fv(glGetUniformLocation(programShaderID, uniform_location_name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void Shader::set_uniform_location(const char* uniform_location_name, glm::vec3& vector) {
+	int uniform_value = glGetUniformLocation(programShaderID, uniform_location_name);
+	if (uniform_value < 0) {
+		std::cout << uniform_location_name << " was not initialized properly\n";
+	}
 	glUniform3fv(glGetUniformLocation(programShaderID, uniform_location_name), 1, glm::value_ptr(vector));
 }
 

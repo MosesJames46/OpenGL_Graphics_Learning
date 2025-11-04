@@ -139,9 +139,6 @@ void Transparent_Window::draw_transparent_window(Camera& camera) {
 
 	glEnable(GL_BLEND);
 
-	
-
-
 	glBlendFunc(opengl_blend_options[source_index], opengl_blend_options[destination_index]);
 
 	glBindTexture(GL_TEXTURE_2D, texture);
