@@ -84,4 +84,6 @@ private:
 	int front_index = 0;
 	std::vector<std::string> rotation_option_string{ "GL_CW", "GL_CCW" };
 	std::vector<GLenum> rotation_options{ GL_CW, GL_CCW };
+
+	bool has_normals = false;
 };

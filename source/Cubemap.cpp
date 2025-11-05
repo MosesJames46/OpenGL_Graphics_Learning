@@ -58,14 +58,19 @@ void Cubemap::draw_skybox(Camera& camera) {
 
 	skybox.set_uniform_location("skybox", 0);
 
+	//This is an optimization that happens during early depth testing. This works because we set out z value for the cubemap to be our w. gl_Position = pos.xyww
+	//This allows for early depth testing. However, in order to properly test, we must set the Depth function to be Less than or equal to or else we get z fighting.
 	glDepthFunc(GL_LEQUAL);
-
+	//By disabling the DepthMask we always ensure we write to the furthest option in the background.
 	glDepthMask(GL_FALSE);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
+	//Change to default optionis
 	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
 	camera.view = view;
+	
 }

@@ -11,6 +11,9 @@ public:
 	Cubemap();
 
 	void draw_skybox(Camera& camera);
+	unsigned int get_cubemap() {
+		return texture;
+	}
 
 private:
 	unsigned int VAO, VBO, EBO;

@@ -132,10 +132,12 @@ int main() {
 			 
 		ImGui::ShowDemoWindow();
 		//cube.draw_cube(camera);
-		//cube_highlight.draw_cube(camera);
-		
+		cube_highlight.draw_cube(camera, cubemap.get_cubemap());
+		//cube_cull.draw_cube(camera);
 		cubemap.draw_skybox(camera);
-		cube_cull.draw_cube(camera);
+		
+		
+		
 		ImGui::EndFrame();
 		Gui_Settings::render_frame();
 

@@ -23,9 +23,9 @@ void Cube_Cull::draw_cube(Camera& camera) {
 		ImGui::DragFloat3("##Rotation", rotation_values, slider_speed, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
 
 		glm::mat4 model = glm::mat4(1.0f);
-		rotation = glm::rotate(model, rotation_values[0], glm::vec3(1, 0, 0));
-		rotation = glm::rotate(rotation, rotation_values[1], glm::vec3(0, 1, 0));
-		rotation = glm::rotate(rotation, rotation_values[2], glm::vec3(0, 0, 1));
+		rotation = glm::rotate(model, glm::radians(rotation_values[0]), glm::vec3(1, 0, 0));
+		rotation = glm::rotate(rotation, glm::radians(rotation_values[1]), glm::vec3(0, 1, 0));
+		rotation = glm::rotate(rotation, glm::radians(rotation_values[2]), glm::vec3(0, 0, 1));
 
 		ImGui::SeparatorText("Translation");
 		ImGui::PushItemWidth(100);
@@ -70,6 +70,8 @@ void Cube_Cull::draw_cube(Camera& camera) {
 	cube_cull.set_uniform_location("model", camera.model);
 	cube_cull.set_uniform_location("view", camera.view);
 	cube_cull.set_uniform_location("projection", camera.projection);
+
+	cube_cull.set_uniform_location("has_normals", has_normals);
 
 	glEnable(GL_CULL_FACE);
 	glFrontFace(rotation_options[front_index]);
